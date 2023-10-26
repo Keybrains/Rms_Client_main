@@ -55,6 +55,7 @@ import VendorWorkDetail from "views/source/VendorWorkDetail";
 import StaffWorkDetails from "views/source/StaffWorkDetails";
 import VendorAddWork from "views/source/VendorAddWork";
 import ApplicantSummary from "views/source/ApplicantSummary";
+import TenantPropertyDetail from "views/source/TenantPropertyDetail";
 
 var routes = [
   {
@@ -522,6 +523,25 @@ var routes = [
         icon: "ni ni-home-3 text-orange",
         component: <Leaseing />,
         layout: "/admin",    
+      },
+      {
+        path: "/PropDetails/:id/:entryIndex",
+        name:"Prop Details",
+        component: <PropDetails />,
+        layout: "/admin",    
+      },
+
+      {
+        path: "/tenantdetail/:tenantId/:entryIndex",
+        name: "Tenant Detail",
+        component: <TenantDetailPage />,
+        layout: "/admin",
+      },
+      {
+        path: "/tenantpropertydetail/:rental_adress",
+        name: "Tenant Property Detail",
+        component: <TenantPropertyDetail />,
+        layout: "/tenant",
       },
  
 ];

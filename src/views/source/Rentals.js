@@ -657,7 +657,7 @@ const Rentals = () => {
       property_type: selectedProp,
       rental_adress: values.rental_adress,
       rental_city: values.rental_city,
-      rental_country: values.rental_adress,
+      rental_country: values.rental_country,
       rental_postcode: values.rental_postcode,
 
       rentalOwner_operatingAccount: values.rentalOwner_operatingAccount,
@@ -793,7 +793,7 @@ const Rentals = () => {
               property_type: selectedProp,
               rental_adress: rentalsFormik.values.rental_adress,
               rental_city: rentalsFormik.values.rental_city,
-              rental_country: rentalsFormik.values.rental_adress,
+              rental_country: rentalsFormik.values.rental_country,
               rental_postcode: rentalsFormik.values.rental_postcode,
 
               rentalOwner_operatingAccount: rentalsFormik.values.rentalOwner_operatingAccount,
@@ -830,14 +830,14 @@ const Rentals = () => {
             };
 
             console.log(leaseObject, "updated values");
-           const res = await axios.put(editUrl, leaseObject).then((response) => {
-            console.log(response, "response");
+           await axios.put(editUrl, leaseObject).then((response) => {
+             console.log(response, "response1111");
+             handleResponse(response);
              
             }).catch((error) => {
               console.error("Error:", error);
               
             });
-            handleResponse(res);
   }
   function handleResponse(response) {
     console.log(response, "response");

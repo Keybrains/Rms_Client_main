@@ -21,6 +21,7 @@ const TenantProfile = () => {
   const { id } = useParams();
   console.log(id);
   const [tenantDetails, setTenantDetails] = useState({});
+  const [tenantDetails1, setTenantDetails1] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -28,6 +29,7 @@ const TenantProfile = () => {
   // let rentalId = localStorage.getItem("ID")
   let cookies = new Cookies();
   let cookie_id = cookies.get("Tenant ID");
+  let cookie_email = cookies.get("Tenant email");
 
   //   let cookies = new Cookies();
   // Check Authe(token)
@@ -61,7 +63,7 @@ const TenantProfile = () => {
   const getTenantData = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`
+        `http://64.225.8.160:4000/tenant/tenant/${cookie_id}/entries`
       );
       console.log(response.data.data);
       setTenantDetails(response.data.data);
@@ -75,9 +77,39 @@ const TenantProfile = () => {
 
   useEffect(() => {
     getTenantData();
-    console.log(id);
+    console.log(
+      `http://64.225.8.160:4000/tenant/tenant/${cookie_id}/entries`
+    );
   }, [id]);
 
+  const getTenantData1 = async () => {
+    try {
+      const response = await axios.get(
+        `http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`
+      );
+      setTenantDetails1([response.data.data]);
+      console.log(response.data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching tenant details:", error);
+      setError(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getTenantData1();
+    console.log(`http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`);
+  }, [id]);
+
+  function formatDateWithoutTime(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${month}-${day}-${year}`;
+  }
   return (
     <>
       <TenantsHeader />
@@ -95,17 +127,9 @@ const TenantProfile = () => {
                   responsive
                   style={{ width: "100%" }}
                 >
-                  {loading ? (
-                    <tr>
-                      <td>Loading tenant details...</td>
-                    </tr>
-                  ) : error ? (
-                    <tr>
-                      <td>Error: {error.message}</td>
-                    </tr>
-                  ) : tenantDetails._id ? (
-                    <>
-                      <tbody>
+                  {Array.isArray(tenantDetails1) ? (
+                    tenantDetails1.map((tenantDetails) => (
+                      <tbody key={tenantDetails.id}>
                         <tr>
                           <th
                             colSpan="2"
@@ -115,192 +139,106 @@ const TenantProfile = () => {
                             Personal Details
                           </th>
                         </tr>
-                        {/* <tr>
-                                                    <td class="font-weight-bold text-md">ID:</td>
-                                                    <td>{tenantDetails._id}</td>
-                                                </tr> */}
                         <tr>
-                          <td class="font-weight-bold text-md">First Name:</td>
-                          <td>{tenantDetails.tenant_firstName}</td>
+                          <td className="font-weight-bold text-md">
+                            First Name:
+                          </td>
+                          <td>{tenantDetails.tenant_firstName || "N/A"}</td>
                         </tr>
                         <tr>
-                          <td class="font-weight-bold text-md">Last Name:</td>
-                          <td>{tenantDetails.tenant_lastName}</td>
+                          <td className="font-weight-bold text-md">
+                            Last Name:
+                          </td>
+                          <td>{tenantDetails.tenant_lastName || "N/A"}</td>
                         </tr>
                         <tr>
-                          <td class="font-weight-bold text-md">Phone:</td>
-                          <td>{tenantDetails.tenant_mobileNumber}</td>
+                          <td className="font-weight-bold text-md">Phone:</td>
+                          <td>{tenantDetails.tenant_mobileNumber || "N/A"}</td>
                         </tr>
                         <tr>
-                          <td class="font-weight-bold text-md">Email:</td>
-                          <td>{tenantDetails.tenant_email}</td>
+                          <td className="font-weight-bold text-md">Email:</td>
+                          <td>{tenantDetails.tenant_email || "N/A"}</td>
                         </tr>
                       </tbody>
-
-                      <tbody>
-                        <tr>
-                          <th
-                            colSpan="2"
-                            className="text-lg"
-                            style={{ color: "#3B2F2F" }}
-                          >
-                            Lease Details
-                          </th>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold text-md">
-                            Property Type:
-                          </td>
-                          <td>{tenantDetails.rental_adress}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold text-md">Lease Type:</td>
-                          <td>{tenantDetails.lease_type}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold text-md">Start Date:</td>
-                          <td>{tenantDetails.start_date}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold text-md">End Date:</td>
-                          <td>{tenantDetails.end_date}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold text-md">Rent Cycle:</td>
-                          <td>{tenantDetails.rent_cycle}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold text-md">Rent Amount:</td>
-                          <td>{tenantDetails.amount}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold text-md">Account:</td>
-                          <td>{tenantDetails.account}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold text-md">
-                            Next Due Date:
-                          </td>
-                          <td>{tenantDetails.nextDue_date}</td>
-                        </tr>
-                        {/* <tr>
-                                                    <td class="font-weight-bold text-md">Memo:</td>
-                                                    <td>{tenantDetails.memo}</td>
-                                                </tr> */}
-                      </tbody>
-
-                      {/* <tbody>
-                                                <tr>
-                                                    <th colSpan="2" className="text-lg" style={{color:'#3B2F2F'}}>Co-signer Details</th>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">First Name:</td>
-                                                    <td>{tenantDetails.cosigner_firstName}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Last Name:</td>
-                                                    <td>{tenantDetails.cosigner_lastName}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Mobile Number:</td>
-                                                    <td>{tenantDetails.cosigner_mobileNumber}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Work Number:</td>
-                                                    <td>{tenantDetails.cosigner_workNumber}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Home Number:</td>
-                                                    <td>{tenantDetails.cosigner_homeNumber}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Fax Number:</td>
-                                                    <td>{tenantDetails.cosigner_faxPhoneNumber}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Email:</td>
-                                                    <td>{tenantDetails.cosigner_email}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Alternate Email:</td>
-                                                    <td>{tenantDetails.cosigner_alternateemail}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Street Address:</td>
-                                                    <td>{tenantDetails.cosigner_streetAdress}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">City:</td>
-                                                    <td>{tenantDetails.cosigner_city}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">State:</td>
-                                                    <td>{tenantDetails.cosigner_state}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Country:</td>
-                                                    <td>{tenantDetails.cosigner_country}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Postal Code:</td>
-                                                    <td>{tenantDetails.cosigner_postalcode}</td>
-                                                </tr>
-                                            </tbody> */}
-
-                      {/* <tbody>
-                                                <tr>
-                                                    <th colSpan="2" className="text-lg" style={{color:'#3B2F2F'}}>Recurring Payment Details</th>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Amount:</td>
-                                                    <td>{tenantDetails.recuring_amount}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Account:</td>
-                                                    <td>{tenantDetails.recuring_account}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Next Due Date:</td>
-                                                    <td>{tenantDetails.recuringnextDue_date}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Memo:</td>
-                                                    <td>{tenantDetails.recuringmemo}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Frequency:</td>
-                                                    <td>{tenantDetails.recuringfrequency}</td>
-                                                </tr>
-                                            </tbody> */}
-
-                      {/* <tbody>
-                                                <tr>
-                                                    <th colSpan="2" className="text-lg" style={{color:'#3B2F2F'}}>One-time Payment Details</th>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Amount:</td>
-                                                    <td>{tenantDetails.onetime_amount}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Account:</td>
-                                                    <td>{tenantDetails.onetime_account}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Due Date:</td>
-                                                    <td>{tenantDetails.onetime_Due_date}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-weight-bold text-md">Memo:</td>
-                                                    <td>{tenantDetails.onetime_memo}</td>
-                                                </tr>
-                                            </tbody> */}
-                    </>
+                    ))
                   ) : (
-                    <tbody>
-                      <tr>
-                        <td>No tenant details found.</td>
-                      </tr>
-                    </tbody>
+                    <p>No tenant details available.</p>
+                  )}
+
+                  {Array.isArray(tenantDetails) ? (
+                    tenantDetails.map((tenantDetails) => (
+                      <>
+                        <tbody>
+                          <tr>
+                            <th
+                              colSpan="2"
+                              className="text-lg"
+                              style={{ color: "#3B2F2F" }}
+                            >
+                              Lease Details
+                            </th>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">
+                              Property Type:
+                            </td>
+                            <td>{tenantDetails.entries.rental_adress || "N/A"}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">
+                              Lease Type:
+                            </td>
+                            <td>{tenantDetails.entries.lease_type || "N/A"}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">
+                              Start Date:
+                            </td>
+                            <td>
+                              {formatDateWithoutTime(
+                                tenantDetails.entries.start_date
+                              ) || "N/A"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">End Date:</td>
+                            <td>
+                              {formatDateWithoutTime(tenantDetails.entries.end_date) ||
+                                "N/A"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">
+                              Rent Cycle:
+                            </td>
+                            <td>{tenantDetails.entries.rent_cycle || "N/A"}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">
+                              Rent Amount:
+                            </td>
+                            <td>{tenantDetails.entries.amount || "N/A"}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">Account:</td>
+                            <td>{tenantDetails.entries.account || "N/A"}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">
+                              Next Due Date:
+                            </td>
+                            <td>{formatDateWithoutTime(tenantDetails.entries.nextDue_date) ||
+                                "N/A"}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold text-md">Uploaded Files:</td>
+                            <td>{tenantDetails.entries.upload_file || "N/A"}</td>
+                          </tr>
+                        </tbody>
+                      </>
+                    ))
+                  ) : (
+                    <p>No property details available</p>
                   )}
                 </Table>
               </div>

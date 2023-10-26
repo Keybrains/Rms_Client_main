@@ -31,19 +31,25 @@ const style = {
   p: 4,
 };
 const PropDetails = () => {
-  const { id } = useParams();
+  const { id, entryIndex } = useParams();
   console.log(id);
   const [propertyDetails, setpropertyDetails] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   let navigate = useNavigate();
-
+  const [matchedProperty, setMatchedProperty] = useState({});
   const getRentalsData = async () => {
     try {
       const response = await axios.get(
         `http://64.225.8.160:4000/rentals/rentals_summary/${id}`
       );
       setpropertyDetails(response.data.data);
+      console.log(response.data.data,'response frirn simmary')
+      const matchedProperty = response.data.data.entries.find(
+        (property) => property.entryIndex === entryIndex
+      )
+      setMatchedProperty(matchedProperty)
+      console.log(matchedProperty,`matched property`)
       setLoading(false);
     } catch (error) {
       console.error("Error fetching tenant details:", error);
@@ -176,8 +182,8 @@ const PropDetails = () => {
                                 flexWrap: "wrap",
                               }}
                             >
-                              {propertyDetails.propertyres_image &&
-                                propertyDetails.propertyres_image.length >
+                              {matchedProperty.propertyres_image &&
+                                matchedProperty.propertyres_image.length >
                                   0 && (
                                   <div
                                     style={{
@@ -185,7 +191,7 @@ const PropDetails = () => {
                                     }}
                                   >
                                     Residential:
-                                    {propertyDetails.propertyres_image.map(
+                                    {matchedProperty.propertyres_image.map(
                                       (propertyres_image, index) => (
                                         <img
                                           key={index}
@@ -244,15 +250,15 @@ const PropDetails = () => {
                                     <OpenImageDialog open={open} setOpen={setOpen} selectedImage={selectedImage} />
                                   </div>
                                 )}
-                              {propertyDetails.property_image &&
-                                propertyDetails.property_image.length > 0 && (
+                              {matchedProperty.property_image &&
+                                matchedProperty.property_image.length > 0 && (
                                   <div
                                     style={{
                                       width: "100%", // Expands to full width by default
                                     }}
                                   >
                                     Commercial:
-                                    {propertyDetails.property_image.map(
+                                    {matchedProperty.property_image.map(
                                       (property_image, index) => (
                                         <img
                                           key={index}
@@ -281,23 +287,23 @@ const PropDetails = () => {
                           <td className="font-weight-bold text-md">
                             Property Type
                           </td>
-                          <td>{propertyDetails.property_type || "N/A"}</td>
+                          <td>{matchedProperty.property_type || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">Address</td>
-                          <td>{propertyDetails.rental_adress || "N/A"}</td>
+                          <td>{matchedProperty.rental_adress || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">City</td>
-                          <td>{propertyDetails.rental_city || "N/A"}</td>
+                          <td>{matchedProperty.rental_city || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">Country</td>
-                          <td>{propertyDetails.rental_country || "N/A"}</td>
+                          <td>{matchedProperty.rental_country || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">Postcode</td>
-                          <td>{propertyDetails.rental_postcode || "N/A"}</td>
+                          <td>{matchedProperty.rental_postcode || "N/A"}</td>
                         </tr>
                       </tbody>
 
@@ -400,7 +406,7 @@ const PropDetails = () => {
                           <td className="font-weight-bold text-md">
                             Staff Member
                           </td>
-                          <td>{propertyDetails.staffMember || "N/A"}</td>
+                          <td>{matchedProperty.staffMember || "N/A"}</td>
                         </tr>
                       </tbody>
 
@@ -413,8 +419,8 @@ const PropDetails = () => {
                         <tr>
                           <td className="font-weight-bold text-md">Unit</td>
                           <td>
-                            {propertyDetails.rental_units ||
-                              propertyDetails.rentalcom_units ||
+                            {matchedProperty.rental_units ||
+                              matchedProperty.rentalcom_units ||
                               "N/A"}
                           </td>
                         </tr>
@@ -423,24 +429,24 @@ const PropDetails = () => {
                             Unit Address
                           </td>
                           <td>
-                            {propertyDetails.rental_unitsAdress ||
-                              propertyDetails.rentalcom_unitsAdress ||
+                            {matchedProperty.rental_unitsAdress ||
+                              matchedProperty.rentalcom_unitsAdress ||
                               "N/A"}
                           </td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">Bed</td>
-                          <td>{propertyDetails.rental_bed || "N/A"}</td>
+                          <td>{matchedProperty.rental_bed || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">Bath</td>
-                          <td>{propertyDetails.rental_bath || "N/A"}</td>
+                          <td>{matchedProperty.rental_bath || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">SQFT</td>
                           <td>
-                            {propertyDetails.rental_soft ||
-                              propertyDetails.rentalcom_soft ||
+                            {matchedProperty.rental_soft ||
+                              matchedProperty.rentalcom_soft ||
                               "N/A"}
                           </td>
                         </tr>

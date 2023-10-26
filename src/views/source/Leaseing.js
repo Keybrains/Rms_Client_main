@@ -61,7 +61,7 @@ const Leaseing = () => {
   console.log(id, entryIndex, "entryIndex");
   const [tenantData, setTenantData] = useState([]);
   const [selectedTenantData, setSelectedTenantData] = useState([]);
-  const [checkedCheckbox, setCheckedCheckbox] = useState();
+  const [checkedCheckbox, setCheckedCheckbox] = useState(null);
 
   const [cosignerData, setCosignerData] = useState([]);
   const [recurringData, setRecurringData] = useState([]);
@@ -1083,17 +1083,17 @@ const Leaseing = () => {
           const tenantId = filteredData._id;
           console.log(tenantId, "tenantId");
           console.log(putObject, "putObject");
-          axios
-            .put(
+          const res = await axios.put(
               `http://64.225.8.160:4000/tenant/tenant/${tenantId}`,
               putObject
             )
-            .then((res) => {
-              console.log(res, "res");
-            })
-            .catch((err) => {
-              console.log(err, "err");
-            });
+            if (res.data.statusCode === 200) {
+              swal("", res.data.message, "success");
+              navigate("/admin/TenantsTable");
+            } else {
+              swal("", res.data.message, "error");
+            }
+            handleResponse(res);
         } else {
           if (id === undefined) {
             console.log(leaseObject, "leaseObject");
@@ -1128,7 +1128,7 @@ const Leaseing = () => {
     } else {
       console.error("file is not an array");
 
-      console.log(values, "values");
+      console.log(values, "values");    
     }
     console.log(values, "values to check");
     try {
@@ -1141,7 +1141,7 @@ const Leaseing = () => {
   };
 
   const editLease = async (id) => {
-    const editUrl = `http://64.225.8.160:4000/tenant/tenant/${id}/entry/${entryIndex}`;
+    const editUrl = `http://64.225.8.160:4000/tenant/tenants/${id}/entry/${entryIndex}`;
     const entriesArray = [];
 
     const entriesObject = {
@@ -1207,6 +1207,7 @@ const Leaseing = () => {
     entriesArray.push(entriesObject);
 
     const leaseObject = {
+      
       tenant_firstName: leaseFormik.values.tenant_firstName,
       tenant_lastName: leaseFormik.values.tenant_lastName,
       tenant_mobileNumber: leaseFormik.values.tenant_mobileNumber,
@@ -1227,19 +1228,21 @@ const Leaseing = () => {
       relationship_tenants: leaseFormik.values.relationship_tenants,
       email: leaseFormik.values.email,
       emergency_PhoneNumber: leaseFormik.values.emergency_PhoneNumber,
+      entries: entriesArray,
     };
 
     console.log(leaseObject, "updated values");
-    const res = await axios
+    await axios
       .put(editUrl, leaseObject)
       .then((response) => {
-        console.log(response, "response");
+        console.log(response, "response1111");
+        handleResponse(response);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
-    handleResponse(res);
   };
+
   function handleResponse(response) {
     if (response.status === 200) {
       navigate("/admin/TenantsTable");
@@ -3739,6 +3742,8 @@ const Leaseing = () => {
                                     setToggleApiCall={setToggleApiCall}
                                     toggleApiCall={toggleApiCall}
                                     hadleselectedAccount={hadleselectedAccount}
+                                    hadleselectedOneTimeAccount={hadleselectedOneTimeAccount}
+                                    hadleselectedRecuringAccount={hadleselectedRecuringAccount}
                                   />
                                 </FormGroup>
                               </FormGroup>

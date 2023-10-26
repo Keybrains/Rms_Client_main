@@ -125,13 +125,14 @@ function AccountDialog(props) {
       try {
         // values["property_type"] = localStorage.getItem("propertyType");
         const res = await axios.post(
-          "http://64.225.8.160:4000/recurringAcc/addaccount",
+          "http://64.225.8.160:4000/recurringAcc/addRecuringAcc",
           values
         );
         if (res.data.statusCode === 200) {
           swal("", res.data.message, "success");
           navigate("/admin/Leaseing");
           props.setToggleApiCall(!props.toggleApiCall);
+          props.hadleselectedRecuringAccount(values.account_name)
           accountFormik.setValues({
             account_name: "",
             account_type: "",
@@ -152,13 +153,14 @@ function AccountDialog(props) {
       try {
         // values["property_type"] = localStorage.getItem("propertyType");
         const res = await axios.post(
-          "http://64.225.8.160:4000/onetimecharge/addaccount",
+          "http://64.225.8.160:4000/onetimecharge/addOneTimeAcc",
           values
         );
         if (res.data.statusCode === 200) {
           swal("", res.data.message, "success");
           navigate("/admin/Leaseing");
           props.setToggleApiCall(!props.toggleApiCall);
+          props.hadleselectedOneTimeAccount(values.account_name)
           accountFormik.setValues({
             account_name: "",
             account_type: "",

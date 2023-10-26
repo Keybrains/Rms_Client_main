@@ -92,6 +92,7 @@ const TenantsTable = ({ tenantDetails }) => {
           .then((response) => {
             if (response.data.statusCode === 200) {
               swal("Success!", "Tenant deleted successfully!", "success");
+              getTenantsDate();
               // Optionally, you can refresh your tenant data here.
             } else {
               swal("", response.data.message, "error");
@@ -110,20 +111,20 @@ const TenantsTable = ({ tenantDetails }) => {
     // Fetch initial data
     getTenantsDate();
   }, []);
-  const filterTenantsBySearch = () => {
-    if (!searchQuery) {
-      return tentalsData;
-    }
 
-    return tentalsData.filter((tenant) => {
-      return (
-        `${tenant.tenant_firstName} ${tenant.tenant_lastName}`
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        tenant.tenant_email.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    });
-  };
+ const filterTenantsBySearch = () => {
+  if (searchQuery === undefined) {
+    return tentalsData;
+  }
+
+  return tentalsData.filter((tenant) => {
+    return tenant.entries.some((entry) =>
+      entry.rental_adress.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
+};
+
+  
 
   const editLeasing = (id,entryIndex) => {
     navigate(`/admin/Leaseing/${id}/${entryIndex}`);
@@ -137,17 +138,16 @@ const TenantsTable = ({ tenantDetails }) => {
     const day = String(date.getDate()).padStart(2, "0");
     return `${month}-${day}-${year}`;
   }
-  const generatePDF = async (tenantId, tenantDetails) => {
+  const generatePDF = async (tenantId, tenantDetails, entryIndex) => {
     try {
       let tenantData = tenantDetails;
       if (!tenantData || !tenantData._id) {
         const response = await axios.get(
-          `http://64.225.8.160:4000/tenant/tenant_summary/${tenantId}`
+          `http://64.225.8.160:4000/tenant/tenant_summary/${tenantId}/entry/${entryIndex}`
         );
         tenantData = response.data.data;
         console.log(tenantData, "tenantData");
       }
-
       const doc = new jsPDF();
       doc.text(`Lease Details`, 10, 10);
 
@@ -166,46 +166,48 @@ const TenantsTable = ({ tenantDetails }) => {
         ["Relationship With Tenants", tenantData.relationship_tenants],
         ["Emergency Email", tenantData.email],
         ["Emergench PhoneNumber", tenantData.emergency_PhoneNumber],
-        ["Property Type", tenantData.rental_adress],
-        ["Lease Type", tenantData.lease_type],
-        ["Start Date", formatDateWithoutTime(tenantData.start_date)],
-        ["End Date", formatDateWithoutTime(tenantData.end_date)],
-        ["Rent Cycle", tenantData.rent_cycle],
-        ["Amount", tenantData.amount],
-        ["Accout", tenantData.account],
-        ["Next Due Date", formatDateWithoutTime(tenantData.nextDue_date)],
-        ["Memo", tenantData.memo],
-        ["Cosigner Firstname", tenantData.cosigner_firstName],
-        ["Cosigner Lastname", tenantData.cosigner_lastName],
-        ["Cosigner Mobilenumber", tenantData.cosigner_mobileNumber],
-        ["Cosigner Worknumber", tenantData.cosigner_workNumber],
-        ["Cosigner HomeNumber", tenantData.cosigner_homeNumber],
-        ["Cosigner FaxPhone Number", tenantData.cosigner_faxPhoneNumber],
-        ["Cosigner Email", tenantData.cosigner_email],
-        ["Cosigner AlternateEmail", tenantData.cosigner_alternateemail],
-        ["Cosigner StreeAddress", tenantData.cosigner_streetAdress],
-        ["Cosigner City", tenantData.cosigner_city],
-        ["Cosigner State", tenantData.cosigner_state],
-        ["Cosigner Country", tenantData.cosigner_country],
-        ["Cosigner PostalCode", tenantData.cosigner_postalcode],
-        ["Recurring Amount", tenantData.recuring_amount],
-        ["Recurring Account", tenantData.recuring_account],
-        ["Recurring NextDue Date", tenantData.recuringnextDue_date],
-        ["Recurring Memo", tenantData.recuringmemo],
-        ["Recurring Frequency", tenantData.recuringfrequency],
-        ["One Time Amont", tenantData.onetime_amount],
-        ["One Time Account", tenantData.onetime_account],
+        ["Property Type", tenantData.entries.rental_adress],
+        ["Lease Type", tenantData.entries.lease_type],
+        ["Start Date", formatDateWithoutTime(tenantData.entries.start_date)],
+        ["End Date", formatDateWithoutTime(tenantData.entries.end_date)],
+        ["Rent Cycle", tenantData.entries.rent_cycle],
+        ["Amount", tenantData.entries.amount],
+        ["Accout", tenantData.entries.account],
+        ["Next Due Date", formatDateWithoutTime(tenantData.entries.nextDue_date)],
+        ["Memo", tenantData.entries.memo],
+        ["Cosigner Firstname", tenantData.entries.cosigner_firstName],
+        ["Cosigner Lastname", tenantData.entries.cosigner_lastName],
+        ["Cosigner Mobilenumber", tenantData.entries.cosigner_mobileNumber],
+        ["Cosigner Worknumber", tenantData.entries.cosigner_workNumber],
+        ["Cosigner HomeNumber", tenantData.entries.cosigner_homeNumber],
+        ["Cosigner FaxPhone Number", tenantData.entries.cosigner_faxPhoneNumber],
+        ["Cosigner Email", tenantData.entries.cosigner_email],
+        ["Cosigner AlternateEmail", tenantData.entries.cosigner_alternateemail],
+        ["Cosigner StreeAddress", tenantData.entries.cosigner_streetAdress],
+        ["Cosigner City", tenantData.entries.cosigner_city],
+        ["Cosigner State", tenantData.entries.cosigner_state],
+        ["Cosigner Country", tenantData.entries.cosigner_country],
+        ["Cosigner PostalCode", tenantData.entries.cosigner_postalcode],
+        ["Recurring Amount", tenantData.entries.recuring_amount],
+        ["Recurring Account", tenantData.entries.recuring_account],
+        ["Recurring NextDue Date", tenantData.entries.recuringnextDue_date],
+        ["Recurring Memo", tenantData.entries.recuringmemo],
+        ["Recurring Frequency", tenantData.entries.recuringfrequency],
+        ["One Time Amont", tenantData.entries.onetime_amount],
+        ["One Time Account", tenantData.entries.onetime_account],
         [
           "One Time Due Date",
-          formatDateWithoutTime(tenantData.onetime_Due_date),
+          formatDateWithoutTime(tenantData.entries.onetime_Due_date),
         ],
-        ["One Time Memo", tenantData.onetime_memo],
+        ["One Time Memo", tenantData.entries.onetime_memo],
         // ["Uploaded Files", tenantData.upload_file[0]],
       ];
 
-      tenantData.upload_file.forEach((item, index) => {
-        data.push([`Uploaded File ${index + 1}`, item]);
-      });
+      if (tenantData.upload_file && Array.isArray(tenantData.upload_file)) {
+        tenantData.upload_file.forEach((item, index) => {
+          data.push([`Uploaded File ${index + 1}`, item]);
+        });
+      }      
 
       const filteredData = data.filter(
         (row) => row[1] !== undefined && row[1] !== null && row[1] !== ""
@@ -345,7 +347,7 @@ const TenantsTable = ({ tenantDetails }) => {
                                   style={{ cursor: "pointer" }}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    generatePDF(tenant._id, tenantDetails);
+                                    generatePDF(tenant._id, tenantDetails,entry.entryIndex);
                                   }}
                                 >
                                   <PictureAsPdfIcon />

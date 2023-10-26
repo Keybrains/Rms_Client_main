@@ -26,8 +26,8 @@ const PropertiesTables = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loader, setLoader] = useState(true);
 
-  const navigateToPropDetails = (rentalId) => {
-    const propDetailsURL = `/admin/PropDetails/${rentalId}`;
+  const navigateToPropDetails = (rentalId,entryIndex) => {
+    const propDetailsURL = `/admin/PropDetails/${rentalId}/${entryIndex}`;
     window.location.href = propDetailsURL;
   };
 
@@ -252,7 +252,7 @@ React.useEffect(() => {
                       
                       <tr
                         key={rental._id}
-                        onClick={() => navigateToPropDetails(rental._id)}
+                        onClick={() => navigateToPropDetails(rental._id,property.entryIndex)}
                         style={{ cursor: "pointer" }}
                       >
                         <td>{property.rental_adress}</td>

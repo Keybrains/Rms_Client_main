@@ -15,6 +15,7 @@ import {
 } from "reactstrap";
 
 const TenantDetailPage = () => {
+  const { tenantId, entryIndex } = useParams();  
   const { id } = useParams();
   const [tenantDetails, setTenantDetails] = useState({});
   const [loading, setLoading] = useState(true);
@@ -50,23 +51,22 @@ React.useEffect(() => {
   chackAuth();
 }, [cookies.get("token")]);
 
-  const getTenantData = async () => {
-    try {
-      const response = await axios.get(
-        `http://64.225.8.160:4000/tenant/tenant_summary/${id}`
-      );
-      setTenantDetails(response.data.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching tenant details:", error);
-      setError(error);
-      setLoading(false);
-    }
-  };
+const apiUrl = `http://64.225.8.160:4000/tenant/tenant_summary/${tenantId}/entry/${entryIndex}`;
+const getTenantData = async () => {
+  try {
+    const response = await axios.get(apiUrl);
+    setTenantDetails(response.data.data);
+    setLoading(false);
+  } catch (error) {
+    console.error("Error fetching tenant details:", error);
+    setError(error);
+    setLoading(false);
+  }
+};
 
-  useEffect(() => {
-    getTenantData();
-  }, [id]);
+useEffect(() => {
+  getTenantData();
+}, [tenantId, entryIndex]);
 
   function formatDateWithoutTime(dateString) {
     if (!dateString) return "";
@@ -232,14 +232,14 @@ React.useEffect(() => {
                             Property Type:
                           </td>
                           <td>
-                            {tenantDetails.rental_adress || "N/A"}
+                            {tenantDetails.entries.rental_adress || "N/A"}
                           </td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">
                             Lease Type:
                           </td>
-                          <td>{tenantDetails.lease_type || "N/A"}</td>
+                          <td>{tenantDetails.entries.lease_type || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">
@@ -247,7 +247,7 @@ React.useEffect(() => {
                           </td>
                           <td>
                             {formatDateWithoutTime(
-                              tenantDetails.start_date
+                              tenantDetails.entries.start_date
                             ) || "N/A"}
                           </td>
                         </tr>
@@ -257,7 +257,7 @@ React.useEffect(() => {
                           </td>
                           <td>
                             {formatDateWithoutTime(
-                              tenantDetails.end_date
+                              tenantDetails.entries.end_date
                             ) || "N/A"}
                           </td>
                         </tr>
@@ -265,19 +265,19 @@ React.useEffect(() => {
                           <td className="font-weight-bold text-md">
                             Rent Cycle:
                           </td>
-                          <td>{tenantDetails.rent_cycle || "N/A"}</td>
+                          <td>{tenantDetails.entries.rent_cycle || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">
                             Rent Amount:
                           </td>
-                          <td>{tenantDetails.amount || "N/A"}</td>
+                          <td>{tenantDetails.entries.amount || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">
                             Account:
                           </td>
-                          <td>{tenantDetails.account || "N/A"}</td>
+                          <td>{tenantDetails.entries.account || "N/A"}</td>
                         </tr>
                         <tr>
                           <td className="font-weight-bold text-md">
@@ -285,7 +285,7 @@ React.useEffect(() => {
                           </td>
                           <td>
                             {formatDateWithoutTime(
-                              tenantDetails.nextDue_date
+                              tenantDetails.entries.nextDue_date
                             ) || "N/A"}
                           </td>
                         </tr>
@@ -293,7 +293,7 @@ React.useEffect(() => {
                           <td className="font-weight-bold text-md">
                             Memo:
                           </td>
-                          <td>{tenantDetails.memo || "N/A"}</td>
+                          <td>{tenantDetails.entries.memo || "N/A"}</td>
                         </tr>
                       </tbody>
 
@@ -308,7 +308,7 @@ React.useEffect(() => {
                             First Name:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_firstName || "N/A"}
+                            {tenantDetails.entries.cosigner_firstName || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -316,7 +316,7 @@ React.useEffect(() => {
                             Last Name:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_lastName || "N/A"}
+                            {tenantDetails.entries.cosigner_lastName || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -324,7 +324,7 @@ React.useEffect(() => {
                             Mobile Number:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_mobileNumber || "N/A"}
+                            {tenantDetails.entries.cosigner_mobileNumber || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -332,7 +332,7 @@ React.useEffect(() => {
                             Work Number:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_workNumber || "N/A"}
+                            {tenantDetails.entries.cosigner_workNumber || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -340,7 +340,7 @@ React.useEffect(() => {
                             Home Number:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_homeNumber || "N/A"}
+                            {tenantDetails.entries.cosigner_homeNumber || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -348,7 +348,7 @@ React.useEffect(() => {
                             Fax Number:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_faxPhoneNumber || "N/A"}
+                            {tenantDetails.entries.cosigner_faxPhoneNumber || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -356,7 +356,7 @@ React.useEffect(() => {
                             Email:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_email || "N/A"}
+                            {tenantDetails.entries.cosigner_email || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -364,7 +364,7 @@ React.useEffect(() => {
                             Alternate Email:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_alternateemail || "N/A"}
+                            {tenantDetails.entries.cosigner_alternateemail || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -372,7 +372,7 @@ React.useEffect(() => {
                             Street Address:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_streetAdress || "N/A"}
+                            {tenantDetails.entries.cosigner_streetAdress || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -380,7 +380,7 @@ React.useEffect(() => {
                             City:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_city || "N/A"}
+                            {tenantDetails.entries.cosigner_city || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -388,7 +388,7 @@ React.useEffect(() => {
                             State:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_state || "N/A"}
+                            {tenantDetails.entries.cosigner_state || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -396,7 +396,7 @@ React.useEffect(() => {
                             Country:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_country || "N/A"}
+                            {tenantDetails.entries.cosigner_country || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -404,7 +404,7 @@ React.useEffect(() => {
                             Postal Code:
                           </td>
                           <td>
-                            {tenantDetails.cosigner_postalcode || "N/A"}
+                            {tenantDetails.entries.cosigner_postalcode || "N/A"}
                           </td>
                         </tr>
                       </tbody>
@@ -420,7 +420,7 @@ React.useEffect(() => {
                             Amount:
                           </td>
                           <td>
-                            {tenantDetails.recuring_amount || "N/A"}
+                            {tenantDetails.entries.recuring_amount || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -428,7 +428,7 @@ React.useEffect(() => {
                             Account:
                           </td>
                           <td>
-                            {tenantDetails.recuring_account || "N/A"}
+                            {tenantDetails.entries.recuring_account || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -436,7 +436,7 @@ React.useEffect(() => {
                             Next Due Date:
                           </td>
                           <td>
-                            {tenantDetails.recuringnextDue_date || "N/A"}
+                            {tenantDetails.entries.recuringnextDue_date || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -444,7 +444,7 @@ React.useEffect(() => {
                             Memo:
                           </td>
                           <td>
-                            {tenantDetails.recuringmemo || "N/A"}
+                            {tenantDetails.entries.recuringmemo || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -452,7 +452,7 @@ React.useEffect(() => {
                             Frequency:
                           </td>
                           <td>
-                            {tenantDetails.recuringfrequency || "N/A"}
+                            {tenantDetails.entries.recuringfrequency || "N/A"}
                           </td>
                         </tr>
                       </tbody>
@@ -468,7 +468,7 @@ React.useEffect(() => {
                             Amount:
                           </td>
                           <td>
-                            {tenantDetails.onetime_amount || "N/A"}
+                            {tenantDetails.entries.onetime_amount || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -476,7 +476,7 @@ React.useEffect(() => {
                             Account:
                           </td>
                           <td>
-                            {tenantDetails.onetime_account || "N/A"}
+                            {tenantDetails.entries.onetime_account || "N/A"}
                           </td>
                         </tr>
                         <tr>
@@ -485,7 +485,7 @@ React.useEffect(() => {
                           </td>
                           <td>
                             {formatDateWithoutTime(
-                              tenantDetails.onetime_Due_date
+                              tenantDetails.entries.onetime_Due_date
                             ) || "N/A"}
                           </td>
                         </tr>
@@ -494,7 +494,7 @@ React.useEffect(() => {
                             Memo:
                           </td>
                           <td>
-                            {tenantDetails.onetime_memo || "N/A"}
+                            {tenantDetails.entries.onetime_memo || "N/A"}
                           </td>
                         </tr>
                       </tbody>
