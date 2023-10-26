@@ -401,9 +401,9 @@ const Sidebar = (props) => {
               <i className="ni ni-pin-3 text-orange" /> Leasing
             </DropdownToggle>
             <DropdownMenu>
-              <DropdownItem to="/admin/Listings" tag={Link} >
+              {/* <DropdownItem to="/admin/Listings" tag={Link} >
                 Listings
-              </DropdownItem>
+              </DropdownItem> */}
               <DropdownItem to="/admin/Applicants" tag={Link} >
                 Applicants
               </DropdownItem>
@@ -437,9 +437,9 @@ const Sidebar = (props) => {
                 <DropdownItem to="/admin/GeneralLedger" tag={Link}>
                   General Ledger
                 </DropdownItem>
-                <DropdownItem to="/admin/Payment" tag={Link}>
+                {/* <DropdownItem to="/admin/Payment" tag={Link}>
                   Payment
-                </DropdownItem>
+                </DropdownItem> */}
                 <DropdownItem to="/admin/OutstandingBalance" tag={Link}>
                 Outstanding Balances
               </DropdownItem>
