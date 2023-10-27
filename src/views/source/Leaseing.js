@@ -273,7 +273,9 @@ const Leaseing = () => {
         mobileNumber: leaseFormik.values.tenant_mobileNumber,
       };
       setSelectedTenantData(newTenantDetails);
-      swal("Success!", "New tenant added successfully", "success");
+      if (!id) {
+        swal("Success!", "New tenant added successfully", "success");
+      }
     } else {
       setSelectedTenants([]);
       const selectedTenant = selectedTenants[0];
@@ -911,7 +913,7 @@ const Leaseing = () => {
           // const arrayOfObjects = laesingdata.upload_file.map((innerArray) => innerArray[0])
 
           // setFile(arrayOfObjects || "Select");
-          console.log(matchedLease.upload_file, "upload_file");
+          console.log(matchedLease.upload_file, "upload_fileeee");
           const data = matchedLease.upload_file.map((item) => {
             return {
               name: item[0],
@@ -966,11 +968,13 @@ const Leaseing = () => {
         .catch((error) => {
           console.error("Error fetching vendor data:", error);
         });
+      handleAddTenant();
     }
-  }, [id]);
+  }, [id, leaseFormik.values.tenant_firstName]);
 
   const handleSubmit = async (values) => {
     console.log(file, "values");
+    const arrayOfNames = file.map((item) => item.name);
 
     const entriesArray = [];
 
@@ -1026,7 +1030,7 @@ const Leaseing = () => {
       account_type: values.account_type,
 
       //upload File
-      upload_file: values.upload_file,
+      upload_file: arrayOfNames,
 
       parent_account: values.parent_account,
       account_number: values.account_number,
@@ -1084,16 +1088,16 @@ const Leaseing = () => {
           console.log(tenantId, "tenantId");
           console.log(putObject, "putObject");
           const res = await axios.put(
-              `http://64.225.8.160:4000/tenant/tenant/${tenantId}`,
-              putObject
-            )
-            if (res.data.statusCode === 200) {
-              swal("", res.data.message, "success");
-              navigate("/admin/TenantsTable");
-            } else {
-              swal("", res.data.message, "error");
-            }
-            handleResponse(res);
+            `http://64.225.8.160:4000/tenant/tenant/${tenantId}`,
+            putObject
+          );
+          if (res.data.statusCode === 200) {
+            swal("", res.data.message, "success");
+            navigate("/admin/TenantsTable");
+          } else {
+            swal("", res.data.message, "error");
+          }
+          handleResponse(res);
         } else {
           if (id === undefined) {
             console.log(leaseObject, "leaseObject");
@@ -1128,7 +1132,7 @@ const Leaseing = () => {
     } else {
       console.error("file is not an array");
 
-      console.log(values, "values");    
+      console.log(values, "values");
     }
     console.log(values, "values to check");
     try {
@@ -1141,6 +1145,8 @@ const Leaseing = () => {
   };
 
   const editLease = async (id) => {
+    const arrayOfNames = file.map((item) => item.name);
+
     const editUrl = `http://64.225.8.160:4000/tenant/tenants/${id}/entry/${entryIndex}`;
     const entriesArray = [];
 
@@ -1196,7 +1202,7 @@ const Leaseing = () => {
       account_type: leaseFormik.values.account_type,
 
       //upload File
-      upload_file: leaseFormik.values.upload_file,
+      upload_file: arrayOfNames,
 
       parent_account: leaseFormik.values.parent_account,
       account_number: leaseFormik.values.account_number,
@@ -1207,7 +1213,6 @@ const Leaseing = () => {
     entriesArray.push(entriesObject);
 
     const leaseObject = {
-      
       tenant_firstName: leaseFormik.values.tenant_firstName,
       tenant_lastName: leaseFormik.values.tenant_lastName,
       tenant_mobileNumber: leaseFormik.values.tenant_mobileNumber,
@@ -3742,8 +3747,12 @@ const Leaseing = () => {
                                     setToggleApiCall={setToggleApiCall}
                                     toggleApiCall={toggleApiCall}
                                     hadleselectedAccount={hadleselectedAccount}
-                                    hadleselectedOneTimeAccount={hadleselectedOneTimeAccount}
-                                    hadleselectedRecuringAccount={hadleselectedRecuringAccount}
+                                    hadleselectedOneTimeAccount={
+                                      hadleselectedOneTimeAccount
+                                    }
+                                    hadleselectedRecuringAccount={
+                                      hadleselectedRecuringAccount
+                                    }
                                   />
                                 </FormGroup>
                               </FormGroup>

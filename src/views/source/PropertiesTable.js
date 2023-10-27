@@ -18,7 +18,7 @@ import {
   Col,
 } from "reactstrap";
 import Header from "components/Headers/Header";
-import Cookies from 'universal-cookie';
+import Cookies from "universal-cookie";
 
 const PropertiesTables = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const PropertiesTables = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loader, setLoader] = useState(true);
 
-  const navigateToPropDetails = (rentalId,entryIndex) => {
+  const navigateToPropDetails = (rentalId, entryIndex) => {
     const propDetailsURL = `/admin/PropDetails/${rentalId}/${entryIndex}`;
     window.location.href = propDetailsURL;
   };
@@ -35,30 +35,30 @@ const PropertiesTables = () => {
   // Check Authe(token)
   let chackAuth = async () => {
     if (cookies.get("token")) {
-      let  authConfig = {
+      let authConfig = {
         headers: {
-        Authorization: `Bearer ${cookies.get("token")}`,
-        token: cookies.get("token"),
-      },
-    };
-    // auth post method
-    let res = await axios.post(
-      "http://64.225.8.160:4000/register/auth",
-      { purpose: "validate access" },
-      authConfig
-    );
-    if (res.data.statusCode !== 200) {
-      // cookies.remove("token");
+          Authorization: `Bearer ${cookies.get("token")}`,
+          token: cookies.get("token"),
+        },
+      };
+      // auth post method
+      let res = await axios.post(
+        "http://64.225.8.160:4000/register/auth",
+        { purpose: "validate access" },
+        authConfig
+      );
+      if (res.data.statusCode !== 200) {
+        // cookies.remove("token");
+        navigate("/auth/login");
+      }
+    } else {
       navigate("/auth/login");
     }
-  } else {
-    navigate("/auth/login");
-  }
-};
+  };
 
-React.useEffect(() => {
-  chackAuth();
-}, [cookies.get("token")]);
+  React.useEffect(() => {
+    chackAuth();
+  }, [cookies.get("token")]);
 
   const getRentalsData = async () => {
     try {
@@ -74,7 +74,7 @@ React.useEffect(() => {
     }
   };
 
-  const deleteRentals = (id,entryIndex) => {
+  const deleteRentals = (id, entryIndex) => {
     // Show a confirmation dialog to the user
     swal({
       title: "Are you sure?",
@@ -85,7 +85,8 @@ React.useEffect(() => {
     }).then((willDelete) => {
       if (willDelete) {
         axios
-          .delete(`http://64.225.8.160:4000/rentals/rental/${id}/entry/${entryIndex}`
+          .delete(
+            `http://64.225.8.160:4000/rentals/rental/${id}/entry/${entryIndex}`
           )
           .then((response) => {
             if (response.data.statusCode === 200) {
@@ -95,12 +96,14 @@ React.useEffect(() => {
                 "success"
               );
               getRentalsData(); // Refresh your rentals data or perform other actions
-            }
-            else if (response.data.statusCode === 201) {
-              swal("Warning!", "Property already assigned to Tenant!", "warning");
+            } else if (response.data.statusCode === 201) {
+              swal(
+                "Warning!",
+                "Property already assigned to Tenant!",
+                "warning"
+              );
               getRentalsData();
-            }  
-            else {
+            } else {
               swal("", response.data.message, "error");
             }
           })
@@ -118,7 +121,7 @@ React.useEffect(() => {
     getRentalsData();
   }, []);
 
-  const editProperty = (id,propertyIndex) => {
+  const editProperty = (id, propertyIndex) => {
     navigate(`/admin/rentals/${id}/${propertyIndex}`);
     console.log(id);
   };
@@ -147,32 +150,62 @@ React.useEffect(() => {
 
   const filterRentalsBySearch = () => {
     if (!searchQuery) {
+      console.log(rentalsData, "rental from table of properties");
       return rentalsData;
     }
-  
+
+    const lowerCaseQuery = searchQuery.toLowerCase();
+
     return rentalsData.filter((rental) => {
-      const lowerCaseQuery = searchQuery.toLowerCase();
-      const rentalAddress = rental.rental_adress || ''; // Ensure rental address is defined
-      const propertyType = rental.property_type || ''; // Ensure property type is defined
-      const ownerFirstName = rental.rentalOwner_firstName || ''; // Ensure owner first name is defined
-      const ownerLastName = rental.rentalOwner_lastName || ''; // Ensure owner last name is defined
-      const ownerCompanyName = rental.rentalOwner_companyName || ''; // Ensure owner company name is defined
-      const cityAndCountry = `${rental.rental_city || ''}, ${rental.rental_country || ''}`; // Ensure city and country are defined
-      const ownerEmail = rental.rentalOwner_primaryEmail || ''; // Ensure owner email is defined
-  
+      const matchesRentalAddress = rental.entries.some(
+        (entry) =>
+          entry.rental_adress &&
+          entry.rental_adress.toLowerCase().includes(lowerCaseQuery)
+      );
+
+      const matchesPropertyType = rental.entries.some(
+        (entry) =>
+          entry.property_type &&
+          entry.property_type.toLowerCase().includes(lowerCaseQuery)
+      );
+
+      const ownerFullName = `${rental.rentalOwner_firstName || ""} ${
+        rental.rentalOwner_lastName || ""
+      }`.toLowerCase();
+
+      const matchesOwnerInfo =
+        ownerFullName.includes(lowerCaseQuery) ||
+        (rental.rentalOwner_companyName &&
+          rental.rentalOwner_companyName
+            .toLowerCase()
+            .includes(lowerCaseQuery)) ||
+        (rental.rentalOwner_primaryEmail &&
+          rental.rentalOwner_primaryEmail
+            .toLowerCase()
+            .includes(lowerCaseQuery));
+
+      const matchesCity = rental.entries.some(
+        (entry) =>
+          entry.rental_city &&
+          entry.rental_city.toLowerCase().includes(lowerCaseQuery)
+      );
+
+      const matchesCountry = rental.entries.some(
+        (entry) =>
+          entry.rental_country &&
+          entry.rental_country.toLowerCase().includes(lowerCaseQuery)
+      );
+
       return (
-        rentalAddress.toLowerCase().includes(lowerCaseQuery) ||
-        propertyType.toLowerCase().includes(lowerCaseQuery) ||
-        `${ownerFirstName} ${ownerLastName}`
-          .toLowerCase()
-          .includes(lowerCaseQuery) ||
-        ownerCompanyName.toLowerCase().includes(lowerCaseQuery) ||
-        cityAndCountry.toLowerCase().includes(lowerCaseQuery) ||
-        ownerEmail.toLowerCase().includes(lowerCaseQuery)
+        matchesRentalAddress ||
+        matchesPropertyType ||
+        matchesOwnerInfo ||
+        matchesCity ||
+        matchesCountry
       );
     });
   };
-  
+  console.log(filterRentalsBySearch(), "filterasdadasdasdasdasda");
 
   return (
     <>
@@ -246,48 +279,54 @@ React.useEffect(() => {
                   </thead>
                   <tbody>
                     {console.log(filterRentalsBySearch(), "filter")}
-                    {filterRentalsBySearch().map((rental) => (
+                    {filterRentalsBySearch().map((rental) =>
                       rental.entries.map((property) => (
-                        
-                      
-                      <tr
-                        key={rental._id}
-                        onClick={() => navigateToPropDetails(rental._id,property.entryIndex)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <td>{property.rental_adress}</td>
-                        <td>{property.property_type}</td>
-                        <td>{`${rental.rentalOwner_firstName} ${rental.rentalOwner_lastName}`}</td>
-                        <td>{rental.rentalOwner_companyName}</td>
-                        <td>{`${property.rental_city}, ${property.rental_country}`}</td>
-                        <td>{rental.rentalOwner_primaryEmail}</td>
-                        <td>{rental.rentalOwner_phoneNumber}</td>
-                        <td>
-                          <div style={{ display: "flex", gap: "5px" }}>
-                            <div
-                              style={{ cursor: "pointer" }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteRentals(rental._id,property.entryIndex);
-                              }}
-                            >
-                              <DeleteIcon />
+                        <tr
+                          key={rental._id}
+                          onClick={() =>
+                            navigateToPropDetails(
+                              rental._id,
+                              property.entryIndex
+                            )
+                          }
+                          style={{ cursor: "pointer" }}
+                        >
+                          <td>{property.rental_adress}</td>
+                          <td>{property.property_type}</td>
+                          <td>{`${rental.rentalOwner_firstName} ${rental.rentalOwner_lastName}`}</td>
+                          <td>{rental.rentalOwner_companyName}</td>
+                          <td>{`${property.rental_city}, ${property.rental_country}`}</td>
+                          <td>{rental.rentalOwner_primaryEmail}</td>
+                          <td>{rental.rentalOwner_phoneNumber}</td>
+                          <td>
+                            <div style={{ display: "flex", gap: "5px" }}>
+                              <div
+                                style={{ cursor: "pointer" }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteRentals(
+                                    rental._id,
+                                    property.entryIndex
+                                  );
+                                }}
+                              >
+                                <DeleteIcon />
+                              </div>
+                              &nbsp; &nbsp; &nbsp;
+                              <div
+                                style={{ cursor: "pointer" }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  editProperty(rental._id, property.entryIndex);
+                                }}
+                              >
+                                <EditIcon />
+                              </div>
                             </div>
-                            &nbsp; &nbsp; &nbsp;
-                            <div
-                              style={{ cursor: "pointer" }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                editProperty(rental._id,property.entryIndex);
-                              }}
-                            >
-                              <EditIcon />
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-))
-))}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </Table>
               </Card>
