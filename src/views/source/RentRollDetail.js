@@ -124,7 +124,7 @@ React.useEffect(() => {
                     </tr>
                   ) : tenantDetails._id ? (
                     <>
-                      <tbody>
+                      {/* <tbody>
                         <tr>
                           <th colSpan="2" className="text-primary text-lg">
                             Tenant Details
@@ -205,7 +205,7 @@ React.useEffect(() => {
                             {tenantDetails.emergency_PhoneNumber || "N/A"}
                           </td>
                         </tr>
-                      </tbody>
+                      </tbody> */}
 
                       <tbody>
                         <tr>
@@ -275,7 +275,7 @@ React.useEffect(() => {
                         </tr>
                       </tbody>
 
-                      <tbody>
+                      {/* <tbody>
                         <tr>
                           <th colSpan="2" className="text-primary text-lg">
                             Co-signer Details
@@ -391,9 +391,9 @@ React.useEffect(() => {
                           </td>
                           <td>{tenantDetails.recuringfrequency || "N/A"}</td>
                         </tr>
-                      </tbody>
+                      </tbody> */}
 
-                      <tbody>
+                      {/* <tbody>
                         <tr>
                           <th colSpan="2" className="text-primary text-lg">
                             One-time Payment Details
@@ -421,7 +421,7 @@ React.useEffect(() => {
                           <td className="font-weight-bold text-md">Memo:</td>
                           <td>{tenantDetails.onetime_memo || "N/A"}</td>
                         </tr>
-                      </tbody>
+                      </tbody> */}
                     </>
                   ) : (
                     <tbody>

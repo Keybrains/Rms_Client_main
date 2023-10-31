@@ -80,10 +80,9 @@ const StaffNavbar = (props) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
-          setNotificationData(data.data);
-          setNotificationCount(data.data.length);
-          console.log("Notification",data.data);
-          console.log("vendor",staffmember_name)
+          const unreadNotifications = data.data.filter(notification => !notification.isStaffread);
+          setNotificationData(unreadNotifications);
+          setNotificationCount(unreadNotifications.length);
         } else {
           // Handle error
           console.error("Error:", data.message);
@@ -103,17 +102,20 @@ const StaffNavbar = (props) => {
 
   
   const navigateToDetails = (workorder_id) => {
-    // Make a DELETE request to delete the notification
-    axios.delete(`http://64.225.8.160:4000/notification/notification/${workorder_id}`)
+    axios.get(`http://64.225.8.160:4000/notification/notification/${workorder_id}?role=staff`)
       .then((response) => {
-        if (response.status === 200) {
-          // Notification deleted successfully, now update the state to remove it from the list
-          const updatedNotificationData = notificationData.filter((notification) => notification.workorder_id !== workorder_id);
-          setNotificationData(updatedNotificationData);
-          setNotificationCount(updatedNotificationData.length);
-          console.log(`Notification with workorder_id ${workorder_id} deleted successfully.`);
+          if (response.status === 200) {
+            const updatedNotificationData = notificationData.map(notification => {
+              if (notification.workorder_id === workorder_id) {
+                return { ...notification, isStaffread: true };
+              }
+              return notification;
+            });
+            setNotificationData(updatedNotificationData);
+            setNotificationCount(updatedNotificationData.length);
+           console.log(`Notification with workorder_id ${workorder_id} deleted successfully.`);
         } else {
-          console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
+          console.error(`Failed to mark notification with workorder_id ${workorder_id} as read.`);
         }
       })
       .catch((error) => {
@@ -159,7 +161,7 @@ const StaffNavbar = (props) => {
                 onKeyDown={toggleSidebar}
               >
                 <List style={{ width: '350px' }}>
-                  <h2 style={{color:'blue',marginLeft:'15px'}}>
+                  <h2 style={{color:'#033E3E',marginLeft:'15px'}}>
                     Notifications
                   </h2>
                   <Divider />
@@ -186,8 +188,8 @@ const StaffNavbar = (props) => {
                             <Col>
                               <Button
                               variant="contained"
-                              color="primary"
-                              style={{textTransform: 'none', fontSize: '12px' }}
+                              //color="primary"
+                              style={{background:'#033E3E',color:'white',textTransform: 'none', fontSize: '12px' }}
                               onClick={() => navigateToDetails(data.workorder_id)}
                             >
                               View

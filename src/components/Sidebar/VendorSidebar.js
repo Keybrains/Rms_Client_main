@@ -124,10 +124,12 @@ const VendorSidebar = (props) => {
         .then((response) => response.json())
         .then((data) => {
           if (data.statusCode === 200) {
-            setNotificationData(data.data);
-            setNotificationCount(data.data.length);
-            console.log("Notification",data.data);
-            console.log("vendor",vendor_name)
+            // Filter the notifications with isVendorread set to false
+            const unreadNotifications = data.data.filter(notification => !notification.isVendorread);
+            setNotificationData(unreadNotifications);
+            setNotificationCount(unreadNotifications.length);
+            console.log("Unread Notifications", unreadNotifications);
+            console.log("vendor", vendor_name);
           } else {
             // Handle error
             console.error("Error:", data.message);
@@ -145,21 +147,26 @@ const VendorSidebar = (props) => {
     }, [id]);
   
     const navigateToDetails = (workorder_id) => {
-      // Make a DELETE request to delete the notification
-      axios.delete(`http://64.225.8.160:4000/notification/notification/${workorder_id}`)
+      // Make a GET request to mark the notification as read
+      axios.get(`http://64.225.8.160:4000/notification/notification/${workorder_id}?role=vendor`)
         .then((response) => {
           if (response.status === 200) {
-            // Notification deleted successfully, now update the state to remove it from the list
-            const updatedNotificationData = notificationData.filter((notification) => notification.workorder_id !== workorder_id);
+            const updatedNotificationData = notificationData.map(notification => {
+              if (notification.workorder_id === workorder_id) {
+                return { ...notification, isVendorread: true };
+              }
+              return notification;
+            });
             setNotificationData(updatedNotificationData);
+            console.log("updatedNotificationData", updatedNotificationData)
             setNotificationCount(updatedNotificationData.length);
-            console.log(`Notification with workorder_id ${workorder_id} deleted successfully.`);
+            console.log(`Notification with workorder_id ${workorder_id} marked as read.`);
           } else {
-            console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
+            console.error(`Failed to mark notification with workorder_id ${workorder_id} as read.`);
           }
         })
         .catch((error) => {
-          console.error("Error:", error); 
+          console.error("Error:", error);
         });
     
       // Continue with navigating to the details page
@@ -230,7 +237,7 @@ const VendorSidebar = (props) => {
           </NavbarBrand>
         ) : null}
 
-<FormGroup className="mb-0" style={notificationIconStyle} onClick={toggleSidebar}>
+          <FormGroup className="mb-0" style={notificationIconStyle} onClick={toggleSidebar}>
              <NotificationsIcon style={{color:'black',fontSize:'30px'}}/>
               {notificationCount > 0 && (
               <div className="notification-circle" style={{position: 'absolute',top: '-15px',right: '-20px',background: 'red',borderRadius: '50%',padding: '0.1px 8px'}}>
@@ -248,7 +255,7 @@ const VendorSidebar = (props) => {
                 onKeyDown={toggleSidebar}
               >
                 <List style={{ width: '250px' }}>
-                  <h2 style={{color:'#3B2F2F',marginLeft:'15px'}}>
+                  <h2 style={{color:'#36013F',marginLeft:'15px'}}>
                     Notifications
                   </h2>
                   <Divider />
@@ -277,7 +284,7 @@ const VendorSidebar = (props) => {
                               <Button
                               variant="contained"
                              
-                              style={{ background:'#3B2F2F',color:'white',textTransform: 'none', fontSize: '12px' }}
+                              style={{ background:'#36013F',color:'white',textTransform: 'none', fontSize: '12px' }}
                               onClick={() => navigateToDetails(data.workorder_id)}
                             >
                               View

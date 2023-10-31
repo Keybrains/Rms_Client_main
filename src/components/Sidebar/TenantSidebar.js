@@ -111,41 +111,60 @@ const TenantSidebar = (props) => {
   };
 
   const [rental_adress, setRentalAddress] = useState("");
-  console.log(rental_adress)
+  let [loader, setLoader] = React.useState(true);
+  const [workData, setWorkData] = useState([]);
+const [rentalAddress, setRentalAddresses] = useState([]);
+  
 
-  useEffect(() => {
-    fetch(`http://64.225.8.160:4000/notification/tenantnotification/${rental_adress}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.statusCode === 200) {
-          setNotificationData(data.data);
-          setNotificationCount(data.data.length); 
-          console.log("Notification",data.data);
-          console.log("Rental Address",rental_adress)
-        } else {
-          // Handle error
-          console.error("Error:", data.message);
-        }
-      })
-      .catch((error) => {
-        // Handle network error
-        console.error("Network error:", error);
-      });
-  }, [rental_adress]);
+const getRentalData = async (addresses) => {
+  try {
+    const response = await axios.get(`http://64.225.8.160:4000/notification/tenantnotification/tenant/${addresses}`);
+    console.log(response, "abc");
+
+    if (Array.isArray(response.data.data)) {
+      // Filter the notifications with isTenantread set to false
+      const unreadNotifications = response.data.data.filter(notification => !notification.isTenantread);
+
+      // Update the state with the filtered unread notifications
+      setWorkData((prevData) => [...prevData, ...unreadNotifications]);
+      setNotificationData((prevNotificationData) => [...prevNotificationData, ...response.data.data]);
+      setNotificationCount(unreadNotifications.length);
+    } else if (typeof response.data.data === 'object') {
+      setWorkData((prevData) => [...prevData, response.data.data]);
+      setNotificationData((prevNotificationData) => [...prevNotificationData, response.data.data]);
+    } else {
+      console.error("Response data is not an array or object:", response.data.data);
+    }
+  } catch (error) {
+    console.error("Error fetching work order data:", error);
+  }
+};
+
+  React.useEffect(() => {
+    if (rentalAddress && rentalAddress.length > 0) {
+      setLoader(true);
+    }
+  }, [rentalAddress]);
 
   const getVendorDetails = async () => {
     try {
-      const response = await axios.get(
-        `http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`
-      );
-      console.log(response.data.data)
-      setVendorDetails(response.data.data);
-      setRentalAddress(response.data.data.rental_adress)
-      setLoading(false);
+      const response = await axios.get(`http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`);
+      const entries = response.data.data.entries;
+  
+      if (entries.length > 0) {
+        const rentalAddresses = entries.map(entry => entry.rental_adress).join('-');
+        //console.log(rentalAddresses, "mansi");
+        setVendorDetails(response.data.data);
+        getRentalData(rentalAddresses);
+        //getVendorDetails(rentalAddresses);
+      } else {
+        console.error("No rental addresses found.");
+      }
+  
+      setLoader(false);
     } catch (error) {
-      console.error("Error fetching vendor details:", error);
-      setError(error);
-      setLoading(false);
+      console.error("Error fetching tenant details:", error);
+      setLoader(false);
     }
   };
 
@@ -156,15 +175,20 @@ const TenantSidebar = (props) => {
 
   const navigateToDetails = (workorder_id) => {
     // Make a DELETE request to delete the notification
-    axios.delete(`http://64.225.8.160:4000/notification/notification/${workorder_id}`)
-      .then((response) => {
-        if (response.status === 200) {
-          // Notification deleted successfully, now update the state to remove it from the list
-          const updatedNotificationData = notificationData.filter((notification) => notification.workorder_id !== workorder_id);
-          setNotificationData(updatedNotificationData);
-          setNotificationCount(updatedNotificationData.length);
-          console.log(`Notification with workorder_id ${workorder_id} deleted successfully.`);
-        } else {
+    axios.get(`http://64.225.8.160:4000/notification/notification/${workorder_id}?role=tenant`)
+        .then((response) => {
+          if (response.status === 200) {
+            const updatedNotificationData = notificationData.map(notification => {
+              if (notification.workorder_id === workorder_id) {
+                return { ...notification, isTenantread: true };
+              }
+              return notification;
+            });
+            setNotificationData(updatedNotificationData);
+            console.log("updatedNotificationData", updatedNotificationData)
+            setNotificationCount(updatedNotificationData.length);
+            console.log(`Notification with workorder_id ${workorder_id} marked as read.`);
+          } else {
           console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
         }
       })

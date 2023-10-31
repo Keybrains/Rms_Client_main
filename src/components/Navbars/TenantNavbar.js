@@ -35,7 +35,7 @@ import { makeStyles } from '@mui/styles';
 const TenantNavbar = (props) => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  let [loader, setLoader] = React.useState(true);
 
   let cookies = new Cookies();
   let Logout = () => {
@@ -46,7 +46,6 @@ const TenantNavbar = (props) => {
   console.log(id);
   const [vendorDetails, setVendorDetails] = useState({});
   const [rental_adress, setRentalAddress] = useState("");
-  console.log(rental_adress)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -62,26 +61,39 @@ const TenantNavbar = (props) => {
   
   const getVendorDetails = async () => {
     try {
-      const response = await axios.get(
-        `http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`
-      );
-      console.log(response.data.data)
-      setVendorDetails(response.data.data);
-      setRentalAddress(response.data.data.rental_adress)
-      setLoading(false);
+      const response = await axios.get(`http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`);
+      const entries = response.data.data.entries;
+  
+      if (entries.length > 0) {
+        const rentalAddresses = entries.map(entry => entry.rental_adress).join('-');
+        //console.log(rentalAddresses, "mansi");
+        setVendorDetails(response.data.data);
+        getRentalData(rentalAddresses);
+        //getVendorDetails(rentalAddresses);
+      } else {
+        console.error("No rental addresses found.");
+      }
+  
+      setLoader(false);
     } catch (error) {
-      console.error("Error fetching vendor details:", error);
-      setError(error);
-      setLoading(false);
+      console.error("Error fetching tenant details:", error);
+      setLoader(false);
     }
   };
+
+  useEffect(() => {
+    getVendorDetails();
+    console.log(id);
+  }, [id]);
 
 // const {vendor_name}= useParams();
 // const ENDPOINT = 'http://64.225.8.160:4001/notification/vendornotification/:vendor_name';
 const [notification, setNotification] = useState('');
 const [notificationCount, setNotificationCount] = useState(0);
 const [notificationData, setNotificationData] = useState([]);
-console.log("Rental Address", rental_adress);
+const [workData, setWorkData] = useState([]);
+const [rentalAddress, setRentalAddresses] = useState([]);
+
 const notifyData = [];
 
 const [selectedProp, setSelectedProp] = useState("Select");
@@ -90,42 +102,80 @@ const handlePropertySelect = (property) => {
   setSelectedProp(property);
 };
 
-useEffect(() => {
-  fetch(`http://64.225.8.160:4000/notification/tenantnotification/${rental_adress}`)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.statusCode === 200) {
-        setNotificationData(data.data);
-        setNotificationCount(data.data.length); 
-        console.log("Notification",data.data);
-        console.log("Rental Address",rental_adress)
-      } else {
-        // Handle error
-        console.error("Error:", data.message);
-      }
-    })
-    .catch((error) => {
-      // Handle network error
-      console.error("Network error:", error);
-    });
-}, [rental_adress]);
+const getRentalData = async (addresses) => {
+  try {
+    const response = await axios.get(`http://64.225.8.160:4000/notification/tenantnotification/tenant/${addresses}`);
+    console.log(response, "abc");
 
-useEffect(() => {
-  getVendorDetails();
-  console.log(id);
-}, [id]);
+    if (Array.isArray(response.data.data)) {
+      // Filter the notifications with isTenantread set to false
+      const unreadNotifications = response.data.data.filter(notification => !notification.isTenantread);
+
+      // Update the state with the filtered unread notifications
+      setWorkData((prevData) => [...prevData, ...unreadNotifications]);
+      setNotificationData((prevNotificationData) => [...prevNotificationData, ...response.data.data]);
+      setNotificationCount(unreadNotifications.length);
+    } else if (typeof response.data.data === 'object') {
+      setWorkData((prevData) => [...prevData, response.data.data]);
+      setNotificationData((prevNotificationData) => [...prevNotificationData, response.data.data]);
+    } else {
+      console.error("Response data is not an array or object:", response.data.data);
+    }
+  } catch (error) {
+    console.error("Error fetching work order data:", error);
+  }
+};
+
+
+React.useEffect(() => {
+  if (rentalAddress && rentalAddress.length > 0) {
+    setLoader(true);
+  }
+}, [rentalAddress]);
+
+// useEffect(() => {
+//   // Fetch notification data when rental_adress changes
+//   if (rental_adress) {
+//     fetch(`http://64.225.8.160:4000/notification/tenantnotification/tenant/${rental_adress}`)
+//       .then((response) => {
+//         if (response.status === 200) {
+//           return response.json();
+         
+//         } else {
+//           throw new Error('Response status is not 200');
+//         }
+//       })
+//       .then((data) => {
+//         setNotificationData(data.data);
+//         console.log("Notification",data.data)
+//         setNotificationCount(data.data.length);
+//         console.log("Notification Count",data.data.length)
+//       })
+//       .catch((error) => {
+//         console.error("Error:", error);
+//         // Handle the error, display a message to the user, or take other appropriate action.
+//       });
+//   }
+// }, [rental_adress]);
+
+
 
 const navigateToDetails = (workorder_id) => {
   // Make a DELETE request to delete the notification
-  axios.delete(`http://64.225.8.160:4000/notification/notification/${workorder_id}`)
-    .then((response) => {
-      if (response.status === 200) {
-        // Notification deleted successfully, now update the state to remove it from the list
-        const updatedNotificationData = notificationData.filter((notification) => notification.workorder_id !== workorder_id);
-        setNotificationData(updatedNotificationData);
-        setNotificationCount(updatedNotificationData.length);
-        console.log(`Notification with workorder_id ${workorder_id} deleted successfully.`);
-      } else {
+  axios.get(`http://64.225.8.160:4000/notification/notification/${workorder_id}?role=tenant`)
+      .then((response) => {
+        if (response.status === 200) {
+          const updatedNotificationData = notificationData.map(notification => {
+            if (notification.workorder_id === workorder_id) {
+              return { ...notification, isTenantread: true };
+            }
+            return notification;
+          });
+          setNotificationData(updatedNotificationData);
+          console.log("updatedNotificationData", updatedNotificationData)
+          setNotificationCount(updatedNotificationData.length);
+          console.log(`Notification with workorder_id ${workorder_id} marked as read.`);
+        } else {
         console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
       }
     })
@@ -155,15 +205,16 @@ const navigateToDetails = (workorder_id) => {
             {props.brandText}
           </Link>
           <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
-            <FormGroup className="mb-0" onClick={toggleSidebar} style={{ cursor: 'pointer',position: 'relative' }}>
-              <NotificationsIcon style={{color:'white',fontSize:'30px'}}/>
-              {notificationCount > 0 && (
-              <div className="notification-circle" style={{position: 'absolute',top: '-15px',right: '-20px',background: 'red',borderRadius: '50%',padding: '0.1px 8px'}}>
-                <span className="notification-count" style={{color:'white',fontSize:"13px"}}>{notificationCount}</span>
-              </div>
-               )}
-            </FormGroup>
-          </Form>
+        <FormGroup className="mb-0" onClick={toggleSidebar} style={{ cursor: 'pointer', position: 'relative' }}>
+          <NotificationsIcon style={{ color: 'white', fontSize: '30px' }} />
+          {notificationCount > 0 && (
+            <div className="notification-circle" style={{ position: 'absolute', top: '-15px', right: '-20px', background: 'red', borderRadius: '50%', padding: '0.1px 8px' }}>
+              <span className="notification-count" style={{ color: 'white', fontSize: "13px" }}>{notificationCount}</span>
+
+            </div>
+          )}
+        </FormGroup>
+      </Form>
           
           <Nav className="align-items-center d-none d-md-flex" navbar>
             
@@ -174,7 +225,7 @@ const navigateToDetails = (workorder_id) => {
                 onKeyDown={toggleSidebar}
               >
                 <List style={{ width: '350px' }}>
-                  <h2 style={{color:'blue',marginLeft:'15px'}}>
+                  <h2 style={{color:'#3B2F2F',marginLeft:'15px'}}>
                     Notifications
                   </h2>
                   <Divider />
@@ -202,7 +253,7 @@ const navigateToDetails = (workorder_id) => {
                               <Button
                               variant="contained"
                               color="primary"
-                              style={{textTransform: 'none', fontSize: '12px' }}
+                              style={{background:'#3B2F2F',color:'white',textTransform: 'none', fontSize: '12px' }}
                               onClick={() => navigateToDetails(data.workorder_id)}
                             >
                               View

@@ -382,9 +382,9 @@ const Sidebar = (props) => {
                 <DropdownItem to="/admin/propertiesTable" tag={Link}>
                   Properties
                 </DropdownItem>
-                {/* <DropdownItem to="/admin/RentRoll" tag={Link}>
+                <DropdownItem to="/admin/RentRoll" tag={Link}>
                   Rent Roll
-                </DropdownItem> */}
+                </DropdownItem>
                 <DropdownItem to="/admin/TenantsTable" tag={Link}>
                   Tenants
                 </DropdownItem>
@@ -437,9 +437,9 @@ const Sidebar = (props) => {
                 <DropdownItem to="/admin/GeneralLedger" tag={Link}>
                   General Ledger
                 </DropdownItem>
-                {/* <DropdownItem to="/admin/Payment" tag={Link}>
+                <DropdownItem to="/admin/Payment" tag={Link}>
                   Payment
-                </DropdownItem> */}
+                </DropdownItem>
                 <DropdownItem to="/admin/OutstandingBalance" tag={Link}>
                 Outstanding Balances
               </DropdownItem>

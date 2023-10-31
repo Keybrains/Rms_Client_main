@@ -11,7 +11,6 @@ import {
   Col,
   // UncontrolledTooltip,
 } from "reactstrap";
-
 // core components
 import TenantsHeader from "components/Headers/TenantsHeader";
 import * as React from "react";
@@ -48,9 +47,10 @@ const TenantWork = () => {
   const [filteredRentalsData, setFilteredRentalsData] = useState([]); 
   let [loader, setLoader] = React.useState(true);
   const toggle1 = () => setproDropdownOpen((prevState) => !prevState);
-
+ 
   const [tenantDetails, setTenantDetails] = useState({});
   const [rental_adress, setRentalAddress] = useState("");
+  const [rentalAddress, setRentalAddresses] = useState([]);
   console.log(rental_adress)
   const { id } = useParams();
   console.log(id, tenantDetails);
@@ -104,48 +104,58 @@ React.useEffect(() => {
   chackAuth();
 }, [cookies.get("token")]);
 
-  const getTenantData = async () => {
-    try {
-      const response = await axios.get(
-        `http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`
-      );
-    //   console.log(response.data.data.rental_adress, "this is my data");
-      setTenantDetails(response.data.data);
-      setRentalAddress(response.data.data.rental_adress)
-       setLoading(false);
-    } catch (error) {
-      console.error("Error fetching tenant details:", error);
-      // setError(error);
-       setLoading(false);
-    }
-  };
+const getTenantData = async () => {
+  try {
+    const response = await axios.get(`http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`);
+    const entries = response.data.data.entries;
 
+    if (entries.length > 0) {
+      const rentalAddresses = entries.map(entry => entry.rental_adress).join('-');
+      //console.log(rentalAddresses, "mansi");
+      setTenantDetails(response.data.data);
+      getRentalData(rentalAddresses);
+      //getVendorDetails(rentalAddresses);
+    } else {
+      console.error("No rental addresses found.");
+    }
+
+    setLoader(false);
+  } catch (error) {
+    console.error("Error fetching tenant details:", error);
+    setLoader(false);
+  }
+};
   React.useEffect(() => {
     getTenantData();
     // console.log(id)
-  }, [id]);
+  }, [cookie_id]);
 
-  const getRentalData = async () => {
-          try {
-            const response = await axios.get(`http://64.225.8.160:4000/workorder/workorder/${rental_adress}`);
-            setWorkData(response.data.data); 
-            setLoader(false);
-          } 
-          catch (error) {
-            console.error("Error fetching work order data:", error);
-          }
-        }
-
-  React.useEffect(() => {
-    if (rental_adress) {
-        console.log("url......",`http://64.225.8.160:4000/workorder/workorder/${rental_adress}`)
-        getRentalData();
-    }
-    //console.log(rental_adress)
-  }, [rental_adress]);
+  const getRentalData = async (addresses) => {
+    try {
+      const response = await axios.get(`http://64.225.8.160:4000/workorder/workorder/tenant/${addresses}`);
+      console.log(response, "abc");
   
-  // Log rental_adress after setting it
-  console.log("rental_adress:", rental_adress);
+      if (Array.isArray(response.data.data)) {
+        // Response is an array of work orders
+        setWorkData((prevData) => [...prevData, ...response.data.data]);
+      } else if (typeof response.data.data === 'object') {
+        // Response is a single work order object
+        setWorkData((prevData) => [...prevData, response.data.data]);
+      } else {
+        console.error("Response data is not an array or object:", response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching work order data:", error);
+    }
+  };
+  
+  
+  
+  React.useEffect(() => {
+    if (rentalAddress && rentalAddress.length > 0) {
+      setLoader(true);
+    }
+  }, [rentalAddress]);
   
   const navigateToDetails = (tenantId) => {
     // const propDetailsURL = `/admin/WorkOrderDetails/${tenantId}`;
@@ -214,7 +224,6 @@ React.useEffect(() => {
           </div>
         ) : (
             <Card className="shadow">
-            
               <CardHeader className="border-0">
                 <Row>
                     <Col xs="12" sm="6">
@@ -226,6 +235,7 @@ React.useEffect(() => {
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           style={{
+
                             width: "100%",
                             maxWidth: "200px",
                             minWidth: "200px",

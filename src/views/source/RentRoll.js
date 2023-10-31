@@ -235,7 +235,7 @@ React.useEffect(() => {
                       <th scope="col">ACTION</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  {/* <tbody>
                     {filterRentRollsBySearch()?.map((tenant) => (
                       <tr
                         key={tenant._id}
@@ -269,6 +269,66 @@ React.useEffect(() => {
                           </div>
                         </td>
                       </tr>
+                    ))}
+                  </tbody> */}
+                      <tbody>
+                    {filterRentRollsBySearch()?.map((tenant) => (
+                      <>
+                        {tenant.entries.map((entry) => (
+                          // <td key={entry.key}>{entry.value}</td>
+
+                          <tr
+                            key={tenant._id}
+                            onClick={() =>
+                              navigateToRentRollDetails(
+                                tenant._id,
+                                entry.entryIndex
+                              )
+                            }
+                            style={{ cursor: "pointer" }}
+                          >
+                            <td>{entry.rental_adress}</td>
+                            <td>{entry.lease_type}</td>
+                            <td>{entry.start_date}</td>
+                            <td>{entry.end_date}</td>
+                            {/* <td>{entry.entryIndex}</td> */}
+                            {/* <td>{entry.rental_adress}</td> */}
+                            <td style={{}}>
+                              <div style={{ display: "flex", gap: "5px" }}>
+                                <div
+                                  style={{ cursor: "pointer" }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log("Entry Object:", entry);
+                                    deleteTenant(tenant._id, entry.entryIndex);
+                                    // console.log(entry.entryIndex,"dsgdg")
+                                  }}
+                                >
+                                  <DeleteIcon />
+                                </div>
+                                <div
+                                  style={{ cursor: "pointer" }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    editLeasing(tenant._id ,entry.entryIndex);
+                                  }}
+                                >
+                                  <EditIcon />
+                                </div>
+                                {/* <div
+                                  style={{ cursor: "pointer" }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    generatePDF(tenant._id, tenantDetails,entry.entryIndex);
+                                  }}
+                                >
+                                  <PictureAsPdfIcon />
+                                </div> */}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </>
                     ))}
                   </tbody>
                 </Table>

@@ -4,7 +4,7 @@ const VendorHeader = () => {
   return (
     <>
       <div className="header pb-8 pt-5 pt-md-8" style={{
-          background: '#4B0082'
+          background: '#36013F'
         }}>
         <Container fluid>
           <div className="header-body">
