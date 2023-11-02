@@ -70,7 +70,7 @@ const OutstandingBalance = () => {
   }
 
   let getTenantsDate = async () => {
-    let responce = await axios.get("http://64.225.8.160:4000/tenant/tenant");
+    let responce = await axios.get("http://64.225.8.160:4000/api/tenant/tenant");
     setLoader(false);
     setTenantsDate(responce.data.data);
   };
@@ -80,7 +80,7 @@ const OutstandingBalance = () => {
 
   const editPropertyData = async (id, updatedData) => {
     try {
-      const editUrl = `http://64.225.8.160:4000/tenant/tenant/${id}`;
+      const editUrl = `http://64.225.8.160:4000/api/tenant/tenant/${id}`;
       console.log("Edit URL:", editUrl);
       console.log("Property ID:", id);
       console.log("Updated Data:", updatedData); // Log the updated data for debugging
@@ -110,7 +110,7 @@ const OutstandingBalance = () => {
     }).then((willDelete) => {
       if (willDelete) {
         axios
-          .delete("http://64.225.8.160:4000/tenant/tenant", {
+          .delete("http://64.225.8.160:4000/api/tenant/tenant", {
             data: { _id: id },
           })
           .then((response) => {
@@ -162,7 +162,7 @@ const OutstandingBalance = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/register/auth",
+      "http://64.225.8.160:4000/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );

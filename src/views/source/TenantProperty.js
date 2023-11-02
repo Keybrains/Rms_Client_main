@@ -41,7 +41,7 @@ const TenantProperty = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/register/auth",
+        "http://64.225.8.160:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -61,7 +61,7 @@ const TenantProperty = () => {
   const getTenantData = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/tenant/tenant_rental_addresses/${cookie_id}`
+        `http://64.225.8.160:4000/api/tenant/tenant_rental_addresses/${cookie_id}`
       );
 
       if (response.data && response.data.rental_adress) {
@@ -83,7 +83,7 @@ const TenantProperty = () => {
   useEffect(() => {
     getTenantData();
     console.log(
-      `http://64.225.8.160:4000/tenant/tenant_rental_addresses/${cookie_id}`
+      `http://64.225.8.160:4000/api/tenant/tenant_rental_addresses/${cookie_id}`
     );
   }, [cookie_id]);
 
@@ -92,7 +92,7 @@ const TenantProperty = () => {
   // const getRentalData = async () => {
   //   try {
   //     const response = await axios.get(
-  //       `http://64.225.8.160:4000/rentals/rentals_property/${rental_adress}`
+  //       `http://64.225.8.160:4000/api/rentals/rentals_property/${rental_adress}`
   //     );
   //     setpropertyDetails(response.data.data);
   //     setpropertyLoading(false);
@@ -103,7 +103,7 @@ const TenantProperty = () => {
   // };
   // useEffect(() => {
   //   if (rental_adress) {
-  //       console.log(`http://64.225.8.160:4000/rentals/rentals_property/${rental_adress}`)
+  //       console.log(`http://64.225.8.160:4000/api/rentals/rentals_property/${rental_adress}`)
   //       getRentalData();
   //   }
   //   //console.log(rental_adress)

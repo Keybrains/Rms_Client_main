@@ -55,7 +55,7 @@ const GeneralLedger = () => {
   };
   React.useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/rentals/property_onrent")
+    fetch("http://64.225.8.160:4000/api/rentals/property_onrent")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -73,7 +73,7 @@ const GeneralLedger = () => {
 
   React.useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/addaccount/find_accountname")
+    fetch("http://64.225.8.160:4000/api/addaccount/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -102,7 +102,7 @@ const GeneralLedger = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/register/auth",
+        "http://64.225.8.160:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -120,7 +120,7 @@ const GeneralLedger = () => {
   }, [cookies.get("token")]);
   const getGeneralLedgerData = async () => {
     try {
-      const response = await axios.get("http://64.225.8.160:4000/ledger/ledger");
+      const response = await axios.get("http://64.225.8.160:4000/api/ledger/ledger");
       setLoader(false);
       setGeneralLedgerData(response.data.data);
       console.log(response.data.data);

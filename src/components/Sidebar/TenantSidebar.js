@@ -118,7 +118,7 @@ const [rentalAddress, setRentalAddresses] = useState([]);
 
 const getRentalData = async (addresses) => {
   try {
-    const response = await axios.get(`http://64.225.8.160:4000/notification/tenantnotification/tenant/${addresses}`);
+    const response = await axios.get(`http://64.225.8.160:4000/api/notification/tenantnotification/tenant/${addresses}`);
     console.log(response, "abc");
 
     if (Array.isArray(response.data.data)) {
@@ -148,7 +148,7 @@ const getRentalData = async (addresses) => {
 
   const getVendorDetails = async () => {
     try {
-      const response = await axios.get(`http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`);
+      const response = await axios.get(`http://64.225.8.160:4000/api/tenant/tenant_summary/${cookie_id}`);
       const entries = response.data.data.entries;
   
       if (entries.length > 0) {
@@ -175,7 +175,7 @@ const getRentalData = async (addresses) => {
 
   const navigateToDetails = (workorder_id) => {
     // Make a DELETE request to delete the notification
-    axios.get(`http://64.225.8.160:4000/notification/notification/${workorder_id}?role=tenant`)
+    axios.get(`http://64.225.8.160:4000/api/notification/notification/${workorder_id}?role=tenant`)
         .then((response) => {
           if (response.status === 200) {
             const updatedNotificationData = notificationData.map(notification => {

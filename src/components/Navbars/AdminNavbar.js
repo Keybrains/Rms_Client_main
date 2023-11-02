@@ -71,7 +71,7 @@ const AdminNavbar = (props) => {
 
 
   useEffect(() => {
-    fetch(`http://64.225.8.160:4000/notification/notification`)
+    fetch(`http://64.225.8.160:4000/api/notification/notification`)
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -92,7 +92,7 @@ const AdminNavbar = (props) => {
 
   const navigateToDetails = (workorder_id) => {
     // Make a DELETE request to delete the notification
-    axios.delete(`http://64.225.8.160:4000/notification/notification/${workorder_id}`)
+    axios.delete(`http://64.225.8.160:4000/api/notification/notification/${workorder_id}`)
       .then((response) => {
         if (response.status === 200) {
           // Notification deleted successfully, now update the state to remove it from the list

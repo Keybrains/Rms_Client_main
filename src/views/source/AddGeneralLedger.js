@@ -124,11 +124,12 @@ const AddGeneralLedger = () => {
   };
 
   useEffect(() => {
-    fetch("http://64.225.8.160:4000/rentals/property_onrent")
+    fetch("http://64.225.8.160:4000/api/rentals/property_onrent")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
           setPropertyData(data.data);
+          console.log(data.data)
         } else {
           console.error("Error:", data.message);
         }
@@ -139,7 +140,7 @@ const AddGeneralLedger = () => {
   }, []);
 
   useEffect(() => {
-    fetch("http://64.225.8.160:4000/addaccount/find_accountname")
+    fetch("http://64.225.8.160:4000/api/addaccount/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -181,7 +182,7 @@ const AddGeneralLedger = () => {
       };
 
       const response = await axios.post(
-        "http://64.225.8.160:4000/ledger/ledger",
+        "http://64.225.8.160:4000/api/ledger/ledger",
         updatedValues
       );
 
@@ -340,7 +341,7 @@ const AddGeneralLedger = () => {
                           <DropdownToggle caret style={{ width: "100%" }}>
                             {selectedProp ? selectedProp : "Select"}
                           </DropdownToggle>
-                          <DropdownMenu
+                          {/* <DropdownMenu
                             style={{
                               zIndex: 999,
                               maxHeight: "280px",
@@ -353,13 +354,34 @@ const AddGeneralLedger = () => {
                               <DropdownItem
                                 key={item._id}
                                 onClick={() =>
-                                  handlePropSelection(item.rental_adress)
+                                  handlePropSelection(item)
                                 }
                               >
                                 {item.rental_adress}
                               </DropdownItem>
                             ))}
-                          </DropdownMenu>
+                          </DropdownMenu> */}
+                           <DropdownMenu
+                                style={{
+                                  width: "100%",
+                                  maxHeight: "200px",
+                                  overflowY: "auto",
+                                  overflowX: "hidden",
+                                }}
+                              >
+                                {propertyData.map((property) => (
+                                  <DropdownItem
+                                    key={property}
+                                    onClick={() =>
+                                      handlePropSelection(
+                                        property
+                                      )
+                                    }
+                                  >
+                                    {property}
+                                  </DropdownItem>
+                                ))}
+                              </DropdownMenu>
                         </Dropdown>
                       </FormGroup>
                     </Col>

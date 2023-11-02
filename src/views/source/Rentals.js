@@ -93,7 +93,7 @@ const Rentals = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/rentals/rentals")
+    fetch("http://64.225.8.160:4000/api/rentals/rentals")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -198,7 +198,7 @@ const Rentals = () => {
   const handlePropSelection = (propertyType) => {
     // const propTypes=[];
     axios
-      .get("http://64.225.8.160:4000/newproparty/propropartytype")
+      .get("http://64.225.8.160:4000/api/newproparty/propropartytype")
       .then((data) => {
         console.log(data.data, "Data from adding the account");
         // setPropertyData(data.data.data);
@@ -307,7 +307,7 @@ const Rentals = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/register/auth",
+        "http://64.225.8.160:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -335,97 +335,94 @@ const Rentals = () => {
  
 
 
-  const fileData = async (file, name) => {
-    //setImgLoader(true);
-    const allData = [];
-    const axiosRequests = [];
-
-    for (let i = 0; i < file.length; i++) {
-      const dataArray = new FormData();
-      dataArray.append("b_video", file[i]);
-      let url = "https://www.sparrowgroups.com/CDN/image_upload.php";
-
-      // Push the Axios request promises into an array
-      axiosRequests.push(
-        axios
-          .post(url, dataArray, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((res) => {
-            //setImgLoader(false);
-            const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
-            console.log(imagePath, "imagePath");
-            allData.push(imagePath);
-          })
-          .catch((err) => {
-            //setImgLoader(false);
-            console.log("Error uploading image:", err);
-          })
-      );
-    }
-
-    // Wait for all Axios requests to complete before logging the data
-    await Promise.all(axiosRequests);
-    if (name === "propertyres_image") {
-      setResidentialImage([...residentialImage, ...allData]);
-    } else {
-      setCommercialImage([...commercialImage, ...allData]);
-    }
-    // console.log(allData, "allData");
-    console.log(residentialImage, "residentialImage");
-    console.log(commercialImage, "commercialImage");
-  };
-
-  
-
   // const fileData = async (file, name) => {
+  //   //setImgLoader(true);
   //   const allData = [];
   //   const axiosRequests = [];
-  
+
   //   for (let i = 0; i < file.length; i++) {
-  //     const formData = new FormData();
-  //     formData.append('file', file[i]);
-  
-  //     // Adjust the URL to match your server's endpoint
-  //     const url = 'http://64.225.8.160:4000/uploadfile';
-  
+  //     const dataArray = new FormData();
+  //     dataArray.append("b_video", file[i]);
+  //     let url = "https://www.sparrowgroups.com/CDN/image_upload.php";
+
+  //     // Push the Axios request promises into an array
   //     axiosRequests.push(
-  //       axios.post(url, formData, {
-  //         headers: {
-  //           'Content-Type': 'multipart/form-data',
-  //         },  
-  //       })
-  //       .then((response) => {
-  //         const imagePath = response.data;
-  //         console.log(imagePath, 'imagePath');
-  //         allData.push(imagePath);
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error uploading image:', error);
-  //       })
+  //       axios
+  //         .post(url, dataArray, {
+  //           headers: {
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         })
+  //         .then((res) => {
+  //           //setImgLoader(false);
+  //           const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
+  //           console.log(imagePath, "imagePath");
+  //           allData.push(imagePath);
+  //         })
+  //         .catch((err) => {
+  //           //setImgLoader(false);
+  //           console.log("Error uploading image:", err);
+  //         })
   //     );
   //   }
-  
-  //   // Wait for all Axios requests to complete before updating state
+
+  //   // Wait for all Axios requests to complete before logging the data
   //   await Promise.all(axiosRequests);
-  
-  //   if (name === 'propertyres_image') {
+  //   if (name === "propertyres_image") {
   //     setResidentialImage([...residentialImage, ...allData]);
   //   } else {
   //     setCommercialImage([...commercialImage, ...allData]);
   //   }
-  
-  //   // Optionally update the selected photo preview here
-  //   // ...
-  
-  //   console.log(residentialImage, 'residentialImage');
-  //   console.log(commercialImage, 'commercialImage');
+  //   // console.log(allData, "allData");
+  //   console.log(residentialImage, "residentialImage");
+  //   console.log(commercialImage, "commercialImage");
   // };
+
+
+  const fileData = async (file, name) => {
+    const allData = [];
+    const axiosRequests = [];
   
-
-
+    for (let i = 0; i < file.length; i++) {
+      const dataArray = new FormData();
+      dataArray.append('file', file[i]);
+  
+      // Update the URL to point to your Express API
+      let url = 'http://64.225.8.160:4000/api/uploadfile';
+  
+      axiosRequests.push(
+        axios
+          .post(url, dataArray, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          .then((res) => {
+            console.log('Response Object:', res);
+            const imagePath = res.data.filePath;
+            console.log('Image Path:', imagePath);
+          
+            // Add the image path to your frontend state
+            allData.push(imagePath);
+          })
+          .catch((err) => {
+            console.log('Error uploading image:', err);
+          })
+      );
+    }
+  
+    await Promise.all(axiosRequests);
+    
+    if (name === 'propertyres_image') {
+      setResidentialImage([...residentialImage, ...allData]);
+    } else {
+      setCommercialImage([...commercialImage, ...allData]);
+    }
+    console.log(residentialImage, 'residentialImage');
+    console.log(commercialImage, 'commercialImage');
+  };
+  
+  
 
   
   let navigate = useNavigate();
@@ -446,7 +443,7 @@ const Rentals = () => {
   //     values['staffMember'] =  selectedUser;
 
   //     const res = await axios.post(
-  //       "http://64.225.8.160:4000/rentals/rentals",
+  //       "http://64.225.8.160:4000/api/rentals/rentals",
   //       values
   //     );
 
@@ -554,7 +551,7 @@ const Rentals = () => {
       "selectedPhotoresPreview"
     );
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/newproparty/propropartytype")
+    fetch("http://64.225.8.160:4000/api/newproparty/propropartytype")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -572,7 +569,7 @@ const Rentals = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/addstaffmember/find_staffmember")
+    fetch("http://64.225.8.160:4000/api/addstaffmember/find_staffmember")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -594,7 +591,7 @@ const Rentals = () => {
     console.log(id, entryIndex, "id && entry Id");
     if (id && entryIndex) {
       axios
-        .get(`http://64.225.8.160:4000/rentals/rentals_summary/${id}`)
+        .get(`http://64.225.8.160:4000/api/rentals/rentals_summary/${id}`)
         .then((response) => {
           const propertysData = response.data.data;
           // setRentalsData(rentalsData); // Update state with the fetched data
@@ -706,7 +703,7 @@ const Rentals = () => {
       entries: entriesArray,
     };
     try {
-      const res = await axios.get("http://64.225.8.160:4000/rentals/rentals");
+      const res = await axios.get("http://64.225.8.160:4000/api/rentals/rentals");
       if (res.data.statusCode === 200) {
         console.log(res.data.data, "allRentalOwner");
 
@@ -731,7 +728,7 @@ const Rentals = () => {
           console.log(putObject, "putObject");
           axios
             .put(
-              `http://64.225.8.160:4000/rentals/rental/${rentalOwnerId}`,
+              `http://64.225.8.160:4000/api/rentals/rental/${rentalOwnerId}`,
               putObject
             )
             .then((res) => {
@@ -746,7 +743,7 @@ const Rentals = () => {
           if (id === undefined) {
             console.log(leaseObject, "leaseObject");
             const res = await axios.post(
-              "http://64.225.8.160:4000/rentals/rentals",
+              "http://64.225.8.160:4000/api/rentals/rentals",
               leaseObject
             );
             if (res.data.statusCode === 200) {
@@ -779,12 +776,12 @@ const Rentals = () => {
     //   if (id === undefined) {
     //     console.log(values, "values after submit");
     //     const res = await axios.post(
-    //       "http://64.225.8.160:4000/rentals/rentals",
+    //       "http://64.225.8.160:4000/api/rentals/rentals",
     //       values
     //     );
     //     handleResponse(res);
     //   } else {
-    //     const editUrl = `http://64.225.8.160:4000/rentals/rentals/${id}`;
+    //     const editUrl = `http://64.225.8.160:4000/api/rentals/rentals/${id}`;
     //     const res = await axios.put(editUrl, values);
     //     handleResponse(res);
     //   }
@@ -797,7 +794,7 @@ const Rentals = () => {
     // }
   };
   const editProperty = async (id) => {
-    const editUrl = `http://64.225.8.160:4000/rentals/rental/${id}/entry/${entryIndex}`;
+    const editUrl = `http://64.225.8.160:4000/api/rentals/rental/${id}/entry/${entryIndex}`;
     const entriesArray = [];
 
     const entriesObject = {
@@ -2259,17 +2256,7 @@ const Rentals = () => {
                                   onChange={(e) => {
                                     const file = [...e.target.files];
                                     fileData(file, "propertyres_image");
-                                    // Update property_image field in Formik
-                                    // rentalsFormik.setFieldValue(
-                                    //   "propertyres_image",
-                                    //   file
-                                    // );
-
-                                    // Update the selected photo preview
-                                    // const selectedPhotoPreview1 =
-                                    //   document.getElementById(
-                                    //     "selectedPhotoPreview1"
-                                    //   );
+                          
                                     if (file.length > 0) {
                                       const allImages = file.map((file) => {
                                         return URL.createObjectURL(file);
@@ -2278,13 +2265,7 @@ const Rentals = () => {
                                         ...residentialImage,
                                         ...allImages,
                                       ]);
-                                      // const imageUrl =
-                                      //   URL.createObjectURL(file);
-                                      //   setResidentialImage(imageUrl);
-                                      // rentalsFormik.setFieldValue(
-                                      //   "propertyres_image",imageUrl
-                                      // )
-                                      // selectedPhotoPreview1.src = imageUrl;
+                                     
                                     } else {
                                       // selectedPhotoPreview1.src = "";
                                       // rentalsFormik.setFieldValue(

@@ -71,7 +71,7 @@ const Header = () => {
         console.log('Form Data:', formData); // Log the formData
     
         axios
-            .post('http://64.225.8.160:4000/applicant/applicant', formData)
+            .post('http://64.225.8.160:4000/api/applicant/applicant', formData)
             .then((response) => {
                 console.log('Applicant created successfully:', response.data); // Log the response
                 closeModal();

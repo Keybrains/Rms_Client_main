@@ -65,7 +65,7 @@ import {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/register/auth",
+        "http://64.225.8.160:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -85,7 +85,7 @@ import {
     const getStaffMemberData = async () => {
       try {
         const response = await axios.get(
-          "http://64.225.8.160:4000/addstaffmember/addstaffmember"
+          "http://64.225.8.160:4000/api/addstaffmember/addstaffmember"
         );
         setLoader(false);
         setStaffMemberData(response.data.data);
@@ -96,7 +96,7 @@ import {
 
     const editStaffMemberData = async (id, updatedData) => {
       try {
-        const editUrl = `http://64.225.8.160:4000/addstaffmember/staffmember/${id}`;
+        const editUrl = `http://64.225.8.160:4000/api/addstaffmember/staffmember/${id}`;
         console.log("Edit URL:", editUrl);
         console.log("ID:", id);
         console.log("Updated Data:", updatedData); // Log the updated data for debugging
@@ -128,7 +128,7 @@ import {
           }).then((willDelete) => {
             if (willDelete) {
               axios
-                .delete("http://64.225.8.160:4000/addstaffmember/delete_staffmember", {
+                .delete("http://64.225.8.160:4000/api/addstaffmember/delete_staffmember", {
                   data: { _id: id },
                 })
                 .then((response) => {

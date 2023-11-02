@@ -87,7 +87,7 @@ const TenantWork = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/register/auth",
+      "http://64.225.8.160:4000/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );
@@ -106,7 +106,7 @@ React.useEffect(() => {
 
 const getTenantData = async () => {
   try {
-    const response = await axios.get(`http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`);
+    const response = await axios.get(`http://64.225.8.160:4000/api/tenant/tenant_summary/${cookie_id}`);
     const entries = response.data.data.entries;
 
     if (entries.length > 0) {
@@ -132,7 +132,7 @@ const getTenantData = async () => {
 
   const getRentalData = async (addresses) => {
     try {
-      const response = await axios.get(`http://64.225.8.160:4000/workorder/workorder/tenant/${addresses}`);
+      const response = await axios.get(`http://64.225.8.160:4000/api/workorder/workorder/tenant/${addresses}`);
       console.log(response, "abc");
   
       if (Array.isArray(response.data.data)) {

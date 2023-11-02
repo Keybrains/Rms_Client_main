@@ -34,7 +34,7 @@ const VendorProfile = () => {
   const getVendorData = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/vendor/vendor_summary/${cookie_id}`
+        `http://64.225.8.160:4000/api/vendor/vendor_summary/${cookie_id}`
       );
       console.log(response.data.data);
       setVendorDetails(response.data.data);
@@ -63,7 +63,7 @@ const VendorProfile = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/register/auth",
+        "http://64.225.8.160:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );

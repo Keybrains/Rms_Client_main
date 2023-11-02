@@ -35,7 +35,7 @@ const VenorWorkOrder = () => {
       }
 
       const response = await axios.get(
-        `http://64.225.8.160:4000/workorder/workorder_summary/${id}`
+        `http://64.225.8.160:4000/api/workorder/workorder_summary/${id}`
       );
 
       console.log("API Response:", response.data.data);
@@ -64,7 +64,7 @@ const VenorWorkOrder = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/register/auth",
+      "http://64.225.8.160:4000/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );

@@ -84,7 +84,7 @@ function AccountDialog(props) {
     if (props.accountTypeName === "rentAccountName") {
       try {
         const res = await axios.post(
-          "http://64.225.8.160:4000/addaccount/addaccount",
+          "http://64.225.8.160:4000/api/addaccount/addaccount",
           values
         );
         if (res.status === 200) {
@@ -125,7 +125,7 @@ function AccountDialog(props) {
       try {
         // values["property_type"] = localStorage.getItem("propertyType");
         const res = await axios.post(
-          "http://64.225.8.160:4000/recurringAcc/addRecuringAcc",
+          "http://64.225.8.160:4000/api/recurringAcc/addRecuringAcc",
           values
         );
         if (res.data.statusCode === 200) {
@@ -153,7 +153,7 @@ function AccountDialog(props) {
       try {
         // values["property_type"] = localStorage.getItem("propertyType");
         const res = await axios.post(
-          "http://64.225.8.160:4000/onetimecharge/addOneTimeAcc",
+          "http://64.225.8.160:4000/api/onetimecharge/addOneTimeAcc",
           values
         );
         if (res.data.statusCode === 200) {
@@ -180,7 +180,7 @@ function AccountDialog(props) {
     // try {
     //   // values["property_type"] = localStorage.getItem("propertyType");
     //   const res = await axios.post(
-    //     "http://64.225.8.160:4000/addaccount/addaccount",
+    //     "http://64.225.8.160:4000/api/addaccount/addaccount",
     //     values
     //   );
     //   if (res.data.statusCode === 200) {

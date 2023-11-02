@@ -62,7 +62,7 @@ const VendorDashBoard = (props) => {
     };
     // auth post methodss
     let res = await axios.post(
-      "http://64.225.8.160:4000/register/auth",
+      "http://64.225.8.160:4000/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );

@@ -31,7 +31,7 @@ const Workorder = () => {
   const getWorkData = async () => {
     try {
       const response = await axios.get(
-        "http://64.225.8.160:4000/workorder/workorder"
+        "http://64.225.8.160:4000/api/workorder/workorder"
       );
       setWorkData(response.data.data);
       setLoader(false);
@@ -53,7 +53,7 @@ const Workorder = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/register/auth",
+      "http://64.225.8.160:4000/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );
@@ -81,7 +81,7 @@ React.useEffect(() => {
     }).then((willDelete) => {
       if (willDelete) {
         axios
-          .delete("http://64.225.8.160:4000/workorder/delete_workorder", {
+          .delete("http://64.225.8.160:4000/api/workorder/delete_workorder", {
             data: { _id: id },
           })
           .then((response) => {

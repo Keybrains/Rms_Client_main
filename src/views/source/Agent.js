@@ -49,7 +49,7 @@ const Agent = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/register/auth",
+        "http://64.225.8.160:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -78,7 +78,7 @@ const Agent = () => {
     }).then((willDelete) => {
       if (willDelete) {
         axios
-          .delete("http://64.225.8.160:4000/addagent/delete_agent", {
+          .delete("http://64.225.8.160:4000/api/addagent/delete_agent", {
             data: { _id: id },
           })
           .then((response) => {
@@ -106,7 +106,7 @@ const Agent = () => {
   const getAgentData = async () => {
     try {
       const response = await axios.get(
-        "http://64.225.8.160:4000/addagent/addagent"
+        "http://64.225.8.160:4000/api/addagent/addagent"
       );
       setLoader(false);
       setAgentData(response.data.data);

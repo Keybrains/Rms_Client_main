@@ -157,7 +157,7 @@ const VendorAddWork = () => {
   const [workOrderData, setWorkOrderData] = useState(null);
 
   useEffect(() => {
-    fetch("http://64.225.8.160:4000/addaccount/find_accountname")
+    fetch("http://64.225.8.160:4000/api/addaccount/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -176,7 +176,7 @@ const VendorAddWork = () => {
     if (id) {
       axios
         .get(
-          `http://64.225.8.160:4000/workorder/workorder_summary/${id}`
+          `http://64.225.8.160:4000/api/workorder/workorder_summary/${id}`
         )
         .then((response) => {
           const vendorData = response.data.data;
@@ -254,7 +254,7 @@ const VendorAddWork = () => {
       if (id === undefined) {
         // Create the work order
         const workOrderRes = await axios.post(
-          "http://64.225.8.160:4000/workorder/workorder",
+          "http://64.225.8.160:4000/api/workorder/workorder",
           values
           
         );
@@ -262,7 +262,7 @@ const VendorAddWork = () => {
         // Check if the work order was created successfully
         if (workOrderRes.status === 200) {
           const notificationRes = await axios.post(
-            "http://64.225.8.160:4000/notification/notification",
+            "http://64.225.8.160:4000/api/notification/notification",
             {
               workorder: {
                 vendor_name: selectedVendor,
@@ -281,11 +281,11 @@ const VendorAddWork = () => {
           console.error("Work Order Error:", workOrderRes.data);
         }
       } else {
-        const editUrl = `http://64.225.8.160:4000/workorder/workorder/${id}`;
+        const editUrl = `http://64.225.8.160:4000/api/workorder/workorder/${id}`;
         const res = await axios.put(editUrl, values);
           if (res.status === 200) {
             const notification = await axios.post(
-              "http://64.225.8.160:4000/notification/notification/vendor",
+              "http://64.225.8.160:4000/api/notification/notification/vendor",
               {
                 workorder: {
                   vendor_name: selectedVendor,
@@ -366,7 +366,7 @@ const VendorAddWork = () => {
 
   React.useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/rentals/allproperty")
+    fetch("http://64.225.8.160:4000/api/rentals/allproperty")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -384,7 +384,7 @@ const VendorAddWork = () => {
 
   React.useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/addstaffmember/find_staffmember")
+    fetch("http://64.225.8.160:4000/api/addstaffmember/find_staffmember")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {

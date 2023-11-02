@@ -32,7 +32,7 @@ import {
   
     const getOutstandData = async () => {
       try {
-        const response = await axios.get(`http://64.225.8.160:4000/workorder/workorder_summary/${id}`);
+        const response = await axios.get(`http://64.225.8.160:4000/api/workorder/workorder_summary/${id}`);
         setoutstandDetails(response.data.data);
         setLoading(false);
       } catch (error) {

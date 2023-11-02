@@ -43,7 +43,7 @@ const TenantProfile = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/register/auth",
+        "http://64.225.8.160:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -63,7 +63,7 @@ const TenantProfile = () => {
   const getTenantData = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/tenant/tenant/${cookie_id}/entries`
+        `http://64.225.8.160:4000/api/tenant/tenant/${cookie_id}/entries`
       );
       console.log(response.data.data);
       setTenantDetails(response.data.data);
@@ -78,14 +78,14 @@ const TenantProfile = () => {
   useEffect(() => {
     getTenantData();
     console.log(
-      `http://64.225.8.160:4000/tenant/tenant/${cookie_id}/entries`
+      `http://64.225.8.160:4000/api/tenant/tenant/${cookie_id}/entries`
     );
   }, [id]);
 
   const getTenantData1 = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`
+        `http://64.225.8.160:4000/api/tenant/tenant_summary/${cookie_id}`
       );
       setTenantDetails1([response.data.data]);
       console.log(response.data.data);
@@ -99,7 +99,7 @@ const TenantProfile = () => {
 
   useEffect(() => {
     getTenantData1();
-    console.log(`http://64.225.8.160:4000/tenant/tenant_summary/${cookie_id}`);
+    console.log(`http://64.225.8.160:4000/api/tenant/tenant_summary/${cookie_id}`);
   }, [id]);
 
   function formatDateWithoutTime(dateString) {

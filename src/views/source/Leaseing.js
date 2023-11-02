@@ -424,7 +424,7 @@ const Leaseing = () => {
     try {
       // values["property_type"] = localStorage.getItem("propertyType");
       const res = await axios.post(
-        "http://64.225.8.160:4000/addaccount/addaccount",
+        "http://64.225.8.160:4000/api/addaccount/addaccount",
         values
       );
       if (res.data.statusCode === 200) {
@@ -521,7 +521,7 @@ const Leaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/rentals/property")
+    fetch("http://64.225.8.160:4000/api/rentals/property")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -540,7 +540,7 @@ const Leaseing = () => {
 
   const fetchingAccountNames = async () => {
     console.log("fetching account names");
-    fetch("http://64.225.8.160:4000/addaccount/find_accountname")
+    fetch("http://64.225.8.160:4000/api/addaccount/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -559,7 +559,7 @@ const Leaseing = () => {
 
   const fetchingRecAccountNames = async () => {
     console.log("fetching rec accounr names");
-    fetch("http://64.225.8.160:4000/recurringAcc/find_accountname")
+    fetch("http://64.225.8.160:4000/api/recurringAcc/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -578,7 +578,7 @@ const Leaseing = () => {
 
   const fetchingOneTimeCharges = async () => {
     console.log("fetcjhiine pne rime charges");
-    fetch("http://64.225.8.160:4000/onetimecharge/find_accountname")
+    fetch("http://64.225.8.160:4000/api/onetimecharge/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -614,7 +614,7 @@ const Leaseing = () => {
 
   // useEffect(() => {
   //   // Make an HTTP GET request to your Express API endpoint
-  //   fetch("http://64.225.8.160:4000/addaccount/find_accountname")
+  //   fetch("http://64.225.8.160:4000/api/addaccount/find_accountname")
   //     .then((response) => response.json())
   //     .then((data) => {
   //       if (data.statusCode === 200) {
@@ -633,7 +633,7 @@ const Leaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/addagent/find_agentname")
+    fetch("http://64.225.8.160:4000/api/addagent/find_agentname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -671,7 +671,7 @@ const Leaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/tenant/tenant")
+    fetch("http://64.225.8.160:4000/api/tenant/tenant")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -700,7 +700,7 @@ const Leaseing = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/register/auth",
+        "http://64.225.8.160:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -856,7 +856,7 @@ const Leaseing = () => {
     console.log(id, entryIndex, "id && entry Id");
     if (id && entryIndex) {
       axios
-        .get(`http://64.225.8.160:4000/tenant/tenant_summary/${id}`)
+        .get(`http://64.225.8.160:4000/api/tenant/tenant_summary/${id}`)
         .then((response) => {
           const laesingdata = response.data.data;
           //setleasingData(leasingData);
@@ -1067,7 +1067,7 @@ const Leaseing = () => {
     };
 
     try {
-      const res = await axios.get(`http://64.225.8.160:4000/tenant/tenant`);
+      const res = await axios.get(`http://64.225.8.160:4000/api/tenant/tenant`);
       if (res.data.statusCode === 200) {
         console.log(res.data.data, "allTenants");
         const allTenants = res.data.data;
@@ -1088,7 +1088,7 @@ const Leaseing = () => {
           console.log(tenantId, "tenantId");
           console.log(putObject, "putObject");
           const res = await axios.put(
-            `http://64.225.8.160:4000/tenant/tenant/${tenantId}`,
+            `http://64.225.8.160:4000/api/tenant/tenant/${tenantId}`,
             putObject
           );
           if (res.data.statusCode === 200) {
@@ -1102,7 +1102,7 @@ const Leaseing = () => {
           if (id === undefined) {
             console.log(leaseObject, "leaseObject");
             const res = await axios.post(
-              "http://64.225.8.160:4000/tenant/tenant",
+              "http://64.225.8.160:4000/api/tenant/tenant",
               leaseObject
             );
             if (res.data.statusCode === 200) {
@@ -1147,7 +1147,7 @@ const Leaseing = () => {
   const editLease = async (id) => {
     const arrayOfNames = file.map((item) => item.name);
 
-    const editUrl = `http://64.225.8.160:4000/tenant/tenants/${id}/entry/${entryIndex}`;
+    const editUrl = `http://64.225.8.160:4000/api/tenant/tenants/${id}/entry/${entryIndex}`;
     const entriesArray = [];
 
     const entriesObject = {
