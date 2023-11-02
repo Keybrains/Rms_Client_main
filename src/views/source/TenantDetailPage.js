@@ -34,7 +34,7 @@ const TenantDetailPage = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/api/register/auth",
+      "https://propertymanager.cloudpress.host/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );
@@ -51,7 +51,7 @@ React.useEffect(() => {
   chackAuth();
 }, [cookies.get("token")]);
 
-const apiUrl = `http://64.225.8.160:4000/api/tenant/tenant_summary/${tenantId}/entry/${entryIndex}`;
+const apiUrl = `https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${tenantId}/entry/${entryIndex}`;
 const getTenantData = async () => {
   try {
     const response = await axios.get(apiUrl);

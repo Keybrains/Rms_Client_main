@@ -40,7 +40,7 @@ const StaffWorkTable = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/api/register/auth",
+      "https://propertymanager.cloudpress.host/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );
@@ -62,7 +62,7 @@ React.useEffect(() => {
   const getWorkData = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/api/addstaffmember/staffmember_summary/${cookie_id}`
+        `https://propertymanager.cloudpress.host/api/addstaffmember/staffmember_summary/${cookie_id}`
       );
       if (response.data && response.data.data) {
         console.log(response.data.data);
@@ -85,7 +85,7 @@ React.useEffect(() => {
   const getRentalData = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/api/workorder/workorder/by-staff-member/${staffmember_name}`
+        `https://propertymanager.cloudpress.host/api/workorder/workorder/by-staff-member/${staffmember_name}`
       );
       setWorkData(response.data.data);
       console.log(response.data);

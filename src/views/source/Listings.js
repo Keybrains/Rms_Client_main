@@ -36,7 +36,7 @@ import { useNavigate } from "react-router-dom";
   const getRentalsData = async () => {
     try {
       const response = await axios.get(
-        "http://64.225.8.160:4000/api/rentals/listings"
+        "https://propertymanager.cloudpress.host/api/rentals/listings"
       );
       setRentalsData(response.data.data);
     } catch (error) {
@@ -61,7 +61,7 @@ import { useNavigate } from "react-router-dom";
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/api/register/auth",
+      "https://propertymanager.cloudpress.host/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );

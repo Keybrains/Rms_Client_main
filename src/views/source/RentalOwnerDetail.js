@@ -34,7 +34,7 @@ const RentalOwnerDetail = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/api/register/auth",
+      "https://propertymanager.cloudpress.host/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );
@@ -54,7 +54,7 @@ React.useEffect(() => {
   const getRentalOwnerData = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/api/rentalowner/rentalowner/${id}`
+        `https://propertymanager.cloudpress.host/api/rentalowner/rentalowner/${id}`
       );
       console.log(response.data.data);
       setRentalOwnerDetails(response.data.data);

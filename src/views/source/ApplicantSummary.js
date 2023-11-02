@@ -100,7 +100,7 @@ const ApplicantSummary = () => {
 
   const navigateToLease = () => {
     axios
-      .get(`http://64.225.8.160:4000/api/applicant/applicant_summary/${id}`)
+      .get(`https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`)
       .then((response) => {
         const data = response.data.data;
 
@@ -121,10 +121,10 @@ const ApplicantSummary = () => {
 
   useEffect(() => {
     axios
-      .get(`http://64.225.8.160:4000/api/applicant/applicant_summary/${id}`)
+      .get(`https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`)
       .then((applicants) => {
         axios
-          .get("http://64.225.8.160:4000/api/rentals/property")
+          .get("https://propertymanager.cloudpress.host/api/rentals/property")
           .then((properties) => {
             console.log(applicants.data.data, "applicants");
             console.log(properties.data.data, "properties");
@@ -175,7 +175,7 @@ const ApplicantSummary = () => {
     try {
       // Step 1: Fetch data from the API
       const response = await axios.get(
-        `http://64.225.8.160:4000/api/applicant/applicant_summary/${id}`
+        `https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`
       );
 
       // Check if the response contains the data you expect
@@ -197,7 +197,7 @@ const ApplicantSummary = () => {
 
         // Step 3: Make a POST request to send the data to the server
         const postResponse = await axios.post(
-          "http://64.225.8.160:4000/api/tenant/tenant",
+          "https://propertymanager.cloudpress.host/api/tenant/tenant",
           dataToSend
         );
         console.log(dataToSend, "hagfjg");

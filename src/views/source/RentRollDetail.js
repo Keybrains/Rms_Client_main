@@ -24,7 +24,7 @@ const RentRollDetail = () => {
   const getTenantData = async () => {
     try {
       const response = await axios.get(
-        `http://64.225.8.160:4000/api/tenant/tenant_summary/${id}`
+        `https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${id}`
       );
       console.log(response.data.data);
       setTenantDetails(response.data.data);
@@ -53,7 +53,7 @@ const RentRollDetail = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/api/register/auth",
+      "https://propertymanager.cloudpress.host/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );

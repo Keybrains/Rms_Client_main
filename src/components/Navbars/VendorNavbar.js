@@ -66,7 +66,7 @@ const VendorNavbar = (props) => {
   const getVendorDetails = async () => {
       try {
         const response = await axios.get(
-          `http://64.225.8.160:4000/api/vendor/vendor_summary/${cookie_id}`
+          `https://propertymanager.cloudpress.host/api/vendor/vendor_summary/${cookie_id}`
         );
         console.log(response.data.data)
         setVendorDetails(response.data.data);
@@ -92,7 +92,7 @@ const VendorNavbar = (props) => {
   };
 
   useEffect(() => {
-    fetch(`http://64.225.8.160:4000/api/notification/vendornotification/${vendor_name}`)
+    fetch(`https://propertymanager.cloudpress.host/api/notification/vendornotification/${vendor_name}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -123,7 +123,7 @@ const VendorNavbar = (props) => {
 
   const navigateToDetails = (workorder_id) => {
     // Make a GET request to mark the notification as read
-    axios.get(`http://64.225.8.160:4000/api/notification/notification/${workorder_id}?role=vendor`)
+    axios.get(`https://propertymanager.cloudpress.host/api/notification/notification/${workorder_id}?role=vendor`)
       .then((response) => {
         if (response.status === 200) {
           const updatedNotificationData = notificationData.map(notification => {

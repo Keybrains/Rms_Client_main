@@ -116,7 +116,7 @@ const TAddWork = () => {
     // React.useEffect(() => {
     //   if (id) {
     //     axios
-    //       .get(`http://64.225.8.160:4000/api/workorder/workorder_summary/${id}`)
+    //       .get(`https://propertymanager.cloudpress.host/api/workorder/workorder_summary/${id}`)
     //       .then((response) => {
     //         const vendorData = response.data.data;
     //         setWorkOrderData(workOrderData);
@@ -170,7 +170,7 @@ const TAddWork = () => {
         if (id === undefined) {
           // Create the work order
           const workOrderRes = await axios.post(
-            "http://64.225.8.160:4000/api/workorder/workorder",
+            "https://propertymanager.cloudpress.host/api/workorder/workorder",
             values
           );
     
@@ -180,7 +180,7 @@ const TAddWork = () => {
             console.log(workOrderRes.data, "fjalkjflsk")
             // Use the work order data from the response to create the notification
             const notificationRes = await axios.post(
-              "http://64.225.8.160:4000/api/notification/notification/tenant",
+              "https://propertymanager.cloudpress.host/api/notification/notification/tenant",
               {
                 
                 "workorder": {
@@ -203,7 +203,7 @@ const TAddWork = () => {
             console.error("Work Order Error:", workOrderRes.data);
           }
         } else {
-          const editUrl = `http://64.225.8.160:4000/api/workorder/workorder/${id}`;
+          const editUrl = `https://propertymanager.cloudpress.host/api/workorder/workorder/${id}`;
           const res = await axios.put(editUrl, values);
           handleResponse(res);
         }
@@ -259,7 +259,7 @@ const TAddWork = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/api/register/auth",
+        "https://propertymanager.cloudpress.host/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -278,7 +278,7 @@ const TAddWork = () => {
 
     React.useEffect(() => {
         // Make an HTTP GET request to your Express API endpoint
-        fetch("http://64.225.8.160:4000/api/rentals/property_onrent")
+        fetch("https://propertymanager.cloudpress.host/api/rentals/property_onrent")
           .then((response) => response.json())
           .then((data) => {
             if (data.statusCode === 200) {
@@ -296,7 +296,7 @@ const TAddWork = () => {
 
       React.useEffect(() => {
         // Make an HTTP GET request to your Express API endpoint
-        fetch('http://64.225.8.160:4000/api/addstaffmember/find_staffmember')
+        fetch('https://propertymanager.cloudpress.host/api/addstaffmember/find_staffmember')
           .then((response) => response.json())
           .then((data) => {
             if (data.statusCode === 200) {

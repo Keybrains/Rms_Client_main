@@ -46,7 +46,8 @@ const Login = () => {
 
       // Admin login
       const adminRes = await axios.post(
-        "http://64.225.8.160:4000/api/register/login",
+        "https://propertymanager.cloudpress.host/api/register/login",
+        
         values
       );
 
@@ -62,7 +63,7 @@ const Login = () => {
       } else {
         // Admin login failed, try tenant login
         const tenantRes = await axios.post(
-          "http://64.225.8.160:4000/api/tenant/login",
+          "https://propertymanager.cloudpress.host/api/tenant/login",
           {
             tenant_email: values.email,
             tenant_password: values.password,
@@ -93,7 +94,7 @@ const Login = () => {
         } else {
           // Admin and tenant login failed, try agent login
           const agentRes = await axios.post(
-            "http://64.225.8.160:4000/api/addagent/login",
+            "https://propertymanager.cloudpress.host/api/addagent/login",
             {
               agent_email: values.email,
               agent_password: values.password,
@@ -125,7 +126,7 @@ const Login = () => {
           } else {
             // All login attempts failed, try staff login
             const staffRes = await axios.post(
-              "http://64.225.8.160:4000/api/addstaffmember/login",
+              "https://propertymanager.cloudpress.host/api/addstaffmember/login",
               {
                 staffmember_email: values.email,
                 staffmember_password: values.password,
@@ -157,7 +158,7 @@ const Login = () => {
             } else {
               // All login attempts failed, try vendor login
               const vendorRes = await axios.post(
-                "http://64.225.8.160:4000/api/vendor/login",
+                "https://propertymanager.cloudpress.host/api/vendor/login",
                 {
                   vendor_email: values.email,
                   vendor_password: values.password,

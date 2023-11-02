@@ -413,7 +413,7 @@ const RentRollLeaseing = () => {
     try {
       // values["property_type"] = localStorage.getItem("propertyType");
       const res = await axios.post(
-        "http://64.225.8.160:4000/api/addaccount/addaccount",
+        "https://propertymanager.cloudpress.host/api/addaccount/addaccount",
         values
       );
       if (res.data.statusCode === 200) {
@@ -510,7 +510,7 @@ const RentRollLeaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/api/rentals/property")
+    fetch("https://propertymanager.cloudpress.host/api/rentals/property")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -528,7 +528,7 @@ const RentRollLeaseing = () => {
 
   const fetchingAccountNames = async () => {
     console.log("fetching account names");
-    fetch("http://64.225.8.160:4000/api/addaccount/find_accountname")
+    fetch("https://propertymanager.cloudpress.host/api/addaccount/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -547,7 +547,7 @@ const RentRollLeaseing = () => {
 
   const fetchingRecAccountNames = async () => {
     console.log("fetching rec accounr names");
-    fetch("http://64.225.8.160:4000/api/recurringAcc/find_accountname")
+    fetch("https://propertymanager.cloudpress.host/api/recurringAcc/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -566,7 +566,7 @@ const RentRollLeaseing = () => {
 
   const fetchingOneTimeCharges = async () => {
     console.log("fetcjhiine pne rime charges");
-    fetch("http://64.225.8.160:4000/api/onetimecharge/find_accountname")
+    fetch("https://propertymanager.cloudpress.host/api/onetimecharge/find_accountname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -602,7 +602,7 @@ const RentRollLeaseing = () => {
 
   // useEffect(() => {
   //   // Make an HTTP GET request to your Express API endpoint
-  //   fetch("http://64.225.8.160:4000/api/addaccount/find_accountname")
+  //   fetch("https://propertymanager.cloudpress.host/api/addaccount/find_accountname")
   //     .then((response) => response.json())
   //     .then((data) => {
   //       if (data.statusCode === 200) {
@@ -621,7 +621,7 @@ const RentRollLeaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/api/addagent/find_agentname")
+    fetch("https://propertymanager.cloudpress.host/api/addagent/find_agentname")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -659,7 +659,7 @@ const RentRollLeaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("http://64.225.8.160:4000/api/tenant/tenant")
+    fetch("https://propertymanager.cloudpress.host/api/tenant/tenant")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -688,7 +688,7 @@ const RentRollLeaseing = () => {
       };
       // auth post method
       let res = await axios.post(
-        "http://64.225.8.160:4000/api/register/auth",
+        "https://propertymanager.cloudpress.host/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -824,7 +824,7 @@ const RentRollLeaseing = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`http://64.225.8.160:4000/api/tenant/tenant_summary/${id}`)
+        .get(`https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${id}`)
         .then((response) => {
           const laesingdata = response.data.data;
           setleasingData(leasingData);
@@ -977,7 +977,7 @@ const RentRollLeaseing = () => {
       console.log(id, "id from parameter");
       if (id === undefined) {
         const res = await axios.post(
-          "http://64.225.8.160:4000/api/tenant/tenant",
+          "https://propertymanager.cloudpress.host/api/tenant/tenant",
           values
         );
         if (res.data.statusCode === 200) {
@@ -988,7 +988,7 @@ const RentRollLeaseing = () => {
         }
         handleResponse(res);
       } else {
-        const editUrl = `http://64.225.8.160:4000/api/tenant/tenant/${id}`;
+        const editUrl = `https://propertymanager.cloudpress.host/api/tenant/tenant/${id}`;
         console.log(values, "updated values");
         const res = await axios.put(editUrl, values);
         handleResponse(res);

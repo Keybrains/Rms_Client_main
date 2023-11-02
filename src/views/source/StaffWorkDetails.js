@@ -32,7 +32,7 @@ import {
   
     const getOutstandData = async () => {
       try {
-        const response = await axios.get(`http://64.225.8.160:4000/api/workorder/workorder_summary/${workorder_id}`);
+        const response = await axios.get(`https://propertymanager.cloudpress.host/api/workorder/workorder_summary/${workorder_id}`);
         setoutstandDetails(response.data.data);
         setLoading(false);
       } catch (error) {

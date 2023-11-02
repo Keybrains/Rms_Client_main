@@ -56,7 +56,7 @@ const RentRoll = () => {
     };
     // auth post method
     let res = await axios.post(
-      "http://64.225.8.160:4000/api/register/auth",
+      "https://propertymanager.cloudpress.host/api/register/auth",
       { purpose: "validate access" },
       authConfig
     );
@@ -76,7 +76,7 @@ React.useEffect(() => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "http://64.225.8.160:4000/api/tenant/tenant"
+        "https://propertymanager.cloudpress.host/api/tenant/tenant"
       );
       setLoader(false);
       setTenantsData(response.data.data);
@@ -109,7 +109,7 @@ React.useEffect(() => {
 
   const editTenantData = async (id, updatedData) => {
     try {
-      const editUrl = ` http://64.225.8.160:4000/api/tenant/tenant/${id}`;
+      const editUrl = ` https://propertymanager.cloudpress.host/api/tenant/tenant/${id}`;
       const response = await axios.put(editUrl, updatedData);
 
       if (response.status === 200) {
@@ -144,7 +144,7 @@ React.useEffect(() => {
     }).then((willDelete) => {
       if (willDelete) {
         axios
-          .delete("http://64.225.8.160:4000/api/tenant/tenant", {
+          .delete("https://propertymanager.cloudpress.host/api/tenant/tenant", {
             data: { _id: id },
           })
           .then((response) => {
