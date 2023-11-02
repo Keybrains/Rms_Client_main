@@ -335,92 +335,92 @@ const Rentals = () => {
  
 
 
-  // const fileData = async (file, name) => {
-  //   //setImgLoader(true);
-  //   const allData = [];
-  //   const axiosRequests = [];
-
-  //   for (let i = 0; i < file.length; i++) {
-  //     const dataArray = new FormData();
-  //     dataArray.append("b_video", file[i]);
-  //     let url = "https://www.sparrowgroups.com/CDN/image_upload.php";
-
-  //     // Push the Axios request promises into an array
-  //     axiosRequests.push(
-  //       axios
-  //         .post(url, dataArray, {
-  //           headers: {
-  //             "Content-Type": "multipart/form-data",
-  //           },
-  //         })
-  //         .then((res) => {
-  //           //setImgLoader(false);
-  //           const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
-  //           console.log(imagePath, "imagePath");
-  //           allData.push(imagePath);
-  //         })
-  //         .catch((err) => {
-  //           //setImgLoader(false);
-  //           console.log("Error uploading image:", err);
-  //         })
-  //     );
-  //   }
-
-  //   // Wait for all Axios requests to complete before logging the data
-  //   await Promise.all(axiosRequests);
-  //   if (name === "propertyres_image") {
-  //     setResidentialImage([...residentialImage, ...allData]);
-  //   } else {
-  //     setCommercialImage([...commercialImage, ...allData]);
-  //   }
-  //   // console.log(allData, "allData");
-  //   console.log(residentialImage, "residentialImage");
-  //   console.log(commercialImage, "commercialImage");
-  // };
-
-
   const fileData = async (file, name) => {
+    //setImgLoader(true);
     const allData = [];
     const axiosRequests = [];
-  
+
     for (let i = 0; i < file.length; i++) {
       const dataArray = new FormData();
-      dataArray.append('file', file[i]);
-  
-      // Update the URL to point to your Express API
-      let url = 'http://64.225.8.160:4000/api/uploadfile';
-  
+      dataArray.append("b_video", file[i]);
+      let url = "https://www.sparrowgroups.com/CDN/image_upload.php";
+
+      // Push the Axios request promises into an array
       axiosRequests.push(
         axios
           .post(url, dataArray, {
             headers: {
-              'Content-Type': 'multipart/form-data',
+              "Content-Type": "multipart/form-data",
             },
           })
           .then((res) => {
-            console.log('Response Object:', res);
-            const imagePath = res.data.filePath;
-            console.log('Image Path:', imagePath);
-          
-            // Add the image path to your frontend state
+            //setImgLoader(false);
+            const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
+            console.log(imagePath, "imagePath");
             allData.push(imagePath);
           })
           .catch((err) => {
-            console.log('Error uploading image:', err);
+            //setImgLoader(false);
+            console.log("Error uploading image:", err);
           })
       );
     }
-  
+
+    // Wait for all Axios requests to complete before logging the data
     await Promise.all(axiosRequests);
-    
-    if (name === 'propertyres_image') {
+    if (name === "propertyres_image") {
       setResidentialImage([...residentialImage, ...allData]);
     } else {
       setCommercialImage([...commercialImage, ...allData]);
     }
-    console.log(residentialImage, 'residentialImage');
-    console.log(commercialImage, 'commercialImage');
+    // console.log(allData, "allData");
+    console.log(residentialImage, "residentialImage");
+    console.log(commercialImage, "commercialImage");
   };
+
+
+  // const fileData = async (file, name) => {
+  //   const allData = [];
+  //   const axiosRequests = [];
+  
+  //   for (let i = 0; i < file.length; i++) {
+  //     const dataArray = new FormData();
+  //     dataArray.append('file', file[i]);
+  
+  //     // Update the URL to point to your Express API
+  //     let url = 'http://64.225.8.160:4000/api/uploadfile';
+  
+  //     axiosRequests.push(
+  //       axios
+  //         .post(url, dataArray, {
+  //           headers: {
+  //             'Content-Type': 'multipart/form-data',
+  //           },
+  //         })
+  //         .then((res) => {
+  //           console.log('Response Object:', res);
+  //           const imagePath = res.data.filePath;
+  //           console.log('Image Path:', imagePath);
+          
+  //           // Add the image path to your frontend state
+  //           allData.push(imagePath);
+  //         })
+  //         .catch((err) => {
+  //           console.log('Error uploading image:', err);
+  //         })
+  //     );
+  //   }
+  
+  //   await Promise.all(axiosRequests);
+    
+  //   if (name === 'propertyres_image') {
+  //     setResidentialImage([...residentialImage, ...allData]);
+  //   } else {
+  //     setCommercialImage([...commercialImage, ...allData]);
+  //   }
+  //   console.log(residentialImage, 'residentialImage');
+  //   console.log(commercialImage, 'commercialImage');
+  // };
   
   
 
