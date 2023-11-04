@@ -423,7 +423,7 @@ React.useEffect(() => {
                         </tr>
                       </tbody> */}
                     </>
-                  ) : (
+                  ) : ( 
                     <tbody>
                       <tr>
                         <td>No tenant details found.</td>

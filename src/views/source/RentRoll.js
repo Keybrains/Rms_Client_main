@@ -28,50 +28,52 @@ import swal from "sweetalert"; // Import sweetalert
 import { Link } from "react-router-dom";
 import InfoIcon from "@mui/icons-material/Info";
 import { RotatingLines } from "react-loader-spinner";
-import Cookies from 'universal-cookie';
+import Cookies from "universal-cookie";
 // import RentRollHeader from "components/Headers/RentRollHeader";
 
 const RentRoll = () => {
   const [tenantsData, setTenantsData] = useState([]);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingTenant, setEditingTenant] = useState(null);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   let [loader, setLoader] = React.useState(true);
 
-  function navigateToRentRollDetails(rentRollId) {
-    const rentRollDetailsURL = `/admin/rentrolldetail/${rentRollId}`;
-    window.location.href = rentRollDetailsURL;
-  }
-
+  // function navigateToRentRollDetails(rentRollId) {
+  //   const rentRollDetailsURL = `/admin/rentrolldetail/${rentRollId}`;
+  //   window.location.href = rentRollDetailsURL;
+  // }
+  const navigateToRentRollDetails = (tenantId, entryIndex) => {
+    navigate(`/admin/rentrolldetail/${tenantId}/${entryIndex}`);
+    console.log(tenantId, "Tenant Id");
+    console.log(entryIndex, "Entry Index");
+  };
   let cookies = new Cookies();
   // Check Authe(token)
   let chackAuth = async () => {
     if (cookies.get("token")) {
-      let  authConfig = {
+      let authConfig = {
         headers: {
-        Authorization: `Bearer ${cookies.get("token")}`,
-        token: cookies.get("token"),
-      },
-    };
-    // auth post method
-    let res = await axios.post(
-      "https://propertymanager.cloudpress.host/api/register/auth",
-      { purpose: "validate access" },
-      authConfig
-    );
-    if (res.data.statusCode !== 200) {
-      // cookies.remove("token");
+          Authorization: `Bearer ${cookies.get("token")}`,
+          token: cookies.get("token"),
+        },
+      };
+      // auth post method
+      let res = await axios.post(
+        "https://propertymanager.cloudpress.host/api/register/auth",
+        { purpose: "validate access" },
+        authConfig
+      );
+      if (res.data.statusCode !== 200) {
+        // cookies.remove("token");
+        navigate("/auth/login");
+      }
+    } else {
       navigate("/auth/login");
     }
-  } else {
-    navigate("/auth/login");
-  }
-};
+  };
 
-React.useEffect(() => {
-  chackAuth();
-}, [cookies.get("token")]);
+  React.useEffect(() => {
+    chackAuth();
+  }, [cookies.get("token")]);
 
   const fetchData = async () => {
     try {
@@ -107,56 +109,30 @@ React.useEffect(() => {
     fetchData();
   }, []);
 
-  const editTenantData = async (id, updatedData) => {
-    try {
-      const editUrl = ` https://propertymanager.cloudpress.host/api/tenant/tenant/${id}`;
-      const response = await axios.put(editUrl, updatedData);
-
-      if (response.status === 200) {
-        fetchData();
-        setIsEditDialogOpen(false); // Close the dialog
-        swal("Success!", "RentRoll updated successfully!", "success"); // Display success message
-      } else {
-        console.error("Edit request failed with status:", response.status);
-      }
-    } catch (error) {
-      console.error("Error editing property:", error);
-    }
-  };
-
-  const openEditDialog = (tenant) => {
-    setEditingTenant({ ...tenant });
-    setIsEditDialogOpen(true);
-  };
-
-  const closeEditDialog = () => {
-    setIsEditDialogOpen(false);
-  };
-
-  const deleteTenant = (id) => {
-    // Show a confirmation dialog to the user
+  const deleteTenant = (tenantId, entryIndex) => {
     swal({
       title: "Are you sure?",
       text: "Once deleted, you will not be able to recover this tenant!",
       icon: "warning",
       buttons: ["Cancel", "Delete"],
-      dangerMode: true,
+      dangerMode: true,     
     }).then((willDelete) => {
       if (willDelete) {
         axios
-          .delete("https://propertymanager.cloudpress.host/api/tenant/tenant", {
-            data: { _id: id },
-          })
+          .delete(
+            `https://propertymanager.cloudpress.host/api/tenant/tenant/${tenantId}/entry/${entryIndex}`
+          )
           .then((response) => {
             if (response.data.statusCode === 200) {
               swal("Success!", "Tenant deleted successfully!", "success");
-              fetchData(); // Refresh your tenant data or perform other actions
+              // getTenantsDate();
+              // Optionally, you can refresh your tenant data here.
             } else {
               swal("", response.data.message, "error");
             }
           })
           .catch((error) => {
-            console.error("Error deleting tenant:", error);
+            console.error("Error deleting Tenant:", error);
           });
       } else {
         swal("Cancelled", "Tenant is safe :)", "info");
@@ -231,47 +207,12 @@ React.useEffect(() => {
                     <tr>
                       <th scope="col">Lease</th>
                       <th scope="col">Type</th>
-                      <th scope="col">Rent</th>
+                      <th scope="col">Start Date</th>
+                      <th scope="col">End Date</th>
                       <th scope="col">ACTION</th>
                     </tr>
                   </thead>
-                  {/* <tbody>
-                    {filterRentRollsBySearch()?.map((tenant) => (
-                      <tr
-                        key={tenant._id}
-                        onClick={() => navigateToRentRollDetails(tenant._id)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <td>{tenant.rental_adress}</td>
-                        <td>{tenant.lease_type}</td>
-                        <td>{tenant.amount}</td>
-                        <td style={{}}>
-                          <div style={{ display: "flex", gap: "5px" }}>
-                            <div
-                              style={{ cursor: "pointer" }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteTenant(tenant._id);
-                              }}
-                            >
-                              <DeleteIcon />
-                            </div>
-                            &nbsp; &nbsp; &nbsp;
-                            <div
-                              style={{ cursor: "pointer" }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                editLeasing(tenant._id);
-                              }}
-                            >
-                              <EditIcon />
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody> */}
-                      <tbody>
+                  <tbody>
                     {filterRentRollsBySearch()?.map((tenant) => (
                       <>
                         {tenant.entries.map((entry) => (
@@ -310,20 +251,11 @@ React.useEffect(() => {
                                   style={{ cursor: "pointer" }}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    editLeasing(tenant._id ,entry.entryIndex);
+                                    editLeasing(tenant._id, entry.entryIndex);
                                   }}
                                 >
                                   <EditIcon />
                                 </div>
-                                {/* <div
-                                  style={{ cursor: "pointer" }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    generatePDF(tenant._id, tenantDetails,entry.entryIndex);
-                                  }}
-                                >
-                                  <PictureAsPdfIcon />
-                                </div> */}
                               </div>
                             </td>
                           </tr>
@@ -337,125 +269,6 @@ React.useEffect(() => {
           </Grid>
         </Grid>
       </Container>
-      <Dialog
-        open={isEditDialogOpen}
-        onClose={closeEditDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle style={{ background: "#F0F8FF", marginBottom: "16px" }}>
-          Update
-        </DialogTitle>
-        <DialogContent style={{ width: "100%", maxWidth: "500px" }}>
-          {/* <div style={{ marginBottom: "16px" }}>
-            <InputLabel>Lease</InputLabel>
-            <TextField
-              fullWidth
-              value={editingTenant?.property_type || ""}
-              onChange={(e) =>
-                setEditingTenant({
-                  ...editingTenant,
-                  property_type: e.target.value,
-                })
-              }
-            />
-          </div> */}
-          <FormGroup>
-            <label className="form-control-label" htmlFor="input-property">
-              Lease
-            </label>
-            <Input
-              className="form-control-alternative"
-              id="input-protype"
-              type="text"
-              name="propertysub_type"
-              value={editingTenant?.rental_adress || ""}
-              onChange={(e) =>
-                setEditingTenant({
-                  ...editingTenant,
-                  rental_adress: e.target.value,
-                })
-              }
-            />
-          </FormGroup>
-
-          {/* <div style={{ marginBottom: "16px" }}>
-            <InputLabel>Type</InputLabel>
-
-            <TextField
-              // label="Type"
-              fullWidth
-              value={editingTenant?.lease_type || ""}
-              onChange={(e) =>
-                setEditingTenant({
-                  ...editingTenant,
-                  lease_type: e.target.value,
-                })
-              }
-            />
-          </div> */}
-          <FormGroup>
-            <label className="form-control-label" htmlFor="input-property">
-              Type
-            </label>
-            <Input
-              className="form-control-alternative"
-              id="input-protype"
-              type="text"
-              name="lease_type "
-              value={editingTenant?.lease_type || ""}
-              onChange={(e) =>
-                setEditingTenant({
-                  ...editingTenant,
-                  lease_type: e.target.value,
-                })
-              }
-            />
-          </FormGroup>
-          {/* <InputLabel>Rent</InputLabel>
-
-          <TextField
-            // label="Rent"
-            fullWidth
-            value={editingTenant?.amount || ""}
-            onChange={(e) =>
-              setEditingTenant({
-                ...editingTenant,
-                amount: e.target.value,
-              })
-            }
-          /> */}
-          <FormGroup>
-            <label className="form-control-label" htmlFor="input-property">
-              Rent
-            </label>
-            <Input
-              className="form-control-alternative"
-              id="input-protype"
-              type="text"
-              name=" amount"
-              value={editingTenant?.amount || ""}
-              onChange={(e) =>
-                setEditingTenant({
-                  ...editingTenant,
-                  amount: e.target.value,
-                })
-              }
-            />
-          </FormGroup>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeEditDialog}>Cancel</Button>
-          <Button
-            onClick={() => {
-              editTenantData(editingTenant._id, editingTenant);
-            }}
-            color="primary"
-          >
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };

@@ -32,6 +32,12 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const TAddWork = () => {
 
+  const [workOrderData, setWorkOrderData] = useState(null);
+  const { id } = useParams();
+
+  let cookies = new Cookies();
+  let cookie_id = cookies.get("Tenant ID");
+  console.log(cookie_id, "cookie_id");
 
     const [open, setOpen] = React.useState(false);
     
@@ -110,8 +116,6 @@ const TAddWork = () => {
       navigate('../tenantwork');
     };
 
-    const [workOrderData, setWorkOrderData] = useState(null);
-    const { id } = useParams();
 
     // React.useEffect(() => {
     //   if (id) {
@@ -247,7 +251,7 @@ const TAddWork = () => {
       },
     });
 
-    let cookies = new Cookies();
+    // let cookies = new Cookies();
     // Check Authe(token)
     let chackAuth = async () => {
       if (cookies.get("token")) {
@@ -276,23 +280,24 @@ const TAddWork = () => {
     chackAuth();
   }, [cookies.get("token")]);
 
-    React.useEffect(() => {
-        // Make an HTTP GET request to your Express API endpoint
-        fetch("https://propertymanager.cloudpress.host/api/rentals/property_onrent")
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.statusCode === 200) {
-              setPropertyData(data.data);
-            } else {
-              // Handle error
-              console.error("Error:", data.message);
-            }
-          })
-          .catch((error) => {
-            // Handle network error
-            console.error("Network error:", error);
-          });
-      }, []);
+  React.useEffect(() => {
+    // Make an HTTP GET request to your Express API endpoint
+    fetch(
+      `https://propertymanager.cloudpress.host/api/tenant/rental-address/${cookie_id}`
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setPropertyData(data.rentalAddresses); // Correct the property data source
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, [cookie_id]);
 
       React.useEffect(() => {
         // Make an HTTP GET request to your Express API endpoint
@@ -388,18 +393,18 @@ const TAddWork = () => {
                                                     maxHeight: "200px",
                                                     overflowY: "auto",
                                                 }}>
-                                                {propertyData.map((property) => (
-                                                    <DropdownItem
-                                                    key={property._id}
-                                                    onClick={() =>
-                                                        handlePropertySelect(
-                                                        property.rental_adress
-                                                        )
-                                                    }
-                                                    >
-                                                    {property.rental_adress}
-                                                    </DropdownItem>
-                                                ))}
+                                             <div>
+                                  {propertyData.map((property) => (
+                                    <DropdownItem
+                                      key={property}
+                                      onClick={() =>
+                                        handlePropertySelect(property)
+                                      }
+                                    >
+                                      {property}
+                                    </DropdownItem>
+                                  ))}
+                                </div>
                                                 </DropdownMenu>
                                             </Dropdown>
                                             </FormGroup>

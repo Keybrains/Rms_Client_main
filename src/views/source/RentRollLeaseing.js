@@ -55,12 +55,13 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Cookies from "universal-cookie";
 import AccountDialog from "components/AccountDialog";
-
+import moment from "moment";
 const RentRollLeaseing = () => {
-  const { id } = useParams();
+  const { id, entryIndex } = useParams();
+  console.log(id, entryIndex, "entryIndex");
   const [tenantData, setTenantData] = useState([]);
   const [selectedTenantData, setSelectedTenantData] = useState([]);
-  const [checkedCheckbox, setCheckedCheckbox] = useState();
+  const [checkedCheckbox, setCheckedCheckbox] = useState(null);
 
   const [cosignerData, setCosignerData] = useState([]);
   const [recurringData, setRecurringData] = useState([]);
@@ -115,6 +116,7 @@ const RentRollLeaseing = () => {
   const [accountTypeName, setAccountTypeName] = useState([]);
   // const [selectedProp, setSelectedProp] = useState("");
   const [propertyData, setPropertyData] = useState([]);
+  console.log(propertyData, "dsgjhsdkgjh"); // Add this line before rendering the dropdown
 
   const [userdropdownOpen, setuserDropdownOpen] = React.useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -258,6 +260,10 @@ const RentRollLeaseing = () => {
     // Use history.push to navigate to the PropertiesTable page
     navigate("../TenantsTable");
   };
+  const AddNewAccountName = async (accountName) => {
+    toggleAddBankDialog();
+    setAccountTypeName(accountName);
+  };
 
   const handleAddTenant = () => {
     if (selectedTenants.length === 0) {
@@ -266,9 +272,10 @@ const RentRollLeaseing = () => {
         lastName: leaseFormik.values.tenant_lastName,
         mobileNumber: leaseFormik.values.tenant_mobileNumber,
       };
-      // setTenantData(newTenantDetails);
       setSelectedTenantData(newTenantDetails);
-      swal("Success!", "New tenant added successfully", "success");
+      if (!id) {
+        swal("Success!", "New tenant added successfully", "success");
+      }
     } else {
       setSelectedTenants([]);
       const selectedTenant = selectedTenants[0];
@@ -303,7 +310,6 @@ const RentRollLeaseing = () => {
 
         // Add other details as needed
       };
-      // setTenantData(tenantDetails);
       setSelectedTenantData(tenantDetails);
 
       swal("Success!", "Tenant details Added", "success");
@@ -321,30 +327,35 @@ const RentRollLeaseing = () => {
   };
 
   const handleAddRecurring = () => {
-    const newRecurring = {
-      recuring_amount: leaseFormik.values.recuring_amount,
-      recuring_account: leaseFormik.values.recuring_account,
-      recuringnextDue_date: leaseFormik.values.recuringnextDue_date,
-      recuringmemo: leaseFormik.values.recuringmemo,
-      recuringfrequency: leaseFormik.values.recuringfrequency,
-    };
-    setRecurringData(newRecurring);
-    swal("Success!", "Recurring added successfully", "success");
+    if (leaseFormik.values) {
+      const newRecurring = {
+        recuring_amount: leaseFormik.values.recuring_amount,
+        recuring_account: selectedRecuringAccount,
+        recuringnextDue_date: leaseFormik.values.recuringnextDue_date,
+        recuringmemo: leaseFormik.values.recuringmemo,
+        recuringfrequency: leaseFormik.values.recuringfrequency,
+      };
+      setRecurringData(newRecurring);
+      swal("Success!", "Recurring added successfully", "success");
+    }
   };
-
   const handleAddOneTime = () => {
-    const newOneTime = {
-      onetime_amount: leaseFormik.values.onetime_amount,
-      onetime_account: leaseFormik.values.onetime_account,
-      onetime_Due_date: leaseFormik.values.onetime_Due_date,
-      onetime_memo: leaseFormik.values.onetime_memo,
-    };
-    setOneTimeData(newOneTime);
-    swal("Success!", "One Time added successfully", "success");
+    if (leaseFormik.values) {
+      const newOneTime = {
+        onetime_account: selectedOneTimeAccount,
+        onetime_amount: leaseFormik.values.onetime_amount,
+        onetime_Due_date: leaseFormik.values.onetime_Due_date,
+        onetime_memo: leaseFormik.values.onetime_memo,
+      };
+      setOneTimeData(newOneTime);
+      console.log(newOneTime);
+      swal("Success!", "One Time added successfully", "success");
+    } else {
+      console.error("leaseFormik.values is undefined");
+    }
   };
 
   const handleTenantDelete = () => {
-    // setTenantData({});
     setSelectedTenantData({});
     leaseFormik.setValues({
       tenant_firstName: "",
@@ -515,6 +526,7 @@ const RentRollLeaseing = () => {
       .then((data) => {
         if (data.statusCode === 200) {
           setPropertyData(data.data);
+          console.log(data.data, "gdasga");
         } else {
           // Handle error
           console.error("Error:", data.message);
@@ -579,10 +591,10 @@ const RentRollLeaseing = () => {
       });
   };
 
-  const AddNewAccountName = async (accountName) => {
-    toggleAddBankDialog();
-    setAccountTypeName(accountName);
-  };
+  // const AddNewAccountName = async (accountName) => {
+  //   toggleAddBankDialog();
+  //   setAccountTypeName(accountName);
+  // };
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
@@ -731,16 +743,17 @@ const RentRollLeaseing = () => {
     initialValues: {
       // add Tenants
 
-      rental_adress: "",
-      lease_type: "",
-      start_date: "",
-      end_date: "",
-      leasing_agent: "",
-      rent_cycle: "",
-      amount: "",
-      account: "",
-      nextDue_date: "",
-      memo: "",
+      tenant_firstName: "",
+      tenant_lastName: "",
+      tenant_mobileNumber: "",
+      tenant_email: "",
+      tenant_password: "",
+      tenant_workNumber: "",
+      tenant_unitNumber: "",
+      tenant_homeNumber: "",
+      tenant_faxPhoneNumber: "",
+      alternate_email: "",
+      tenant_residentStatus: "",
 
       birth_date: "",
       textpayer_id: "",
@@ -750,51 +763,69 @@ const RentRollLeaseing = () => {
       relationship_tenants: "",
       email: "",
       emergency_PhoneNumber: "",
+      entries: [
+        {
+          rental_adress: "",
+          lease_type: "",
+          start_date: "",
+          end_date: "",
+          leasing_agent: "",
+          rent_cycle: "",
+          amount: "",
+          account: "",
+          nextDue_date: "",
+          memo: "",
+          isrenton: false,
+          propertyOnRent: false,
+          Due_date: "",
+          Security_amount: "",
+          // add cosigner
 
-      tenant_firstName: "",
-      tenant_lastName: "",
-      tenant_mobileNumber: "",
-      tenant_email: "",
-      tenant_password: "",
-      tenant_workNumber: "",
-      alternate_email: "",
+          cosigner_firstName: "",
+          cosigner_lastName: "",
+          cosigner_mobileNumber: "",
+          cosigner_workNumber: "",
+          cosigner_homeNumber: "",
+          cosigner_faxPhoneNumber: "",
+          cosigner_email: "",
+          cosigner_alternateemail: "",
+          cosigner_streetAdress: "",
+          cosigner_city: "",
+          cosigner_state: "",
+          cosigner_zip: "",
+          cosigner_country: "",
+          cosigner_postalcode: "",
 
-      Due_date: "",
-      Security_amount: "",
-      // add cosigner
+          // add recuring charge
 
-      cosigner_firstName: "",
-      cosigner_lastName: "",
-      cosigner_mobileNumber: "",
-      cosigner_workNumber: "",
-      cosigner_homeNumber: "",
-      cosigner_faxPhoneNumber: "",
-      cosigner_email: "",
-      cosigner_alternateemail: "",
-      cosigner_streetAdress: "",
-      cosigner_city: "",
-      cosigner_state: "",
+          recuring_amount: "",
+          recuring_account: "",
+          recuringnextDue_date: "",
+          recuringmemo: "",
+          recuringfrequency: "",
 
-      cosigner_country: "",
-      cosigner_postalcode: "",
+          //add one time charge
 
-      // add recuring charge
+          onetime_amount: "",
+          onetime_account: "",
+          onetime_Due_date: "",
+          onetime_memo: "",
 
-      recuring_amount: "",
-      recuring_account: "",
-      recuringnextDue_date: "",
-      recuringmemo: "",
-      recuringfrequency: "",
+          // add account
+          account_name: "",
+          account_type: "",
 
-      //add one time charge
+          //upload File
+          upload_file: "",
 
-      onetime_amount: "",
-      onetime_account: "",
-      onetime_Due_date: "",
-      onetime_memo: "",
-
-      // add account
-      account_name: "",
+          // parent account
+          parent_account: "",
+          account_number: "",
+          fund_type: "",
+          cash_flow: "",
+          notes: "",
+        },
+      ],
     },
     validationSchema: yup.object({
       // property_type: yup.string().required("Required"),
@@ -818,63 +849,72 @@ const RentRollLeaseing = () => {
     },
   });
 
-  const [leasingData, setleasingData] = useState(null);
+  // const [leasingData, setleasingData] = useState(null);
 
   // Fetch vendor data if editing an existing vendor
   useEffect(() => {
-    if (id) {
+    console.log(id, entryIndex, "id && entry Id");
+    if (id && entryIndex) {
       axios
         .get(`https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${id}`)
         .then((response) => {
           const laesingdata = response.data.data;
-          setleasingData(leasingData);
-          console.log(laesingdata);
+          //setleasingData(leasingData);
+          console.log(laesingdata, "gsgsgsdg");
+          setTenantData(laesingdata);
+          const matchedLease = laesingdata.entries.find((entry) => {
+            return entry.entryIndex === entryIndex;
+          });
+          console.log(matchedLease, "matchedlease");
+          // setShowTenantTable(true);
 
-          const formattedStartDate = laesingdata.start_date
-            ? new Date(laesingdata.start_date).toISOString().split("T")[0]
+          const formattedStartDate = matchedLease.start_date
+            ? new Date(matchedLease.start_date).toISOString().split("T")[0]
             : "";
-          const formattedEndDate = laesingdata.end_date
-            ? new Date(laesingdata.end_date).toISOString().split("T")[0]
+          const formattedEndDate = matchedLease.end_date
+            ? new Date(matchedLease.end_date).toISOString().split("T")[0]
             : "";
-          const formattedNextDueDate = laesingdata.nextDue_date
-            ? new Date(laesingdata.nextDue_date).toISOString().split("T")[0]
+          const formattedNextDueDate = matchedLease.nextDue_date
+            ? new Date(matchedLease.nextDue_date).toISOString().split("T")[0]
             : "";
 
           const formattedBirthDate = laesingdata.birth_date
             ? new Date(laesingdata.birth_date).toISOString().split("T")[0]
             : "";
 
-          const formattedDueDate = laesingdata.Due_date
-            ? new Date(laesingdata.Due_date).toISOString().split("T")[0]
+          const formattedDueDate = matchedLease.Due_date
+            ? new Date(matchedLease.Due_date).toISOString().split("T")[0]
             : "";
 
-          const formattedRecuringNextDueDate = laesingdata.recuringnextDue_date
-            ? new Date(laesingdata.recuringnextDue_date)
+          const formattedRecuringNextDueDate = matchedLease.recuringnextDue_date
+            ? new Date(matchedLease.recuringnextDue_date)
                 .toISOString()
                 .split("T")[0]
             : "";
 
-          const formattedOnetimeDueDate = laesingdata.onetime_Due_date
-            ? new Date(laesingdata.onetime_Due_date).toISOString().split("T")[0]
+          const formattedOnetimeDueDate = matchedLease.onetime_Due_date
+            ? new Date(matchedLease.onetime_Due_date)
+                .toISOString()
+                .split("T")[0]
             : "";
 
-          setSelectedPropertyType(laesingdata.rental_adress || "Select");
-          setselectedLeaseType(laesingdata.lease_type || "Select");
-          setselectedRentCycle(laesingdata.rent_cycle || "Select");
-          setselectedAccount(laesingdata.account || "Select");
-          setselectedAccount(laesingdata.account_name || "Select");
-          setselectedOneTimeAccount(laesingdata.onetime_account || "Select");
-          setselectedRecuringAccount(laesingdata.recuring_account);
-          setselectedFrequency(laesingdata.recuringfrequency || "Select");
-          setselectedAccountType(laesingdata.account_type || "Select");
-          setselectedAccountLevel(laesingdata.parent_account || "Select");
-          setselectedFundType(laesingdata.fund_type || "Select");
-          setSelectedAgent(laesingdata.leasing_agent || "Select");
+          setSelectedPropertyType(matchedLease.rental_adress || "Select");
+          setselectedLeaseType(matchedLease.lease_type || "Select");
+          setselectedRentCycle(matchedLease.rent_cycle || "Select");
+          setselectedAccount(matchedLease.account || "Select");
+          setselectedAccount(matchedLease.account_name || "Select");
+          setselectedOneTimeAccount(matchedLease.onetime_account || "Select");
+          setselectedRecuringAccount(matchedLease.recuring_account);
+          setselectedFrequency(matchedLease.recuringfrequency || "Select");
+          setselectedAccountType(matchedLease.account_type || "Select");
+          setselectedAccountLevel(matchedLease.parent_account || "Select");
+          setselectedFundType(matchedLease.fund_type || "Select");
+          setSelectedAgent(matchedLease.leasing_agent || "Select");
           // const arrayOfObjects = laesingdata.upload_file.map((innerArray) => innerArray[0])
 
           // setFile(arrayOfObjects || "Select");
-          console.log(laesingdata.upload_file, "upload_file");
-          const data = laesingdata.upload_file.map((item) => {
+          console.log(matchedLease.upload_file, "upload_fileeee");
+          const data = matchedLease.upload_file.map((item) => {
             return {
               name: item[0],
             };
@@ -884,9 +924,9 @@ const RentRollLeaseing = () => {
           leaseFormik.setValues({
             start_date: formattedStartDate,
             end_date: formattedEndDate,
-            amount: laesingdata.amount || "",
+            amount: matchedLease.amount || "",
             nextDue_date: formattedNextDueDate,
-            memo: laesingdata.memo || "",
+            memo: matchedLease.memo || "",
             birth_date: formattedBirthDate,
             textpayer_id: laesingdata.textpayer_id || "",
             comments: laesingdata.comments || "",
@@ -895,7 +935,7 @@ const RentRollLeaseing = () => {
             email: laesingdata.email || "",
             emergency_PhoneNumber: laesingdata.emergency_PhoneNumber || "",
             Due_date: formattedDueDate,
-            amount: laesingdata.amount || "",
+            amount: matchedLease.amount || "",
             tenant_firstName: laesingdata.tenant_firstName || "",
             tenant_lastName: laesingdata.tenant_lastName || "",
             tenant_mobileNumber: laesingdata.tenant_mobileNumber || "",
@@ -903,105 +943,314 @@ const RentRollLeaseing = () => {
             tenant_password: laesingdata.tenant_password || "",
             tenant_workNumber: laesingdata.tenant_workNumber || "",
             alternate_email: laesingdata.alternate_email || "",
-            cosigner_firstName: laesingdata.cosigner_firstName || "",
-            cosigner_lastName: laesingdata.cosigner_lastName || "",
-            cosigner_mobileNumber: laesingdata.cosigner_mobileNumber || "",
-            cosigner_workNumber: laesingdata.cosigner_workNumber || "",
-            cosigner_homeNumber: laesingdata.cosigner_homeNumber || "",
-            cosigner_faxPhoneNumber: laesingdata.cosigner_faxPhoneNumber || "",
-            cosigner_email: laesingdata.cosigner_email || "",
-            cosigner_alternateemail: laesingdata.cosigner_alternateemail || "",
-            cosigner_streetAdress: laesingdata.cosigner_streetAdress || "",
-            cosigner_city: laesingdata.cosigner_city || "",
-            cosigner_state: laesingdata.cosigner_state || "",
-            cosigner_country: laesingdata.cosigner_country || "",
-            cosigner_postalcode: laesingdata.cosigner_postalcode || "",
-            recuring_amount: laesingdata.recuring_amount || "",
+            cosigner_firstName: matchedLease.cosigner_firstName || "",
+            cosigner_lastName: matchedLease.cosigner_lastName || "",
+            cosigner_mobileNumber: matchedLease.cosigner_mobileNumber || "",
+            cosigner_workNumber: matchedLease.cosigner_workNumber || "",
+            cosigner_homeNumber: matchedLease.cosigner_homeNumber || "",
+            cosigner_faxPhoneNumber: matchedLease.cosigner_faxPhoneNumber || "",
+            cosigner_email: matchedLease.cosigner_email || "",
+            cosigner_alternateemail: matchedLease.cosigner_alternateemail || "",
+            cosigner_streetAdress: matchedLease.cosigner_streetAdress || "",
+            cosigner_city: matchedLease.cosigner_city || "",
+            cosigner_state: matchedLease.cosigner_state || "",
+            cosigner_country: matchedLease.cosigner_country || "",
+            cosigner_postalcode: matchedLease.cosigner_postalcode || "",
+            recuring_amount: matchedLease.recuring_amount || "",
             recuringnextDue_date: formattedRecuringNextDueDate,
-            recuringmemo: laesingdata.recuringmemo || "",
-            onetime_amount: laesingdata.onetime_amount || "",
+            recuringmemo: matchedLease.recuringmemo || "",
+            onetime_amount: matchedLease.onetime_amount || "",
             onetime_Due_date: formattedOnetimeDueDate,
-            onetime_memo: laesingdata.onetime_memo || "",
-            Security_amount: laesingdata.Security_amount || "",
+            onetime_memo: matchedLease.onetime_memo || "",
+            Security_amount: matchedLease.Security_amount || "",
           });
         })
         .catch((error) => {
           console.error("Error fetching vendor data:", error);
         });
+      handleAddTenant();
     }
-  }, [id]);
+  }, [id, leaseFormik.values.tenant_firstName]);
+
   const handleSubmit = async (values) => {
     console.log(file, "values");
+    const arrayOfNames = Array.isArray(file) ? file.map((item) => item.name) : [];
 
+    const entriesArray = [];
+
+    const entriesObject = {
+      rental_adress: selectedPropertyType,
+      lease_type: selectedLeaseType,
+      start_date: moment(new Date()).format("YYYY-MM-DD"),
+      end_date: values.end_date,
+      leasing_agent: selectedAgent,
+      rent_cycle: selectedRentCycle,
+      amount: values.amount,
+      account: selectedAccount,
+      nextDue_date: values.nextDue_date,
+      memo: values.memo,
+      isrenton: values.isrenton,
+      propertyOnRent: values.propertyOnRent,
+      Due_date: values.Due_date,
+      Security_amount: values.Security_amount,
+      // add cosigner
+
+      cosigner_firstName: values.cosigner_firstName,
+      cosigner_lastName: values.cosigner_lastName,
+      cosigner_mobileNumber: values.cosigner_mobileNumber,
+      cosigner_workNumber: values.cosigner_workNumber,
+      cosigner_homeNumber: values.cosigner_homeNumber,
+      cosigner_faxPhoneNumber: values.cosigner_faxPhoneNumber,
+      cosigner_email: values.cosigner_email,
+      cosigner_alternateemail: values.cosigner_alternateemail,
+      cosigner_streetAdress: values.cosigner_streetAdress,
+      cosigner_city: values.cosigner_city,
+      cosigner_state: values.cosigner_state,
+      cosigner_zip: values.cosigner_zip,
+      cosigner_country: values.cosigner_country,
+      cosigner_postalcode: values.cosigner_postalcode,
+
+      // add recuring charge
+
+      recuring_amount: values.recuring_amount,
+      recuring_account: selectedRecuringAccount,
+      recuringnextDue_date: values.recuringnextDue_date,
+      recuringmemo: values.recuringmemo,
+      recuringfrequency: selectedFrequency,
+
+      //add one time charge
+
+      onetime_amount: values.onetime_amount,
+      onetime_account: selectedOneTimeAccount,
+      onetime_Due_date: values.onetime_Due_date,
+      onetime_memo: values.onetime_memo,
+
+      // add account
+      account_name: selectedAccount,
+      account_type: values.account_type,
+
+      //upload File
+      upload_file: arrayOfNames,
+
+      parent_account: values.parent_account,
+      account_number: values.account_number,
+      fund_type: values.fund_type,
+      cash_flow: values.cash_flow,
+      notes: values.notes,
+    };
+
+    entriesArray.push(entriesObject);
+
+    const leaseObject = {
+      tenant_firstName: values.tenant_firstName,
+      tenant_lastName: values.tenant_lastName,
+      tenant_mobileNumber: values.tenant_mobileNumber,
+      tenant_email: values.tenant_email,
+      tenant_password: values.tenant_password,
+      tenant_workNumber: values.tenant_workNumber,
+      tenant_unitNumber: values.tenant_unitNumber,
+      tenant_homeNumber: values.tenant_homeNumber,
+      tenant_faxPhoneNumber: values.tenant_faxPhoneNumber,
+      alternate_email: values.alternate_email,
+      tenant_residentStatus: values.tenant_residentStatus,
+
+      birth_date: values.birth_date,
+      textpayer_id: values.textpayer_id,
+      comments: values.comments,
+
+      contact_name: values.contact_name,
+      relationship_tenants: values.relationship_tenants,
+      email: values.email,
+      emergency_PhoneNumber: values.emergency_PhoneNumber,
+
+      entries: entriesArray,
+    };
+
+    try {
+      const res = await axios.get(`https://propertymanager.cloudpress.host/api/tenant/tenant`);
+      if (res.data.statusCode === 200) {
+        console.log(res.data.data, "allTenants");
+        const allTenants = res.data.data;
+        const filteredData = allTenants.find((item) => {
+          return (
+            item.tenant_firstName === leaseFormik.values.tenant_firstName &&
+            item.tenant_email === leaseFormik.values.tenant_email &&
+            item.tenant_lastName === leaseFormik.values.tenant_lastName
+          );
+        });
+
+        if (filteredData) {
+          const putObject = {
+            entries: leaseObject.entries,
+          };
+
+          const tenantId = filteredData._id;
+          console.log(tenantId, "tenantId");
+          console.log(putObject, "putObject");
+          const res = await axios.put(
+            `https://propertymanager.cloudpress.host/api/tenant/tenant/${tenantId}`,
+            putObject
+          );
+          if (res.data.statusCode === 200) {
+            swal("", res.data.message, "success");
+            navigate("/admin/TenantsTable");
+          } else {
+            swal("", res.data.message, "error");
+          }
+          handleResponse(res);
+        } else {
+          if (id === undefined) {
+            console.log(leaseObject, "leaseObject");
+            const res = await axios.post(
+              "https://propertymanager.cloudpress.host/api/tenant/tenant",
+              leaseObject
+            );
+            if (res.data.statusCode === 200) {
+              swal("", res.data.message, "success");
+              navigate("/admin/TenantsTable");
+            } else {
+              swal("", res.data.message, "error");
+            }
+            handleResponse(res);
+          } else {
+          }
+        }
+      } else {
+        swal("", res.data.message, "error");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    // console.log(leaseObject, "leaseObject");
     if (Array.isArray(file)) {
       const arrayOfNames = file.map((item) => {
         return item.name;
       });
       console.log("array of names", arrayOfNames);
-      values["upload_file"] = arrayOfNames;
+      entriesObject.upload_file = arrayOfNames;
     } else {
       console.error("file is not an array");
 
       console.log(values, "values");
     }
-
-    // if(Array.isArray(file)){
-
-    //   const arrayOfObject = file.map((item) => {
-    //     return {
-    //       name: item.name,
-    //       type: item.type,
-    //       size: item.size,
-    //       lastModified: item.lastModified,
-    //       lastModifiedDate: item.lastModifiedDate,
-    //       webkitRelativePath: item.webkitRelativePath,
-    //       // file: item
-    //     };
-    //   })
-    //   console.log(arrayOfObject, "array of object");
-
-    //   values["upload_file"] = arrayOfObject;
-
-    // }
-    values["rental_adress"] = selectedPropertyType;
-    values["leasing_agent"] = selectedAgent;
-    values["account_name "] = selectedAccount;
-    values["lease_type"] = selectedLeaseType;
-    values["rent_cycle"] = selectedRentCycle;
-    values["account"] = selectedAccount;
-    values["onetime_account"] = selectedOneTimeAccount;
-    values["recuringfrequency"] = selectedFrequency;
-    values["recuring_account"] = selectedRecuringAccount;
-
+    console.log(values, "values to check");
     try {
       console.log(id, "id from parameter");
-      if (id === undefined) {
-        const res = await axios.post(
-          "https://propertymanager.cloudpress.host/api/tenant/tenant",
-          values
-        );
-        if (res.data.statusCode === 200) {
-          swal("", res.data.message, "success");
-          navigate("/admin/TenantsTable");
-        } else {
-          swal("", res.data.message, "error");
-        }
-        handleResponse(res);
-      } else {
-        const editUrl = `https://propertymanager.cloudpress.host/api/tenant/tenant/${id}`;
-        console.log(values, "updated values");
-        const res = await axios.put(editUrl, values);
-        handleResponse(res);
-      }
+
       // values["property_type"] = localStorage.getItem("propertyType");
     } catch (error) {
       console.log(error);
     }
   };
 
+  const editLease = async (id) => {
+    const arrayOfNames = Array.isArray(file) ? file.map((item) => item.name) : [];
+
+    const editUrl = `https://propertymanager.cloudpress.host/api/tenant/tenants/${id}/entry/${entryIndex}`;
+    const entriesArray = [];
+
+    const entriesObject = {
+      rental_adress: selectedPropertyType,
+      lease_type: selectedLeaseType,
+      start_date: moment(new Date()).format("YYYY-MM-DD"),
+      end_date: leaseFormik.values.end_date,
+      leasing_agent: selectedAgent,
+      rent_cycle: selectedRentCycle,
+      amount: leaseFormik.values.amount,
+      account: selectedAccount,
+      nextDue_date: leaseFormik.values.nextDue_date,
+      memo: leaseFormik.values.memo,
+      isrenton: leaseFormik.values.isrenton,
+      propertyOnRent: leaseFormik.values.propertyOnRent,
+      Due_date: leaseFormik.values.Due_date,
+      Security_amount: leaseFormik.values.Security_amount,
+      // add cosigner
+
+      cosigner_firstName: leaseFormik.values.cosigner_firstName,
+      cosigner_lastName: leaseFormik.values.cosigner_lastName,
+      cosigner_mobileNumber: leaseFormik.values.cosigner_mobileNumber,
+      cosigner_workNumber: leaseFormik.values.cosigner_workNumber,
+      cosigner_homeNumber: leaseFormik.values.cosigner_homeNumber,
+      cosigner_faxPhoneNumber: leaseFormik.values.cosigner_faxPhoneNumber,
+      cosigner_email: leaseFormik.values.cosigner_email,
+      cosigner_alternateemail: leaseFormik.values.cosigner_alternateemail,
+      cosigner_streetAdress: leaseFormik.values.cosigner_streetAdress,
+      cosigner_city: leaseFormik.values.cosigner_city,
+      cosigner_state: leaseFormik.values.cosigner_state,
+      cosigner_zip: leaseFormik.values.cosigner_zip,
+      cosigner_country: leaseFormik.values.cosigner_country,
+      cosigner_postalcode: leaseFormik.values.cosigner_postalcode,
+
+      // add recuring charge
+
+      recuring_amount: leaseFormik.values.recuring_amount,
+      recuring_account: selectedRecuringAccount,
+      recuringnextDue_date: leaseFormik.values.recuringnextDue_date,
+      recuringmemo: leaseFormik.values.recuringmemo,
+      recuringfrequency: selectedFrequency,
+
+      //add one time charge
+
+      onetime_amount: leaseFormik.values.onetime_amount,
+      onetime_account: selectedOneTimeAccount,
+      onetime_Due_date: leaseFormik.values.onetime_Due_date,
+      onetime_memo: leaseFormik.values.onetime_memo,
+
+      // add account
+      account_name: selectedAccount,
+      account_type: leaseFormik.values.account_type,
+
+      //upload File
+      upload_file: arrayOfNames,
+      
+      parent_account: leaseFormik.values.parent_account,
+      account_number: leaseFormik.values.account_number,
+      fund_type: leaseFormik.values.fund_type,
+      cash_flow: leaseFormik.values.cash_flow,
+      notes: leaseFormik.values.notes,
+    };
+    entriesArray.push(entriesObject);
+
+    const leaseObject = {
+      tenant_firstName: leaseFormik.values.tenant_firstName,
+      tenant_lastName: leaseFormik.values.tenant_lastName,
+      tenant_mobileNumber: leaseFormik.values.tenant_mobileNumber,
+      tenant_email: leaseFormik.values.tenant_email,
+      tenant_password: leaseFormik.values.tenant_password,
+      tenant_workNumber: leaseFormik.values.tenant_workNumber,
+      tenant_unitNumber: leaseFormik.values.tenant_unitNumber,
+      tenant_homeNumber: leaseFormik.values.tenant_homeNumber,
+      tenant_faxPhoneNumber: leaseFormik.values.tenant_faxPhoneNumber,
+      alternate_email: leaseFormik.values.alternate_email,
+      tenant_residentStatus: leaseFormik.values.tenant_residentStatus,
+
+      birth_date: leaseFormik.values.birth_date,
+      textpayer_id: leaseFormik.values.textpayer_id,
+      comments: leaseFormik.values.comments,
+
+      contact_name: leaseFormik.values.contact_name,
+      relationship_tenants: leaseFormik.values.relationship_tenants,
+      email: leaseFormik.values.email,
+      emergency_PhoneNumber: leaseFormik.values.emergency_PhoneNumber,
+      entries: entriesArray,
+    };
+
+    console.log(leaseObject, "updated values");
+    await axios
+      .put(editUrl, leaseObject)
+      .then((response) => {
+        console.log(response, "response1111");
+        handleResponse(response);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
   function handleResponse(response) {
     if (response.status === 200) {
-      navigate("/admin/RentRoll");
+      navigate("/admin/TenantsTable");
       swal(
         "Success!",
         id ? "Tenant updated successfully" : "Tenant added successfully!",
@@ -1011,6 +1260,7 @@ const RentRollLeaseing = () => {
       alert(response.data.message);
     }
   }
+
   return (
     <>
       <LeaseHeader />
@@ -1031,7 +1281,7 @@ const RentRollLeaseing = () => {
               </CardHeader>
               <CardBody>
                 <Form>
-                  <h6 className="heading-small text-muted mb-4">Signature</h6>
+                  {/* <h6 className="heading-small text-muted mb-4">Signature</h6>
                   <div className="pl-lg-4">
                     <Row>
                       <Col lg="6">
@@ -1077,7 +1327,7 @@ const RentRollLeaseing = () => {
                         </FormGroup>
                       </Col>
                     </Row>
-                  </div>
+                  </div> */}
                   <br />
 
                   <div className="pl-lg-4">
@@ -1103,17 +1353,14 @@ const RentRollLeaseing = () => {
                                 overflowY: "auto",
                               }}
                             >
-                              <DropdownItem value="">Select</DropdownItem>
                               {propertyData.map((property) => (
                                 <DropdownItem
-                                  key={property._id}
+                                  key={property}
                                   onClick={() =>
-                                    handlePropertyTypeSelect(
-                                      property.rental_adress
-                                    )
+                                    handlePropertyTypeSelect(property)
                                   }
                                 >
-                                  {property.rental_adress}
+                                  {property}
                                 </DropdownItem>
                               ))}
                             </DropdownMenu>
@@ -1189,24 +1436,10 @@ const RentRollLeaseing = () => {
                             name="start_date"
                             onBlur={leaseFormik.handleBlur}
                             onChange={leaseFormik.handleChange}
-                            value={leaseFormik.values.start_date}
+                            value={moment(leaseFormik.values.start_date).format(
+                              "YYYY-MM-DD"
+                            )}
                           />
-                          {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                              className="form-control-alternative"
-                              slotProps={{ textField: { size: 'small' } }}
-                              name="start_date"
-                              id="input-unitadd"
-                              placeholder="3000"
-                              dateFormat="MM-dd-yyyy"
-                              views={['year', 'month', 'day']}
-                              onBlur={leaseFormik.handleBlur}
-                              selected={leaseFormik.values.start_date} // Use 'selected' prop instead of 'value'
-                              onChange={(date) => {
-                                leaseFormik.setFieldValue("start_date", date); // Update the Formik field value
-                              }}
-                            />
-                          </LocalizationProvider> */}
                           {leaseFormik.touched.start_date &&
                           leaseFormik.errors.start_date ? (
                             <div style={{ color: "red" }}>
@@ -1231,25 +1464,14 @@ const RentRollLeaseing = () => {
                             type="date"
                             name="end_date"
                             onBlur={leaseFormik.handleBlur}
-                            onChange={leaseFormik.handleChange}
+                            onChange={(e) => {
+                              leaseFormik.handleChange(e);
+                            }}
                             value={leaseFormik.values.end_date}
+                            min={moment(leaseFormik.values.start_date).format(
+                              "YYYY-MM-DD"
+                            )}
                           />
-                          {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                              className="form-control-alternative"
-                              name="end_date"
-                              id="input-unitadd"
-                              views={['year', 'month', 'day']}
-                              slotProps={{ textField: { size: 'small' } }}
-                              placeholder="3000"
-                              dateFormat="MM-dd-yyyy"
-                              onBlur={leaseFormik.handleBlur}
-                              selected={leaseFormik.values.end_date} // Use 'selected' prop instead of 'value'
-                              onChange={(date) => {
-                                leaseFormik.setFieldValue("end_date", date); // Update the Formik field value
-                              }}
-                            />
-                          </LocalizationProvider> */}
                           {leaseFormik.touched.end_date &&
                           leaseFormik.errors.end_date ? (
                             <div style={{ color: "red" }}>
@@ -1501,55 +1723,7 @@ const RentRollLeaseing = () => {
                                                                 tenant.tenant_mobileNumber
                                                               );
                                                             }}
-                                                            // checked={selectedTenants.includes(
-                                                            //   `${
-                                                            //     tenant.tenant_firstName ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.tenant_lastName ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.tenant_mobileNumber ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.tenant_email ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.textpayer_id ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.birth_date ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.comments ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.contact_name ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.relationship_tenants ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.email ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.emergency_PhoneNumber ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.tenant_password ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.tenant_workNumber ||
-                                                            //     ""
-                                                            //   } ${
-                                                            //     tenant.alternate_email ||
-                                                            //     ""
-                                                            //   }`
-                                                            // )}
                                                           />
-                                                          {/* }
-                                                          
-                                                          /> */}
                                                         </td>
                                                       </tr>
                                                     )
@@ -1725,6 +1899,16 @@ const RentRollLeaseing = () => {
                                                   leaseFormik.values
                                                     .tenant_mobileNumber
                                                 }
+                                                onInput={(e) => {
+                                                  const inputValue =
+                                                    e.target.value;
+                                                  const numericValue =
+                                                    inputValue.replace(
+                                                      /\D/g,
+                                                      ""
+                                                    ); // Remove non-numeric characters
+                                                  e.target.value = numericValue;
+                                                }}
                                               />
                                               {leaseFormik.touched
                                                 .tenant_mobileNumber &&
@@ -1811,6 +1995,17 @@ const RentRollLeaseing = () => {
                                                       leaseFormik.values
                                                         .tenant_workNumber
                                                     }
+                                                    onInput={(e) => {
+                                                      const inputValue =
+                                                        e.target.value;
+                                                      const numericValue =
+                                                        inputValue.replace(
+                                                          /\D/g,
+                                                          ""
+                                                        ); // Remove non-numeric characters
+                                                      e.target.value =
+                                                        numericValue;
+                                                    }}
                                                   />
                                                   {leaseFormik.touched
                                                     .tenant_workNumber &&
@@ -2046,17 +2241,17 @@ const RentRollLeaseing = () => {
                                               ) : null}
                                             </div>
                                           </div>
-                                          <hr />
-                                          <div>
+                                          {/* <hr /> */}
+                                          {/* <div>
                                             <label
                                               className="form-control-label"
                                               htmlFor="input-email"
                                             >
                                               Address*
                                             </label>
-                                          </div>
+                                          </div> */}
 
-                                          <div
+                                          {/* <div
                                             style={{
                                               display: "flex",
                                               alignItems: "center",
@@ -2073,7 +2268,7 @@ const RentRollLeaseing = () => {
                                               {" "}
                                               Same as Unit Address
                                             </label>
-                                          </div>
+                                          </div> */}
                                           {/* <div>
                                               <span
                                                 onClick={setOpenTenantsDialog}
@@ -2397,7 +2592,7 @@ const RentRollLeaseing = () => {
                                                         <Input
                                                           className="form-control-alternative"
                                                           id="input-unitadd"
-                                                          type="number"
+                                                          type="text"
                                                           name="emergency_PhoneNumber"
                                                           onBlur={
                                                             leaseFormik.handleBlur
@@ -2409,6 +2604,17 @@ const RentRollLeaseing = () => {
                                                             leaseFormik.values
                                                               .emergency_PhoneNumber
                                                           }
+                                                          onInput={(e) => {
+                                                            const inputValue =
+                                                              e.target.value;
+                                                            const numericValue =
+                                                              inputValue.replace(
+                                                                /\D/g,
+                                                                ""
+                                                              ); // Remove non-numeric characters
+                                                            e.target.value =
+                                                              numericValue;
+                                                          }}
                                                         />
                                                         {leaseFormik.touched
                                                           .emergency_PhoneNumber &&
@@ -2581,7 +2787,7 @@ const RentRollLeaseing = () => {
                                               className="form-control-alternative"
                                               id="cosigner_mobileNumber"
                                               placeholder="Phone Number"
-                                              type="number"
+                                              type="text"
                                               name="cosigner_mobileNumber"
                                               onBlur={leaseFormik.handleBlur}
                                               onChange={
@@ -2597,6 +2803,13 @@ const RentRollLeaseing = () => {
                                                     <PhoneIcon />
                                                   </InputAdornment>
                                                 ),
+                                              }}
+                                              onInput={(e) => {
+                                                const inputValue =
+                                                  e.target.value;
+                                                const numericValue =
+                                                  inputValue.replace(/\D/g, ""); // Remove non-numeric characters
+                                                e.target.value = numericValue;
                                               }}
                                             />
                                             {leaseFormik.touched
@@ -2684,6 +2897,17 @@ const RentRollLeaseing = () => {
                                                     leaseFormik.values
                                                       .cosigner_workNumber
                                                   }
+                                                  onInput={(e) => {
+                                                    const inputValue =
+                                                      e.target.value;
+                                                    const numericValue =
+                                                      inputValue.replace(
+                                                        /\D/g,
+                                                        ""
+                                                      ); // Remove non-numeric characters
+                                                    e.target.value =
+                                                      numericValue;
+                                                  }}
                                                 />
                                                 {leaseFormik.touched
                                                   .cosigner_workNumber &&
@@ -2989,7 +3213,7 @@ const RentRollLeaseing = () => {
                                                   className="form-control-alternative"
                                                   id="cosigner_postalcode"
                                                   placeholder="Postal code"
-                                                  type="number"
+                                                  type="text"
                                                   name="cosigner_postalcode"
                                                   onBlur={
                                                     leaseFormik.handleBlur
@@ -3001,6 +3225,17 @@ const RentRollLeaseing = () => {
                                                     leaseFormik.values
                                                       .cosigner_postalcode
                                                   }
+                                                  onInput={(e) => {
+                                                    const inputValue =
+                                                      e.target.value;
+                                                    const numericValue =
+                                                      inputValue.replace(
+                                                        /\D/g,
+                                                        ""
+                                                      ); // Remove non-numeric characters
+                                                    e.target.value =
+                                                      numericValue;
+                                                  }}
                                                 />
                                                 {leaseFormik.touched
                                                   .cosigner_postalcode &&
@@ -3063,27 +3298,7 @@ const RentRollLeaseing = () => {
                               )}
                             </div>
                           </DialogContent>
-
-                          {/* <DialogActions>
-                            <button
-                              type="submit"
-                              className="btn btn-primary"
-                              style={{ background: "green" }}
-                            >
-                              Add Tenant
-                            </button>
-                          
-                            <Button onClick={handleClose}>Cancel</Button>
-                          </DialogActions>
-                          */}
                         </Dialog>
-
-                        {/* {console.log(
-                          "tenantData length:",
-                          Object.keys(tenantData).length
-                        )}
-                        {console.log("tenantData length",Object.keys(tenantData).length)} */}
-                        {/* { cosignerData || tenantData.length>0   ? ( */}
                         {Object.keys(selectedTenantData).length > 0 ? (
                           <div>
                             <table
@@ -3393,11 +3608,19 @@ const RentRollLeaseing = () => {
                                     className="form-control-alternative"
                                     id="input-reserve"
                                     placeholder="$0.00"
-                                    type="number"
+                                    type="text"
                                     name="amount"
                                     onBlur={leaseFormik.handleBlur}
                                     onChange={leaseFormik.handleChange}
                                     value={leaseFormik.values.amount}
+                                    onInput={(e) => {
+                                      const inputValue = e.target.value;
+                                      const numericValue = inputValue.replace(
+                                        /\D/g,
+                                        ""
+                                      ); // Remove non-numeric characters
+                                      e.target.value = numericValue;
+                                    }}
                                   />
                                   {leaseFormik.touched.amount &&
                                   leaseFormik.errors.amount ? (
@@ -3430,7 +3653,15 @@ const RentRollLeaseing = () => {
                                         ? selectedAccount
                                         : "Select"}
                                     </DropdownToggle>
-                                    <DropdownMenu style={{ width: "100%" }}>
+                                    <DropdownMenu
+                                      style={{
+                                        zIndex: 999,
+                                        maxHeight: "280px",
+                                        // overflowX: "hidden",
+                                        overflowY: "auto",
+                                        width: "100%",
+                                      }}
+                                    >
                                       {leaseFormik.touched.account &&
                                       leaseFormik.errors.account ? (
                                         <div style={{ color: "red" }}>
@@ -3466,6 +3697,31 @@ const RentRollLeaseing = () => {
                                       </DropdownItem>
                                     </DropdownMenu>
                                   </Dropdown>
+                                  {/* <AccountDialog
+                                    AddBankAccountDialogOpen={
+                                      AddBankAccountDialogOpen
+                                    }
+                                    handleCloseDialog={handleCloseDialog}
+                                    selectAccountDropDown={
+                                      selectAccountDropDown
+                                    }
+                                    toggle8={toggle8}
+                                    setAddBankAccountDialogOpen={
+                                      setAddBankAccountDialogOpen
+                                    }
+                                    toggle1={toggle1}
+                                    selectAccountLevelDropDown={
+                                      selectAccountLevelDropDown
+                                    }
+                                    selectFundTypeDropDown={
+                                      selectFundTypeDropDown
+                                    }
+                                    toggle10={toggle10}
+                                    selectedAccount={selectedAccount}
+                                    accountTypeName={accountTypeName}
+                                    setToggleApiCall={setToggleApiCall}
+                                    toggleApiCall={toggleApiCall}
+                                  /> */}
                                   <AccountDialog
                                     AddBankAccountDialogOpen={
                                       AddBankAccountDialogOpen
@@ -3490,379 +3746,14 @@ const RentRollLeaseing = () => {
                                     accountTypeName={accountTypeName}
                                     setToggleApiCall={setToggleApiCall}
                                     toggleApiCall={toggleApiCall}
+                                    hadleselectedAccount={hadleselectedAccount}
+                                    hadleselectedOneTimeAccount={
+                                      hadleselectedOneTimeAccount
+                                    }
+                                    hadleselectedRecuringAccount={
+                                      hadleselectedRecuringAccount
+                                    }
                                   />
-                                  {/* <Dialog
-                                    open={AddBankAccountDialogOpen}
-                                    onClose={handleCloseDialog}
-                                  >
-                                    <DialogTitle
-                                      style={{ background: "#F0F8FF" }}
-                                    >
-                                      Add account
-                                    </DialogTitle>
-                                    <DialogContent
-                                      style={{
-                                        width: "100%",
-                                        maxWidth: "500px",
-                                      }}
-                                    >
-                                      <div
-                                        className="formInput"
-                                        style={{ margin: "10px 10px" }}
-                                      >
-                                        <label
-                                          className="form-control-label"
-                                          htmlFor="input-address"
-                                        >
-                                          Account Name *
-                                        </label>
-                                        <br />
-                                        <Input
-                                          className="form-control-alternative"
-                                          id="input-accname"
-                                          placeholder="Account Name"
-                                          type="text"
-                                          name="account_name"
-                                          onBlur={accountFormik.handleBlur}
-                                          onChange={accountFormik.handleChange}
-                                          value={
-                                            accountFormik.values.account_name
-                                          }
-                                        />
-                                        {accountFormik.touched.account_name &&
-                                        accountFormik.errors.account_name ? (
-                                          <div style={{ color: "red" }}>
-                                            {accountFormik.errors.account_name}
-                                          </div>
-                                        ) : null}
-                                      </div>
-
-                                      <div
-                                        className="formInput"
-                                        style={{ margin: "30px 10px" }}
-                                      >
-                                        <label
-                                          className="form-control-label"
-                                          htmlFor="input-address"
-                                        >
-                                          Account Type
-                                        </label>
-                                        <br />
-                                        <Dropdown
-                                          isOpen={selectAccountDropDown}
-                                          toggle={toggle8}
-                                        >
-                                          <DropdownToggle
-                                            caret
-                                            style={{ width: "100%" }}
-                                          >
-                                            {selectedAccountType
-                                              ? selectedAccountType
-                                              : "Select"}
-                                          </DropdownToggle>
-                                          <DropdownMenu
-                                            style={{ width: "100%" }}
-                                            name="rent_cycle"
-                                            onBlur={accountFormik.handleBlur}
-                                            onChange={
-                                              accountFormik.handleChange
-                                            }
-                                            value={
-                                              accountFormik.values.account_type
-                                            }
-                                          >
-                                            {accountFormik.touched
-                                              .account_type &&
-                                            accountFormik.errors
-                                              .account_type ? (
-                                              <div style={{ color: "red" }}>
-                                                {
-                                                  accountFormik.errors
-                                                    .account_type
-                                                }
-                                              </div>
-                                            ) : null}
-                                            <DropdownItem
-                                              onClick={() =>
-                                                hadleselectedAccountType(
-                                                  "Income"
-                                                )
-                                              }
-                                            >
-                                              Income
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                hadleselectedAccountType(
-                                                  "Non Operating Income"
-                                                )
-                                              }
-                                            >
-                                              Non Operating Income
-                                            </DropdownItem>
-                                          </DropdownMenu>
-                                        </Dropdown>
-                                      </div>
-                                      <div
-                                        className="formInput"
-                                        style={{ margin: "30px 10px" }}
-                                      >
-                                        <label
-                                          className="form-control-label"
-                                          htmlFor="input-address"
-                                        >
-                                          Account Level
-                                        </label>
-                                        <br />
-                                        <FormGroup check>
-                                          <Label
-                                            check
-                                            style={{
-                                              fontSize: "15px",
-                                              fontFamily: "sans-serif",
-                                            }}
-                                          >
-                                            <Input
-                                              type="radio"
-                                              name="radio1"
-                                              value="Parent Account"
-                                              onChange={handleRadioChange}
-                                            />{" "}
-                                            Parent Account
-                                          </Label>
-                                        </FormGroup>
-                                        <FormGroup check>
-                                          <Label
-                                            check
-                                            style={{
-                                              fontSize: "15px",
-                                              fontFamily: "sans-serif",
-                                            }}
-                                          >
-                                            <Input
-                                              type="radio"
-                                              name="radio1"
-                                              value="Sub Account"
-                                              onChange={handleRadioChange}
-                                            />{" "}
-                                            Sub Account
-                                          </Label>
-                                        </FormGroup>
-                                        {selectedAccountLevel ===
-                                          "Sub Account" && (
-                                          <div
-                                            className="formInput"
-                                            style={{ margin: "30px 10px" }}
-                                          >
-                                            <label
-                                              className="form-control-label"
-                                              htmlFor="input-address"
-                                            >
-                                              Parent Account
-                                            </label>
-                                            <br />
-                                            <Dropdown
-                                              isOpen={
-                                                selectAccountLevelDropDown
-                                              } // Control the open/closed state
-                                              toggle={toggle1}
-                                            >
-                                              <DropdownToggle
-                                                caret
-                                                style={{ width: "100%" }}
-                                              >
-                                                {selectedAccountLevel
-                                                  ? selectedAccountLevel
-                                                  : "Select"}
-                                              </DropdownToggle>
-                                              <DropdownMenu
-                                                style={{ width: "100%" }}
-                                              >
-                                                <DropdownItem
-                                                  onClick={() =>
-                                                    hadleselectedAccountLevel(
-                                                      "Income"
-                                                    )
-                                                  }
-                                                >
-                                                  Income
-                                                </DropdownItem>
-                                                <DropdownItem
-                                                  onClick={() =>
-                                                    hadleselectedAccountLevel(
-                                                      "Non Operating Income"
-                                                    )
-                                                  }
-                                                >
-                                                  Non Operating Income
-                                                </DropdownItem>
-                                              </DropdownMenu>
-                                            </Dropdown>
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div
-                                        className="formInput"
-                                        style={{ margin: "30px 10px" }}
-                                      >
-                                        <label
-                                          className="form-control-label"
-                                          htmlFor="input-address"
-                                        >
-                                          Account Number
-                                        </label>
-                                        <br />
-                                        <Input
-                                          className="form-control-alternative"
-                                          id="input-no"
-                                          placeholder=""
-                                          type="number"
-                                          name="account_number"
-                                          onBlur={accountFormik.handleBlur}
-                                          onChange={accountFormik.handleChange}
-                                          value={
-                                            accountFormik.values.account_number
-                                          }
-                                        />
-                                        {accountFormik.touched.account_number &&
-                                        accountFormik.errors.account_number ? (
-                                          <div style={{ color: "red" }}>
-                                            {
-                                              accountFormik.errors
-                                                .account_number
-                                            }
-                                          </div>
-                                        ) : null}
-                                      </div>
-                                      <div
-                                        className="formInput"
-                                        style={{ margin: "30px 10px" }}
-                                      >
-                                        <label
-                                          className="form-control-label"
-                                          htmlFor="input-address"
-                                        >
-                                          Fund Type
-                                        </label>
-                                        <br />
-                                        <Dropdown
-                                          isOpen={selectFundTypeDropDown}
-                                          toggle={toggle10}
-                                        >
-                                          <DropdownToggle
-                                            caret
-                                            style={{ width: "100%" }}
-                                          >
-                                            {selectedFundType
-                                              ? selectedFundType
-                                              : "Select"}
-                                          </DropdownToggle>
-                                          <DropdownMenu
-                                            style={{ width: "100%" }}
-                                            name="fund_type"
-                                            onBlur={accountFormik.handleBlur}
-                                            onChange={
-                                              accountFormik.handleChange
-                                            }
-                                            value={
-                                              accountFormik.values.fund_type
-                                            }
-                                          >
-                                            {accountFormik.touched.fund_type &&
-                                            accountFormik.errors.fund_type ? (
-                                              <div style={{ color: "red" }}>
-                                                {accountFormik.errors.fund_type}
-                                              </div>
-                                            ) : null}
-                                            <DropdownItem
-                                              onClick={() =>
-                                                hadleselectedFundType("Reserve")
-                                              }
-                                            >
-                                              Reserve
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                hadleselectedFundType(
-                                                  "Operating"
-                                                )
-                                              }
-                                            >
-                                              Operating
-                                            </DropdownItem>
-                                          </DropdownMenu>
-                                        </Dropdown>
-                                      </div>
-                                      <div />
-                                      <div
-                                        className="formInput"
-                                        style={{ margin: "10px 10px" }}
-                                      >
-                                        <label
-                                          className="form-control-label"
-                                          htmlFor="input-address"
-                                        >
-                                          Notes
-                                        </label>
-                                        <br />
-                                        <Input
-                                          className="form-control-alternative"
-                                          id="input-accname"
-                                          placeholder="Notes"
-                                          type="text"
-                                          name="notes"
-                                          onBlur={accountFormik.handleBlur}
-                                          onChange={accountFormik.handleChange}
-                                          value={accountFormik.values.notes}
-                                        />
-                                        {accountFormik.touched.notes &&
-                                        accountFormik.errors.notes ? (
-                                          <div style={{ color: "red" }}>
-                                            {leaseFormik.errors.notes}
-                                          </div>
-                                        ) : null}
-                                      </div>
-
-                                      <div
-                                        className="formInput"
-                                        style={{ margin: "30px 10px" }}
-                                      >
-                                        We stores this information{" "}
-                                        <b
-                                          style={{
-                                            color: "blue",
-                                            fontSize: "15px",
-                                          }}
-                                        >
-                                          Privately
-                                        </b>{" "}
-                                        and{" "}
-                                        <b
-                                          style={{
-                                            color: "blue",
-                                            fontSize: "15px",
-                                          }}
-                                        >
-                                          Securely
-                                        </b>
-                                        .
-                                      </div>
-                                    </DialogContent>
-                                    <DialogActions>
-                                      <Button onClick={handleCloseDialog}>
-                                        Cancel
-                                      </Button>
-                                      <Button
-                                        onClick={() => {
-                                          handleAdd(accountFormik.values); // Call handleAdd with the form values
-                                          handleCloseDialog();
-                                        }}
-                                        color="primary"
-                                      >
-                                        Add
-                                      </Button>
-                                    </DialogActions>
-                                  </Dialog> */}
                                 </FormGroup>
                               </FormGroup>
                             </Col>
@@ -4020,11 +3911,19 @@ const RentRollLeaseing = () => {
                                 className="form-control-alternative"
                                 id="input-reserve"
                                 placeholder="$0.00"
-                                type="number"
+                                type="text"
                                 name="Security_amount"
                                 onBlur={leaseFormik.handleBlur}
                                 onChange={leaseFormik.handleChange}
                                 value={leaseFormik.values.Security_amount}
+                                onInput={(e) => {
+                                  const inputValue = e.target.value;
+                                  const numericValue = inputValue.replace(
+                                    /\D/g,
+                                    ""
+                                  ); // Remove non-numeric characters
+                                  e.target.value = numericValue;
+                                }}
                               />
                               {leaseFormik.touched.Security_amount &&
                               leaseFormik.errors.Security_amount ? (
@@ -4114,7 +4013,13 @@ const RentRollLeaseing = () => {
                                           : "Select"}
                                       </DropdownToggle>
                                       <DropdownMenu
-                                        style={{ width: "100%" }}
+                                        style={{
+                                          zIndex: 999,
+                                          maxHeight: "280px",
+                                          // overflowX: "hidden",
+                                          overflowY: "auto",
+                                          width: "100%",
+                                        }}
                                         name="account"
                                         onBlur={leaseFormik.handleBlur}
                                         onChange={leaseFormik.handleChange}
@@ -4236,11 +4141,19 @@ const RentRollLeaseing = () => {
                                       className="form-control-alternative"
                                       id="recuring_amount"
                                       placeholder="$0.00"
-                                      type="number"
+                                      type="text"
                                       name="recuring_amount"
                                       onBlur={leaseFormik.handleBlur}
                                       onChange={leaseFormik.handleChange}
                                       value={leaseFormik.values.recuring_amount}
+                                      onInput={(e) => {
+                                        const inputValue = e.target.value;
+                                        const numericValue = inputValue.replace(
+                                          /\D/g,
+                                          ""
+                                        ); // Remove non-numeric characters
+                                        e.target.value = numericValue;
+                                      }}
                                     />
                                     {leaseFormik.touched.recuring_amount &&
                                     leaseFormik.errors.recuring_amount ? (
@@ -4381,6 +4294,7 @@ const RentRollLeaseing = () => {
                                 onClick={(e) => {
                                   e.preventDefault();
                                   handleAddRecurring();
+                                  handleDialogClose();
                                 }}
                               >
                                 Add
@@ -4434,7 +4348,13 @@ const RentRollLeaseing = () => {
                                           : "Select"}
                                       </DropdownToggle>
                                       <DropdownMenu
-                                        style={{ width: "100%" }}
+                                        style={{
+                                          zIndex: 999,
+                                          maxHeight: "280px",
+                                          // overflowX: "hidden",
+                                          overflowY: "auto",
+                                          width: "100%",
+                                        }}
                                         name="onetime_account"
                                         onBlur={leaseFormik.handleBlur}
                                         onChange={leaseFormik.handleChange}
@@ -4550,11 +4470,19 @@ const RentRollLeaseing = () => {
                                       className="form-control-alternative"
                                       id="input-reserve"
                                       placeholder="$0.00"
-                                      type="number"
+                                      type="text"
                                       name="onetime_amount"
                                       onBlur={leaseFormik.handleBlur}
                                       onChange={leaseFormik.handleChange}
                                       value={leaseFormik.values.onetime_amount}
+                                      onInput={(e) => {
+                                        const inputValue = e.target.value;
+                                        const numericValue = inputValue.replace(
+                                          /\D/g,
+                                          ""
+                                        ); // Remove non-numeric characters
+                                        e.target.value = numericValue;
+                                      }}
                                     />
                                     {leaseFormik.touched.onetime_amount &&
                                     leaseFormik.errors.onetime_amount ? (
@@ -4596,7 +4524,8 @@ const RentRollLeaseing = () => {
                                   backgroundColor: "#007bff",
                                   color: "white",
                                 }}
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.preventDefault();
                                   handleAddOneTime();
                                   handleDialogClose(); // Call this function to close the dialog
                                 }}
@@ -4634,7 +4563,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              Amount
+                              Account
                             </th>
 
                             <th
@@ -4643,7 +4572,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              Next Due Date
+                              Amount
                             </th>
                             <th
                               style={{
@@ -4651,7 +4580,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              Memo
+                              Next Due Date
                             </th>
                             <th
                               style={{
@@ -4671,7 +4600,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              {recurringData.recuring_amount}
+                              {recurringData.recuring_account}
                             </td>
 
                             <td
@@ -4680,7 +4609,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              {recurringData.recuringnextDue_date}
+                              {recurringData.recuring_amount}
                             </td>
                             <td
                               style={{
@@ -4688,7 +4617,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              {recurringData.recuringmemo}
+                              {recurringData.recuringnextDue_date}
                             </td>
 
                             <td
@@ -4738,7 +4667,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              Next Due Date
+                              Amount
                             </th>
                             <th
                               style={{
@@ -4746,7 +4675,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              Memo
+                              Next Due Date
                             </th>
                             <th
                               style={{
@@ -4766,7 +4695,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              {oneTimeData.onetime_amount}
+                              {oneTimeData.onetime_account}
                             </td>
 
                             <td
@@ -4775,7 +4704,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              {oneTimeData.onetime_Due_date}
+                              {oneTimeData.onetime_amount}
                             </td>
                             <td
                               style={{
@@ -4783,7 +4712,7 @@ const RentRollLeaseing = () => {
                                 textAlign: "left",
                               }}
                             >
-                              {oneTimeData.onetime_memo}
+                              {oneTimeData.onetime_Due_date}
                             </td>
 
                             <td
@@ -4922,13 +4851,20 @@ const RentRollLeaseing = () => {
                             key={index}
                             style={{ position: "relative", marginLeft: "50px" }}
                           >
-                            <p
-                              onClick={() => handleOpenFile(file)}
-                              style={{ cursor: "pointer" }}
-                            >
-                              {file?.name?.substr(0, 5)}
-                              {file?.name?.length > 5 ? "..." : null}
-                            </p>
+                            {!id ? (
+                              <p
+                                onClick={() => handleOpenFile(file)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                {file?.name?.substr(0, 5)}
+                                {file?.name?.length > 5 ? "..." : null}
+                              </p>
+                            ) : (
+                              <p style={{ cursor: "pointer" }}>
+                                {file?.name?.substr(0, 5)}
+                                {file?.name?.length > 5 ? "..." : null}
+                              </p>
+                            )}
                             <CloseIcon
                               style={{
                                 cursor: "pointer",
@@ -4981,7 +4917,7 @@ const RentRollLeaseing = () => {
                   Save
 
                 </Button> */}
-                  <Button
+                  {/* <Button
                     type="submit"
                     className="btn btn-primary"
                     style={{
@@ -4995,7 +4931,32 @@ const RentRollLeaseing = () => {
                     }}
                   >
                     {id ? "Update Lease" : "Add Lease"}
-                  </Button>
+                  </Button> */}
+                  {id ? (
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      style={{ background: "green", cursor: "pointer" }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        editLease(id);
+                      }}
+                    >
+                      Update Lease
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      style={{ background: "green", cursor: "pointer" }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        leaseFormik.handleSubmit();
+                      }}
+                    >
+                      Create Lease
+                    </button>
+                  )}
                   <Button
                     color="primary"
                     href="#rms"

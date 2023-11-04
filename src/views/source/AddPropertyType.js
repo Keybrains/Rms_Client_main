@@ -341,7 +341,7 @@ React.useEffect(() => {
                             </div>
                           ) : null}
                         </FormGroup>
-                      </Col>
+                      </Col>                                           
                     </Row>
                     <br />
                   </div>

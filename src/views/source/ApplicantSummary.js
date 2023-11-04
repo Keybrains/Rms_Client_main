@@ -223,14 +223,12 @@ const ApplicantSummary = () => {
     }
   };
 
-  useEffect(() => {
-    fetchDataAndPost();
-  }, [id]);
+  
 
   return (
     <>
       <Header title="ApplicantSummary" />
-      <Container className="mt--7" fluid>
+      <Container className="mt--5" fluid>
         <Row>
           <Col xs="12" sm="6">
             <FormGroup className="">
@@ -312,7 +310,10 @@ const ApplicantSummary = () => {
                   : { display: "none" }
               }
               color="success"
-              onClick={fetchDataAndPost} // Correctly bind the function
+              onClick={(e) => {
+                fetchDataAndPost();
+                navigate("/admin/RentRoll");
+              }}
             >
               Move in
             </Button>
@@ -326,8 +327,8 @@ const ApplicantSummary = () => {
                     aria-label="lab API tabs example"
                   >
                     <Tab label="Summary" value="Summary" />
-                    {/* <Tab label="Application" value="Application" />
-                    <Tab label="Screening" value="Screening" /> */}
+                    <Tab label="Application" value="Application" />
+                    <Tab label="Screening" value="Screening" />
                   </TabList>
                 </Box>
                 <TabPanel value="Summary">
@@ -390,8 +391,7 @@ const ApplicantSummary = () => {
                           )}
                           <div>
                             <Box display="flex" flexDirection="column">
-                              <br></br>
-                              {/* <FormControlLabel
+                              <FormControlLabel
                                 control={
                                   <Checkbox
                                     id="checkbox1"
@@ -401,7 +401,7 @@ const ApplicantSummary = () => {
                                 }
                                 label="CheckList 1"
                                 style={{ marginTop: "0px" }}
-                              /> */}
+                              />
                               {checklistItems.map((item, index) => (
                                 <div key={index}>
                                   <FormControlLabel
@@ -691,6 +691,7 @@ const ApplicantSummary = () => {
                     </Col>
                   </Row>
                 </TabPanel>
+                
               </TabContext>
             </Col>
           </Row>

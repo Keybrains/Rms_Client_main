@@ -56,6 +56,8 @@ import StaffWorkDetails from "views/source/StaffWorkDetails";
 import VendorAddWork from "views/source/VendorAddWork";
 import ApplicantSummary from "views/source/ApplicantSummary";
 import TenantPropertyDetail from "views/source/TenantPropertyDetail";
+import Payment from "views/source/Payment";
+import AddPayment from "views/source/AddPayment";
 
 var routes = [
   {
@@ -544,6 +546,21 @@ var routes = [
         layout: "/tenant",
       },
  
+      {
+        path: "/Payment",
+        component: <Payment/>,
+        layout: "/admin",    
+      },
+      {
+        path: "/AddPayment/:id",
+        component: <AddPayment/>,
+        layout: "/admin",    
+      },
+      {
+        path: "/AddPayment",
+        component: <AddPayment/>,
+        layout: "/admin",    
+      },
 ];
 export default routes;
 
