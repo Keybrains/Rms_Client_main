@@ -119,9 +119,10 @@ const Payment = () => {
   React.useEffect(() => {
     chackAuth();
   }, [cookies.get("token")]);
+
   const getGeneralLedgerData = async () => {
     try {
-      const response = await axios.get("https://propertymanager.cloudpress.host/api/ledger/ledger");
+      const response = await axios.get("https://propertymanager.cloudpress.host/api/payment/payment");
       setLoader(false);
       setGeneralLedgerData(response.data.data);
       console.log(response.data.data);
@@ -450,10 +451,10 @@ const Payment = () => {
                 <thead className="thead-light">
                   <tr>
                     <th scope="col">Date</th>
-                    <th scope="col">Property</th>
-                    <th scope="col">Account</th>
-                    <th scope="col">Credit&Debit</th>
-                    <th scope="col">Total Amount</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Payment Method</th>
+                    <th scope="col">Tenant Firstname</th>
+                    {/* <th scope="col">Total Amount</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -462,25 +463,17 @@ const Payment = () => {
                       <td>
                         {formatDateWithoutTime(generalledger.date) || "N/A"}
                       </td>
-                      <td>{generalledger.rental_adress}</td>
-                      <td>
+                      <td>{generalledger.amount}</td>
+                      <td>{generalledger.payment_method}</td>
+                      <td>{generalledger.tenant_firstName}</td>
+                      {/* <td>
                         {generalledger.entries.map((entry, index) => (
                           <span key={index}>
                             {entry.account}
                             <br />
                           </span>
                         ))}
-                      </td>
-                      <td>
-                        {generalledger.entries.map((entry, index) => (
-                          <span key={index}>
-                            Credit: {entry.credit}
-                            &nbsp; Debit: {entry.debit}
-                            <br />
-                          </span>
-                        ))}
-                      </td>
-                      <td>{generalledger.total_amount}</td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>

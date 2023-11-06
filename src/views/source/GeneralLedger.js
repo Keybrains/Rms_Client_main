@@ -154,7 +154,7 @@ const GeneralLedger = () => {
           <Col className="order-xl-1" xl="12">
             <Card className="bg-secondary shadow">
               <CardHeader className="border-0">
-                <Form>
+                {/* <Form>
                   <Row>
                     <Col lg="2.5" style={{ marginRight: "20px" }}>
                       <FormGroup>
@@ -312,22 +312,7 @@ const GeneralLedger = () => {
                           type="date"
                           name="from"
                         />
-                        {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker
-                            className="form-control-alternative custom-date-picker"
-                            name="from"
-                            slotProps={{ textField: { size: "small" } }}
-                            id="input-unitadd"
-                            placeholder="3000"
-                            dateFormat="MM-dd-yyyy"
-                            views={["year", "month", "day"]}
-                            // onBlur={leaseFormik.handleBlur}
-                            // selected={leaseFormik.values.recuringnextDue_date} // Use 'selected' prop instead of 'value'
-                            // onChange={(date) => {
-                            //   leaseFormik.setFieldValue("recuringnextDue_date", date); // Update the Formik field value
-                            // }}
-                          />
-                        </LocalizationProvider> */}
+                 
                       </FormGroup>
                     </Col>
                     <Col lg="2">
@@ -338,22 +323,7 @@ const GeneralLedger = () => {
                         >
                           To
                         </label>
-                        {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker
-                            className="form-control-alternative custom-date-picker"
-                            name="to"
-                            slotProps={{ textField: { size: "small" } }}
-                            id="input-unitadd"
-                            placeholder="3000"
-                            dateFormat="MM-dd-yyyy"
-                            views={["year", "month", "day"]}
-                            // onBlur={leaseFormik.handleBlur}
-                            // selected={leaseFormik.values.recuringnextDue_date} // Use 'selected' prop instead of 'value'
-                            // onChange={(date) => {
-                            //   leaseFormik.setFieldValue("recuringnextDue_date", date); // Update the Formik field value
-                            // }}
-                          />
-                        </LocalizationProvider> */}
+            
                         <Input
                           className="form-control-alternative"
                           id="input-unitadd"
@@ -411,7 +381,7 @@ const GeneralLedger = () => {
                       </FormGroup>
                     </Col>
                   </Row>
-                </Form>
+                </Form> */}
               </CardHeader>
 
               <Table className="align-items-center table-flush" responsive>

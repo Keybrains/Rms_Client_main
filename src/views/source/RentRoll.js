@@ -29,9 +29,9 @@ import { Link } from "react-router-dom";
 import InfoIcon from "@mui/icons-material/Info";
 import { RotatingLines } from "react-loader-spinner";
 import Cookies from "universal-cookie";
-// import RentRollHeader from "components/Headers/RentRollHeader";
 
 const RentRoll = () => {
+
   const [tenantsData, setTenantsData] = useState([]);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,11 +41,13 @@ const RentRoll = () => {
   //   const rentRollDetailsURL = `/admin/rentrolldetail/${rentRollId}`;
   //   window.location.href = rentRollDetailsURL;
   // }
+
   const navigateToRentRollDetails = (tenantId, entryIndex) => {
     navigate(`/admin/rentrolldetail/${tenantId}/${entryIndex}`);
     console.log(tenantId, "Tenant Id");
     console.log(entryIndex, "Entry Index");
   };
+
   let cookies = new Cookies();
   // Check Authe(token)
   let chackAuth = async () => {

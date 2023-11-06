@@ -209,10 +209,10 @@ var routes = [
       },
 
       {
-        path: "/rentrolldetail/:id",
+        path: "/rentrolldetail/:tenantId/:entryIndex",
         name: "Rent Roll Detail",
-        component: <RentRollDetail/>,
-        layout: "/admin"
+        component: <RentRollDetail />,
+        layout: "/admin",
       },
       {
         path: "/rentalownerdetail/:id",

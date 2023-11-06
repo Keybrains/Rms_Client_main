@@ -69,16 +69,16 @@ const AdminNavbar = (props) => {
   let cookie_id = cookies.get("Tenant ID");
   console.log(cookie_id)
 
+  
 
   useEffect(() => {
     fetch(`https://propertymanager.cloudpress.host/api/notification/notification`)
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
-          setNotificationData(data.data);
-          setNotificationCount(data.data.length); 
-          console.log("Notification",data.data);
-         
+          const unreadNotifications = data.data.filter(notification => !notification.isAdminread);
+          setNotificationData(unreadNotifications);
+          setNotificationCount(unreadNotifications.length);
         } else {
           // Handle error
           console.error("Error:", data.message);
@@ -92,26 +92,35 @@ const AdminNavbar = (props) => {
 
   const navigateToDetails = (workorder_id) => {
     // Make a DELETE request to delete the notification
-    axios.delete(`https://propertymanager.cloudpress.host/api/notification/notification/${workorder_id}`)
-      .then((response) => {
-        if (response.status === 200) {
-          // Notification deleted successfully, now update the state to remove it from the list
-          const updatedNotificationData = notificationData.filter((notification) => notification.workorder_id !== workorder_id);
-          setNotificationData(updatedNotificationData);
-          setNotificationCount(updatedNotificationData.length);
-          console.log(`Notification with workorder_id ${workorder_id} deleted successfully.`);
-        } else {
-          console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    axios.get(`https://propertymanager.cloudpress.host/api/notification/notification/${workorder_id}?role=admin `)
+    .then((response) => {
+      if (response.status === 200) {
+        const updatedNotificationData = notificationData.map(notification => {
+          if (notification.workorder_id === workorder_id) {
+            return { ...notification, isAdminread: true };
+          }
+          return notification;
+        });
+        setNotificationData(updatedNotificationData);
+        console.log("updatedNotificationData", updatedNotificationData)
+        setNotificationCount(updatedNotificationData.length);
+        console.log(`Notification with workorder_id ${workorder_id} marked as read.`);
+      } else {
+      console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
+    }
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+  });
+
   
     // Continue with navigating to the details page
     navigate(`/admin/workorderdetail/${workorder_id}`);
   };
   
+  // useEffect(() =>{
+  //   navigateToDetails();
+  // },[workorder_id]);
 
   // const navigateToDetails = (workorder_id) => {
   //   // const propDetailsURL = `/admin/WorkOrderDetails/${tenantId}`;

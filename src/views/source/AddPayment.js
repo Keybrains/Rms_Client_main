@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as yup from "yup";
 import { useFormik } from "formik";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import ClearIcon from "@mui/icons-material/Clear";
 import swal from "sweetalert";
@@ -33,12 +33,18 @@ import { Check, CheckBox } from "@mui/icons-material";
 import Checkbox from "@mui/material/Checkbox";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { values } from "pdf-lib";
+import Img from "assets/img/theme/team-4-800x800.jpg";
+import "jspdf-autotable";
 
-const AddPayment = ({tenantDetails}) => {
-  const {id} = useParams();
+const AddPayment = ({ tenantDetails }) => {
+  const location = useLocation();
+  const rentalAddress = location.state && location.state.rentalAddress;
+  console.log(rentalAddress,"rental_address")
+  
+  const { id } = useParams();
   const { rental_adress } = useParams();
   const [file, setFile] = useState([]);
-
   const [accountData, setAccountData] = useState([]);
   const [propertyData, setPropertyData] = useState([]);
   const [checkedCheckbox, setCheckedCheckbox] = useState();
@@ -52,7 +58,7 @@ const AddPayment = ({tenantDetails}) => {
   const handlePropSelection = (propertyType) => {
     setSelectedProp(propertyType);
   };
-  
+
   const [selectedRec, setSelectedRec] = useState("Select Resident");
   const handleRecieverSelection = (propertyType) => {
     setSelectedRec(propertyType);
@@ -66,66 +72,65 @@ const AddPayment = ({tenantDetails}) => {
     const day = String(date.getDate()).padStart(2, "0");
     return `${month}-${day}-${year}`;
   }
-  
 
-  const generatePDF = async (tenantId, tenantDetails) => {
-    try {
-      let tenantData = tenantDetails;
-      if (!tenantData || !tenantData._id) {
-        const response = await axios.get(
-          `https://propertymanager.cloudpress.host/api/Payment/Payment_summary/${tenantId}`
-        );
-        tenantData = response.data.data;
-        console.log(tenantData, "tenantData");
-      }
+  // const generatePDF = async (tenantId, tenantDetails) => {
+  //   try {
+  //     let tenantData = tenantDetails;
+  //     if (!tenantData || !tenantData._id) {
+  //       const response = await axios.get(
+  //         `https://propertymanager.cloudpress.host/api/Payment/Payment_summary/${tenantId}`
+  //       );
+  //       tenantData = response.data.data;
+  //       console.log(tenantData, "tenantData");
+  //     }
 
-      const doc = new jsPDF();
-      doc.text(`Lease Details`, 10, 10);
+  //     const doc = new jsPDF();
+  //     doc.text(`Lease Details`, 10, 10);
 
-      const headers = ["Title", "Value"];
-      const data = [
-        ["Name",tenantData.tenant_firstName],
-        ["Date",  formatDateWithoutTime(tenantData.date)],
-        ["Amount", tenantData.amount],
-        ["Payment Method", tenantData.payment_method],
-        ["Memo", tenantData.memo],
-        ["Account", tenantData.account],
-        ["Balance", tenantData.balance],
-        ["Amount", tenantData.amount],
-        ["Total Amount", tenantData.total_amount],
-      ];
+  //     const headers = ["Title", "Value"];
+  //     const data = [
+  //       ["Name",tenantData.tenant_firstName],
+  //       ["Date",  formatDateWithoutTime(tenantData.date)],
+  //       ["Amount", tenantData.amount],
+  //       ["Payment Method", tenantData.payment_method],
+  //       ["Memo", tenantData.memo],
+  //       ["Account", tenantData.account],
+  //       ["Balance", tenantData.balance],
+  //       ["Amount", tenantData.amount],
+  //       ["Total Amount", tenantData.total_amount],
+  //     ];
 
-      tenantData.upload_file.forEach((item, index) => {
-        data.push([`Uploaded File ${index + 1}`, item]);
-      });
+  //     tenantData.upload_file.forEach((item, index) => {
+  //       data.push([`Uploaded File ${index + 1}`, item]);
+  //     });
 
-      const filteredData = data.filter(
-        (row) => row[1] !== undefined && row[1] !== null && row[1] !== ""
-      );
+  //     const filteredData = data.filter(
+  //       (row) => row[1] !== undefined && row[1] !== null && row[1] !== ""
+  //     );
 
-      if (filteredData.length > 0) {
-        doc.autoTable({
-          head: [headers],
-          body: filteredData,
-          startY: 20,
-        });
-        
-        doc.save(`${tenantId}.pdf`);
-      } else {
-        console.error("No valid data to generate PDF.");
-      }
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    }
-  };
+  //     if (filteredData.length > 0) {
+  //       doc.autoTable({
+  //         head: [headers],
+  //         body: filteredData,
+  //         startY: 20,
+  //       });
+
+  //       doc.save(`${tenantId}.pdf`);
+  //     } else {
+  //       console.error("No valid data to generate PDF.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+  //   }
+  // };
 
   const generalledgerFormik = useFormik({
     initialValues: {
       date: "",
-      rental_adress: "",
-      amount:"",
-      payment_method:"",
-      tenant_firstName:"",
+      rental_adress: rentalAddress, 
+      amount: "",
+      payment_method: "",
+      tenant_firstName: "",
       memo: "",
       entries: [
         {
@@ -159,31 +164,31 @@ const AddPayment = ({tenantDetails}) => {
     navigate("../Payment");
   };
 
-// useEffect(() => {
-//     // Make an HTTP GET request to your Express API endpoint
-//     fetch("https://propertymanager.cloudpress.host/api/tenant/tenant-name/tenant/${rental_adress}")
-//       .then((response) => response.json())
-//       .then((data) => {
-//         if (data.statusCode === 200) {
-//           setPropertyData(data.data);
-//           console.log(data.data, "gdasga");
-//         } else {
-//           // Handle error
-//           console.error("Error:", data.message);
-//         }
-//       })
-//       .catch((error) => {
-//         // Handle network error
-//         console.error("Network error:", error);
-//       });
-//   }, []);
+  // useEffect(() => {
+  //     // Make an HTTP GET request to your Express API endpoint
+  //     fetch("https://propertymanager.cloudpress.host/api/tenant/tenant-name/tenant/${rental_adress}")
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         if (data.statusCode === 200) {
+  //           setPropertyData(data.data);
+  //           console.log(data.data, "gdasga");
+  //         } else {
+  //           // Handle error
+  //           console.error("Error:", data.message);
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         // Handle network error
+  //         console.error("Network error:", error);
+  //       });
+  //   }, []);
 
-const handleAccountSelection = (value, index) => {
-    console.log('Selected index:', index);
-  
+  const handleAccountSelection = (value, index) => {
+    console.log("Selected index:", index);
+
     const updatedEntries = [...generalledgerFormik.values.entries];
-    console.log('Current entries:', updatedEntries);
-  
+    console.log("Current entries:", updatedEntries);
+
     if (updatedEntries[index]) {
       updatedEntries[index].account = value;
       generalledgerFormik.setValues({
@@ -193,7 +198,7 @@ const handleAccountSelection = (value, index) => {
     } else {
       console.error(`Invalid index: ${index}`);
     }
-  }; 
+  };
 
   const handleAddRow = () => {
     const newEntry = {
@@ -256,15 +261,15 @@ const handleAccountSelection = (value, index) => {
 
   const handleSubmit = async (values) => {
     const arrayOfNames = file.map((item) => item.name);
-
+    const rentalAddress = generalledgerFormik.values.rental_adress;
     try {
       const updatedValues = {
         date: values.date,
-        amount:values.amount,
+        amount: values.amount,
         payment_method: selectedProp,
         tenant_firstName: selectedRec,
         attachment: arrayOfNames,
-        
+        rental_adress: rentalAddress,
         entries: generalledgerFormik.values.entries.map((entry) => ({
           account: entry.account,
           balance: parseFloat(entry.balance),
@@ -272,18 +277,117 @@ const handleAccountSelection = (value, index) => {
           total_amount: (totalDebit + totalCredit).toFixed(2),
         })),
       };
-
       const response = await axios.post(
         "https://propertymanager.cloudpress.host/api/payment/add_payment",
         updatedValues
       );
 
       if (response.data.statusCode === 200) {
-        swal("Success","Payment Done Successfully!", "success");
-        navigate("/admin/Payment");
-        
+        const id = response.data.data._id;
+        if (id) {
+          const pdfResponse = await axios.get(
+            `https://propertymanager.cloudpress.host/api/Payment/Payment_summary/${id}`,
+            { responseType: "blob" }
+          );
+          if (pdfResponse.status === 200) {
+            const pdfBlob = pdfResponse.data;
+            const pdfData = URL.createObjectURL(pdfBlob);
+            const doc = new jsPDF();
+
+            // Set custom styling
+            doc.setFont("helvetica");
+            doc.setFontSize(12);
+
+            // Add the image
+            doc.addImage(Img, "JPEG", 15, 20, 30, 15); // left margin topmargin width hetght
+
+            // Add the payment receipt text
+            doc.setFont("helvetica", "bold"); // Set font name and style to bold
+            doc.setFontSize(16); // Increase the font size to 16
+            doc.text("Payment Receipt", 90, 30);
+            doc.setFont("helvetica", "normal"); // Reset font style to normal (optional)
+            doc.setFontSize(12); // Reset the font size to its original size (optional)
+
+            doc.setFont("helvetica", "bold"); // Set font name and style to bold for titles
+            doc.text("Date:", 15, 60); // Title in bold
+            doc.setFont("helvetica", "normal"); // Reset font style to normal for data
+            doc.text(updatedValues.date, 28, 60); // Value in normal font
+
+            doc.setFont("helvetica", "bold"); // Set font name and style to bold for titles
+            doc.text("Tenant Name:", 15, 70); // Title in bold
+            doc.setFont("helvetica", "normal"); // Reset font style to normal for data
+            doc.text(selectedRec, 45, 70);
+
+            doc.setFont("helvetica", "bold"); // Set font name and style to bold for titles
+            doc.text("Payment Method:", 15, 80); // Title in bold
+            doc.setFont("helvetica", "normal"); // Reset font style to normal for data
+            doc.text(selectedProp, 52, 80);
+
+            // doc.text("Tenant Name: " + selectedRec, 15, 70); // Title and data in normal font
+            // doc.text("Payment Method: " + selectedProp, 15, 80);
+
+            const headers = [
+              {
+                content: "Account",
+                styles: {
+                  fillColor: [211, 211, 211],
+                  textColor: [255, 255, 255],
+                },
+              },
+              {
+                content: "Amount",
+                styles: {
+                  fillColor: [211, 211, 211],
+                  textColor: [255, 255, 255],
+                },
+              },
+            ];
+
+            // Create data array with rows for "Account" and "Amount" values
+            const data = updatedValues.entries.map((entry) => [
+              entry.account,
+              entry.amount,
+            ]);
+
+            // Add a separate row for "Total Amount"
+            const totalAmount = parseFloat(updatedValues.entries[0].total_amount);
+            data.push([{ content: 'Total Amount', styles: { fontStyle: 'bold' } }, { content: totalAmount, styles: { fontStyle: 'bold' } }]);
+
+            const headStyles = {
+              lineWidth: 0.01,
+              lineColor: [0, 0, 0],
+              fillColor: [19, 89, 160],
+              textColor: [255, 255, 255],
+              fontStyle: "bold",
+            };
+
+            doc.autoTable({
+              head: [headers],
+              body: data,
+              startY: 90,
+              theme: "striped",
+              styles: { fontSize: 12 },
+              headers: headStyles,
+              margin: { top: 10, left: 10 },
+            });
+
+            // Add the table to the PDF
+
+            // Add the PDF content
+            doc.addImage(pdfData, "JPEG", 15, 110, 180, 100);
+
+            // Save the PDF with a custom filename
+            doc.save(`PaymentReceipt_${id}.pdf`);
+          } else {
+            swal("Error", "Failed to retrieve PDF summary", "error");
+          }
+        } else {
+          swal("Error", "Failed to get 'id' from the response", "error");
+        }
+
+        navigate("/admin/Payment"); // Navigate to the desired page
       } else {
-        swal("", response.data.message, "error");
+        swal("Error", response.data.message, "error");
         console.error("Server Error:", response.data.message);
       }
     } catch (error) {
@@ -340,7 +444,7 @@ const handleAccountSelection = (value, index) => {
     newFile.splice(index, 1);
     setFile(newFile);
   };
-  
+
   const handleOpenFile = (item) => {
     // console.log(file,"fike")
     // const fileToOpen = file.filter((file) => {
@@ -447,18 +551,28 @@ const handleAccountSelection = (value, index) => {
                         <br />
                         <Dropdown isOpen={prodropdownOpen} toggle={toggle1}>
                           <DropdownToggle caret style={{ width: "100%" }}>
-                            {selectedProp ? selectedProp : "Select Payment Method"}
+                            {selectedProp
+                              ? selectedProp
+                              : "Select Payment Method"}
                           </DropdownToggle>
                           <DropdownMenu
                             style={{
-                                width: "100%",
-                                maxHeight: "200px",
-                                overflowY: "auto",
-                                overflowX: "hidden",
+                              width: "100%",
+                              maxHeight: "200px",
+                              overflowY: "auto",
+                              overflowX: "hidden",
                             }}
                           >
-                            <DropdownItem onClick={() =>handlePropSelection("Debit Card")}>Debit Card</DropdownItem>
-                            <DropdownItem onClick={() =>handlePropSelection("Cash")}>Cash</DropdownItem>
+                            <DropdownItem
+                              onClick={() => handlePropSelection("Debit Card")}
+                            >
+                              Debit Card
+                            </DropdownItem>
+                            <DropdownItem
+                              onClick={() => handlePropSelection("Cash")}
+                            >
+                              Cash
+                            </DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </FormGroup>
@@ -480,14 +594,22 @@ const handleAccountSelection = (value, index) => {
                           </DropdownToggle>
                           <DropdownMenu
                             style={{
-                                width: "100%",
-                                maxHeight: "200px",
-                                overflowY: "auto",
-                                overflowX: "hidden",
+                              width: "100%",
+                              maxHeight: "200px",
+                              overflowY: "auto",
+                              overflowX: "hidden",
                             }}
                           >
-                                  <DropdownItem onClick={() =>handleRecieverSelection("Avi")}>Avi</DropdownItem>
-                                  <DropdownItem onClick={() =>handleRecieverSelection("Mansi")}>Mansi</DropdownItem>
+                            <DropdownItem
+                              onClick={() => handleRecieverSelection("Avi")}
+                            >
+                              Avi
+                            </DropdownItem>
+                            <DropdownItem
+                              onClick={() => handleRecieverSelection("Mansi")}
+                            >
+                              Mansi
+                            </DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </FormGroup>
@@ -521,11 +643,11 @@ const handleAccountSelection = (value, index) => {
                       </FormGroup>
                     </Col>
                   </Row>
-                  
+
                   <Row>
                     <Col lg="12">
                       <FormGroup>
-                      <label
+                        <label
                           className="form-control-label"
                           htmlFor="input-unitadd"
                         >
@@ -558,7 +680,9 @@ const handleAccountSelection = (value, index) => {
                                           toggle={() => toggleDropdown(index)}
                                         >
                                           <DropdownToggle caret>
-                                            {entries.account ? entries.account : "Select"}
+                                            {entries.account
+                                              ? entries.account
+                                              : "Select"}
                                           </DropdownToggle>
                                           <DropdownMenu
                                             style={{
@@ -573,9 +697,36 @@ const handleAccountSelection = (value, index) => {
                                             >
                                               Liability Account
                                             </DropdownItem>
-                                            <DropdownItem onClick={() => handleAccountSelection("Last Month's Rent", index)}>Last Month's Rent</DropdownItem>
-                                            <DropdownItem onClick={() =>handleAccountSelection("Prepayments",index)}>Prepayments</DropdownItem>
-                                            <DropdownItem onClick={() =>handleAccountSelection("Security Deposit Liability",index)}>Security Deposit Liability</DropdownItem>
+                                            <DropdownItem
+                                              onClick={() =>
+                                                handleAccountSelection(
+                                                  "Last Month's Rent",
+                                                  index
+                                                )
+                                              }
+                                            >
+                                              Last Month's Rent
+                                            </DropdownItem>
+                                            <DropdownItem
+                                              onClick={() =>
+                                                handleAccountSelection(
+                                                  "Prepayments",
+                                                  index
+                                                )
+                                              }
+                                            >
+                                              Prepayments
+                                            </DropdownItem>
+                                            <DropdownItem
+                                              onClick={() =>
+                                                handleAccountSelection(
+                                                  "Security Deposit Liability",
+                                                  index
+                                                )
+                                              }
+                                            >
+                                              Security Deposit Liability
+                                            </DropdownItem>
 
                                             <DropdownItem
                                               header
@@ -686,7 +837,6 @@ const handleAccountSelection = (value, index) => {
                                   <th>Total</th>
                                   <th>{totalDebit.toFixed(2)}</th>
                                   <th>{totalCredit.toFixed(2)}</th>
-
                                 </tr>
                               </>
                             </tbody>
@@ -759,14 +909,14 @@ const handleAccountSelection = (value, index) => {
                                     {file?.name?.length > 5 ? "..." : null}
                                   </p>
                                   <CloseIcon
-                              style={{
-                                cursor: "pointer",
-                                position: "absolute",
-                                left: "64px",
-                                top: "-2px",
-                              }}
-                              onClick={() => deleteFile(index)}
-                            />
+                                    style={{
+                                      cursor: "pointer",
+                                      position: "absolute",
+                                      left: "64px",
+                                      top: "-2px",
+                                    }}
+                                    onClick={() => deleteFile(index)}
+                                  />
                                 </div>
                               ))}
                           </div>
@@ -777,32 +927,31 @@ const handleAccountSelection = (value, index) => {
                   <Row>
                     <Col lg="3">
                       <FormGroup>
-                        <Checkbox/>
+                        <Checkbox />
                         <label
                           className="form-control-label"
                           htmlFor="input-address"
                         >
-                            Print Receipt
-                        </label>  
+                          Print Receipt
+                        </label>
                       </FormGroup>
                     </Col>
                   </Row>
                   <Row>
                     <Col lg="5">
                       <FormGroup>
-                      <Button
-                        type="submit"
-                        className="btn btn-primary"
-                        style={{ background: "green", color: "white" }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          generalledgerFormik.handleSubmit();
-                          console.log(tenantDetails); 
-                          //generatePDF(tenantDetails._id); // Pass the _id of the record
-                        }}
-                      >
-                        Save Payment
-                      </Button>
+                        <button
+                          type="submit"
+                          className="btn btn-primary"
+                          style={{ background: "green", color: "white" }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            generalledgerFormik.handleSubmit();
+                            console.log(generalledgerFormik.values);
+                          }}
+                        >
+                          Save Payment
+                        </button>
 
                         <Button
                           color="primary"

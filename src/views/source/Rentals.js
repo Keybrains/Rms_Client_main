@@ -379,48 +379,30 @@ const Rentals = () => {
   };
 
 
-  // const fileData = async (file, name) => {
-  //   const allData = [];
-  //   const axiosRequests = [];
+  // const fileData = async (file) => {
+  //   const formData = new FormData();
+  //   formData.append('file', file);
   
-  //   for (let i = 0; i < file.length; i++) {
-  //     const dataArray = new FormData();
-  //     dataArray.append('file', file[i]);
+  //   try {
+  //     const response = await fetch('https://propertymanager.cloudpress.host/api/uploadfile', {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
   
-  //     // Update the URL to point to your Express API
-  //     let url = 'https://propertymanager.cloudpress.host/api/uploadfile';
-  
-  //     axiosRequests.push(
-  //       axios
-  //         .post(url, dataArray, {
-  //           headers: {
-  //             'Content-Type': 'multipart/form-data',
-  //           },
-  //         })
-  //         .then((res) => {
-  //           console.log('Response Object:', res);
-  //           const imagePath = res.data.filePath;
-  //           console.log('Image Path:', imagePath);
-          
-  //           // Add the image path to your frontend state
-  //           allData.push(imagePath);
-  //         })
-  //         .catch((err) => {
-  //           console.log('Error uploading image:', err);
-  //         })
-  //     );
+  //     if (response.ok) {
+  //       const data = await response.text(); // You may need to use text() instead of json() since the server is sending a text response.
+  //       console.log(data); // 'File uploaded successfully' or an error message
+  //     } else {
+  //       console.error('File upload failed');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error uploading file:', error);
   //   }
-  
-  //   await Promise.all(axiosRequests);
-    
-  //   if (name === 'propertyres_image') {
-  //     setResidentialImage([...residentialImage, ...allData]);
-  //   } else {
-  //     setCommercialImage([...commercialImage, ...allData]);
-  //   }
-  //   console.log(residentialImage, 'residentialImage');
-  //   console.log(commercialImage, 'commercialImage');
   // };
+  
+  
+
+  
   
   
 

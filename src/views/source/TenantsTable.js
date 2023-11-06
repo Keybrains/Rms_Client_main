@@ -292,6 +292,7 @@ const TenantsTable = ({ tenantDetails }) => {
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
                     <tr>
+                    <th scope="col">Tenant name</th>
                       <th scope="col">Property Type</th>
                       <th scope="col">Lease Type</th>
                       <th scope="col">Start Date</th>
@@ -315,6 +316,7 @@ const TenantsTable = ({ tenantDetails }) => {
                             }
                             style={{ cursor: "pointer" }}
                           >
+                            <td>{tenant.tenant_firstName } {tenant.tenant_lastName }</td>
                             <td>{entry.rental_adress}</td>
                             <td>{entry.lease_type}</td>
                             <td>{entry.start_date}</td>
