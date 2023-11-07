@@ -418,7 +418,7 @@ const Applicants = () => {
                   />
                 </InputGroup>
               </FormGroup>
-              {/* <div className="mb-3 form-check">
+              <div className="mb-3 form-check">
                             <Input
                                 type="checkbox"
                                 className="form-check-input"
@@ -431,7 +431,7 @@ const Applicants = () => {
                             <Label className="form-check-label" for="exampleCheck1">
                                 email link to online rental application
                             </Label>
-                        </div> */}
+                        </div>
               <FormGroup>
                 <Label for="MobileNumber">Mobile Number</Label>
                 <InputGroup>
@@ -523,6 +523,7 @@ const Applicants = () => {
                   >
                     Property*
                   </label>
+                  {/* {console.log(propertyData, "propertyData")} */}
                   <FormGroup>
                     <Dropdown isOpen={userdropdownOpen} toggle={toggle9}>
                       <DropdownToggle caret style={{ width: "100%" }}>
@@ -540,10 +541,10 @@ const Applicants = () => {
                         <DropdownItem value="">Select</DropdownItem>
                         {propertyData.map((property) => (
                           <DropdownItem
-                            key={property}
-                            onClick={() => handlePropertyTypeSelect(property)}
+                            key={property._id}
+                            onClick={() => handlePropertyTypeSelect(property.rental_adress)}
                           >
-                            {property}
+                            {property.rental_adress}
                           </DropdownItem>
                         ))}
                       </DropdownMenu>

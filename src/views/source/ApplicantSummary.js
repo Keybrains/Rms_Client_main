@@ -47,6 +47,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import { useFormik } from "formik";
 
 const ApplicantSummary = () => {
   const navigate = useNavigate();
@@ -98,9 +99,29 @@ const ApplicantSummary = () => {
   const toggle = () => setIsOpen((prevState) => !prevState);
   // const id = useParams().id;
 
-  const navigateToLease = () => {
+  const applicantFormik = useFormik({
+    initialValues: {
+      applicant_checklist: [],
+      applicant_checkedChecklist: [],
+      applicant_status: "",
+      tenant_firstName: "",
+      tenant_lastName: "",
+      tenant_mobileNumber: "",
+      tenant_workNumber: "",
+      tenant_homeNumber: "",
+      tenant_faxPhoneNumber: "",
+      tenant_email: "",
+    },
+    onSubmit: (values) => {
+      handleEdit(values);
+      console.log(values, "values");
+    },
+  });
+  const navigateToLease = (tenantID,entryIndex) => {
     axios
-      .get(`https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`)
+      .get(
+        `https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`
+      )
       .then((response) => {
         const data = response.data.data;
 
@@ -108,20 +129,91 @@ const ApplicantSummary = () => {
         const rentalAddress = data.rental_adress;
 
         console.log(rentalAddress, "Rental Addressss");
+        axios.get(
+          'https://propertymanager.cloudpress.host/api/rentals/allproperty'
+        ).then((response) => {
+          const property = response.data.data;
+          console.log(property, "properties");
+          const matchedProperty = property.find((property) => {
+            return property.rental_adress === rentalAddress;
+          });
+          console.log(matchedProperty, "matchedProperty");
+          if(!matchedProperty) {
+            alert("Property not found");
+            return;
+          }
+          else{
+            // navigate(`/admin/Leaseing/${id}/${matchedProperty._id}`);
+            console.log(tenantID,"tenantID")
+            navigate(`/admin/RentRollLeaseing/${tenantID}/${entryIndex}`);
+            console.log(matchedApplicant, "matchedApplicant");
+            // axios
+            // .get("https://propertymanager.cloudpress.host/api/tenant/tenant")
+            // .then((response) => {
+            //   console.log(response.data.data,'response.data.data');
+            //   const tenant = response.data.data;
+            //   const matchedTenant = tenant.find((tenant) => {
+            //     return tenant._id === id;
+            //   })
+            //   console.log(matchedTenant, "matchedTenantdddd");
+            // })
+            // .then((err) => {
+            //   console.log(err);
+            //   // setLoader(false);
+            // });
+            // navigate(`/admin/rentrolldetail/${id}/`);
+          }
+        })
 
         // Navigate to the leasing page with the rental address
-        navigate(`/admin/RentRollLeaseing/${rentalAddress}`);
-        console.log(`/admin/RentRollLeaseing/${rentalAddress}`, "fgbasfg");
+
+        // console.log(`/admin/RentRollLeaseing/${rentalAddress}`, "fgbasfg");
       })
       .catch((err) => {
         console.error(err);
         // Handle errors here if needed
       });
   };
+  // const navigateToLease = () => {
+  //   axios
+  //     .get("https://propertymanager.cloudpress.host/api/applicant/applicant")
+  //     .then((applicants) => {
+  //       axios
+  //         .get("https://propertymanager.cloudpress.host/api/rentals/allproperty")
+  //         .then((properties) => {
+  //           console.log(applicants.data.data, "applicants");
+  //           console.log(properties.data.data, "properties");
+  //           setApplicantData(applicants.data.data);
+  //           const allProperties = properties.data.data;
+  //           const allApplicants = applicants.data.data;
+  //           const matchedProperty = allProperties.find((property) => {
+  //             return property.rental_adress === allApplicants[0].rental_adress;
+  //           });
+  //           setPropertyData(matchedProperty);
+  //           console.log(matchedProperty, "matchedProperty");
+  //           navigate(`/admin/Leaseing/${id}/${matchedProperty._id}`);
+  //           // console.log(response.data.data,'response.data.data');
+
+  //           // setRentalsData(response.data.data);
+
+  //           // setLoader(false);
+  //         })
+  //         .then((err) => {
+  //           console.log(err);
+  //           // setLoader(false);
+  //         });
+  //     })
+  //     .then((err) => {
+  //       console.log(err);
+  //       // setLoader(false);
+  //     });
+  // };
 
   useEffect(() => {
     axios
-      .get(`https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`)
+      .get(
+        `https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`
+      )
       .then((applicants) => {
         axios
           .get("https://propertymanager.cloudpress.host/api/rentals/property")
@@ -167,10 +259,30 @@ const ApplicantSummary = () => {
   const handleAddItem = () => {
     if (newItem.trim() !== "") {
       setChecklistItems([...checklistItems, newItem]);
+      const allCheckbox = [...checklistItems, newItem];
+      console.log(allCheckbox, "allCheckbox");
+      console.log(matchedApplicant, "matchedApplicant");
+      const updatedApplicant = {
+        ...matchedApplicant,
+        applicant_checklist: [...matchedApplicant.applicant_checklist, newItem],
+      };
+      console.log(updatedApplicant, "updatedApplicant");
+      axios
+        .put(
+          `https://propertymanager.cloudpress.host/api/applicant/applicant/${id}/checklist`,
+          updatedApplicant
+        )
+        .then((response) => {
+          console.log(response.data.data, "response.data.data");
+          getApplicantData();
+        })
+        .catch((err) => {
+          console.error(err);
+        });
       setNewItem(""); // Clear the input field
     }
   };
-
+  // const [tenantID, setTenantID]=useState("")
   const fetchDataAndPost = async () => {
     try {
       // Step 1: Fetch data from the API
@@ -200,9 +312,12 @@ const ApplicantSummary = () => {
           "https://propertymanager.cloudpress.host/api/tenant/tenant",
           dataToSend
         );
+
         console.log(dataToSend, "hagfjg");
         if (postResponse.status === 200) {
-          console.log("Data posted successfully:", postResponse.data);
+          console.log("Data posted successfully:", postResponse.data.data);
+          // setTenantID(postResponse.data.data._id)
+          navigateToLease(postResponse.data.data._id, postResponse.data.data.entries[0].entryIndex);
         } else {
           console.error(
             "Data post request failed. Status code:",
@@ -222,13 +337,105 @@ const ApplicantSummary = () => {
       console.error("Data fetch or post failed", error);
     }
   };
+  const [matchedApplicant, setMatchedApplicant] = useState([]);
+  const getApplicantData = async () => {
+    await axios
+      .get(`https://propertymanager.cloudpress.host/api/applicant/applicant`)
+      .then((response) => {
+        console.log(response.data.data);
+        if (response.data.data) {
+          const applicantData = response.data.data;
+          const matchedApplicant = applicantData.find((applicant) => {
+            return applicant._id === id;
+          });
+          console.log(matchedApplicant, "matchedApplicant");
+          setMatchedApplicant(matchedApplicant);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+  const onClickEditButton = () => {
+    setIsEdit(true);
+    console.log(matchedApplicant, "matchedApplicant from edit ");
+    applicantFormik.setValues({
+      tenant_firstName: matchedApplicant.tenant_firstName,
+      tenant_lastName: matchedApplicant.tenant_lastName,
+      tenant_unitNumber: matchedApplicant.tenant_unitNumber,
+      tenant_mobileNumber: matchedApplicant.tenant_mobileNumber,
+      tenant_workNumber: matchedApplicant.tenant_workNumber,
+      tenant_homeNumber: matchedApplicant.tenant_homeNumber,
+      tenant_faxPhoneNumber: matchedApplicant.tenant_faxPhoneNumber,
+      tenant_email: matchedApplicant.tenant_email,
+    });
+  };
 
-  
+  const handleEdit = (values) => {
+    setIsEdit(false);
+    console.log(matchedApplicant, "matchedApplicant from edit ");
+    const updatedApplicant = {
+      ...matchedApplicant,
+      tenant_firstName: values.tenant_firstName,
+      tenant_lastName: values.tenant_lastName,
+      tenant_unitNumber: values.tenant_unitNumber,
+      tenant_mobileNumber: values.tenant_mobileNumber,
+      // tenant_workNumber: values.tenant_workNumber,
+      tenant_homeNumber: values.tenant_homeNumber,
+      tenant_faxPhoneNumber: values.tenant_faxPhoneNumber,
+      tenant_email: values.tenant_email,
+      tenant_workNumber: values.tenant_workNumber,
+    };
+    console.log(updatedApplicant, "updatedApplicant");
 
+    axios
+      .put(
+        `https://propertymanager.cloudpress.host/api/applicant/applicant/${id}`,
+        updatedApplicant
+      )
+      .catch((err) => {
+        console.error(err);
+      })
+      .then((res) => {
+        console.log(res, "res");
+        getApplicantData();
+      });
+  };
+
+  useEffect(() => {
+    getApplicantData();
+  }, []);
+
+const handleChecklistChange = (event,item) => {   
+
+  // if (event.target.checked) {
+  //   setChecklistItems([...checklistItems, item]);
+  //   const allCheckbox = [...checklistItems, item];
+  //   console.log(allCheckbox, "allCheckbox");
+  //   console.log(matchedApplicant, "matchedApplicant");
+  //   const updatedApplicant = {
+  //     ...matchedApplicant,
+  //     applicant_checklist: [...matchedApplicant.applicant_checklist, item],
+  //   };
+  //   console.log(updatedApplicant, "updatedApplicant");
+// }
+  if(event.target.checked){
+    console.log(item,"item");
+    if(!applicantFormik.values.applicant_checkedChecklist.includes(item)){
+      applicantFormik.setFieldValue("applicant_checkedChecklist", [...applicantFormik.values.applicant_checkedChecklist, item]);
+    }
+    // console.log(applicantFormik.values, "ssssssssssss");
+  }
+  else{
+    applicantFormik.setFieldValue("applicant_checkedChecklist", applicantFormik.values.applicant_checkedChecklist.filter((checklistItem) => checklistItem !== item));
+    // setChecklistItems([...checklistItems, item]);
+  }
+}
+  console.log(applicantFormik.values, "formik");
   return (
     <>
       <Header title="ApplicantSummary" />
-      <Container className="mt--5" fluid>
+      <Container className="mt--8" fluid>
         <Row>
           <Col xs="12" sm="6">
             <FormGroup className="">
@@ -248,8 +455,7 @@ const ApplicantSummary = () => {
           </Col>
         </Row>
         <br />
-
-        <Paper elevation={2}>
+        <Card elevation={2}>
           {/* <InputGroup>
             <Input
               type="text"
@@ -312,7 +518,7 @@ const ApplicantSummary = () => {
               color="success"
               onClick={(e) => {
                 fetchDataAndPost();
-                navigate("/admin/RentRoll");
+                // navigate("/admin/RentRoll");
               }}
             >
               Move in
@@ -391,30 +597,25 @@ const ApplicantSummary = () => {
                           )}
                           <div>
                             <Box display="flex" flexDirection="column">
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    id="checkbox1"
-                                    color="success"
-                                    name="checkbox1"
-                                  />
-                                }
-                                label="CheckList 1"
-                                style={{ marginTop: "0px" }}
-                              />
-                              {checklistItems.map((item, index) => (
-                                <div key={index}>
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        color="success"
-                                        checked={false} // You can set the checked state as needed
-                                      />
-                                    }
-                                    label={item}
-                                  />
-                                </div>
-                              ))}
+                              {matchedApplicant?.applicant_checklist?.map(
+                                (item, index) => (
+                                  <div key={index}>
+                                    <FormControlLabel
+                                      control={
+                                        <Checkbox
+                                        value={item}
+                                          color="success"
+                                          onChange={(e) => {
+                                            handleChecklistChange(e, item);
+                                          }}
+                                          checked={applicantFormik.values.applicant_checkedChecklist.includes(item)} // You can set the checked state as needed
+                                        />
+                                      }
+                                      label={item}
+                                    />
+                                  </div>
+                                )
+                              )}
                             </Box>
                             {isChecklistVisible && (
                               <div>
@@ -472,95 +673,149 @@ const ApplicantSummary = () => {
                             <Card>
                               <CardBody>
                                 {/* <CardText>Some quick example text to build on the card title and make up the bulk of the card's content.</CardText> */}
+                                <form onSubmit={applicantFormik.handleSubmit}>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                    }}
+                                  >
+                                    <div>
+                                      <h5>Name</h5>
+                                    </div>
+                                    <TextField
+                                      type="text"
+                                      size="small"
+                                      id="tenant_firstName"
+                                      name="tenant_firstName"
+                                      value={
+                                        applicantFormik.values.tenant_firstName
+                                      }
+                                      onChange={applicantFormik.handleChange}
+                                      onBlur={applicantFormik.handleBlur}
+                                      placeholder="FirstName"
+                                    />
+                                    <TextField
+                                      type="text"
+                                      size="small"
+                                      style={{ marginTop: "10px" }}
+                                      placeholder="LastName"
+                                      id="tenant_lastName"
+                                      name="tenant_lastName"
+                                      value={
+                                        applicantFormik.values.tenant_lastName
+                                      }
+                                      onChange={applicantFormik.handleChange}
+                                      onBlur={applicantFormik.handleBlur}
+                                    />
+                                  </div>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      marginTop: "10px",
+                                    }}
+                                  >
+                                    <div>
+                                      <h5>Numbers</h5>
+                                    </div>
+                                    <TextField
+                                      type="number"
+                                      size="small"
+                                      placeholder="Mobile"
+                                      id="tenant_mobileNumber"
+                                      name="tenant_mobileNumber"
+                                      value={
+                                        applicantFormik.values
+                                          .tenant_mobileNumber
+                                      }
+                                      onChange={applicantFormik.handleChange}
+                                      onBlur={applicantFormik.handleBlur}
+                                    />
+                                    <TextField
+                                      type="number"
+                                      size="small"
+                                      style={{ marginTop: "10px" }}
+                                      placeholder="Business"
+                                      id="tenant_workNumber"
+                                      name="tenant_workNumber"
+                                      value={
+                                        applicantFormik.values.tenant_workNumber
+                                      }
+                                      onChange={applicantFormik.handleChange}
+                                      onBlur={applicantFormik.handleBlur}
+                                    />
+                                    <TextField
+                                      type="number"
+                                      size="small"
+                                      style={{ marginTop: "10px" }}
+                                      placeholder="Home"
+                                      id="tenant_homeNumber"
+                                      name="tenant_homeNumber"
+                                      value={
+                                        applicantFormik.values.tenant_homeNumber
+                                      }
+                                      onChange={applicantFormik.handleChange}
+                                      onBlur={applicantFormik.handleBlur}
+                                    />
+                                    <TextField
+                                      type="number"
+                                      size="small"
+                                      style={{ marginTop: "10px" }}
+                                      placeholder="Fax"
+                                      id="tenant_faxPhoneNumber"
+                                      name="tenant_faxPhoneNumber"
+                                      value={
+                                        applicantFormik.values
+                                          .tenant_faxPhoneNumber
+                                      }
+                                      onChange={applicantFormik.handleChange}
+                                      onBlur={applicantFormik.handleBlur}
+                                    />
+                                  </div>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                    }}
+                                  >
+                                    <div style={{ marginTop: "10px" }}>
+                                      <h5>Email</h5>
+                                    </div>
+                                    <TextField
+                                      type="text"
+                                      size="small"
+                                      placeholder="Email"
+                                      id="tenant_email"
+                                      name="tenant_email"
+                                      value={
+                                        applicantFormik.values.tenant_email
+                                      }
+                                      onChange={applicantFormik.handleChange}
+                                      onBlur={applicantFormik.handleBlur}
+                                    />
+                                  </div>
 
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                  }}
-                                >
-                                  <div>
-                                    <h5>Name</h5>
-                                  </div>
-                                  <TextField
-                                    type="text"
-                                    size="small"
-                                    placeholder="FirstName"
-                                  />
-                                  <TextField
-                                    type="text"
-                                    size="small"
-                                    style={{ marginTop: "10px" }}
-                                    placeholder="LastName"
-                                  />
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    marginTop: "10px",
-                                  }}
-                                >
-                                  <div>
-                                    <h5>Numbers</h5>
-                                  </div>
-                                  <TextField
-                                    type="text"
-                                    size="small"
-                                    placeholder="Phone"
-                                  />
-                                  <TextField
-                                    type="text"
-                                    size="small"
-                                    style={{ marginTop: "10px" }}
-                                    placeholder="Business"
-                                  />
-                                  <TextField
-                                    type="text"
-                                    size="small"
-                                    style={{ marginTop: "10px" }}
-                                    placeholder="Home"
-                                  />
-                                  <TextField
-                                    type="text"
-                                    size="small"
-                                    style={{ marginTop: "10px" }}
-                                    placeholder="Fax"
-                                  />
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                  }}
-                                >
                                   <div style={{ marginTop: "10px" }}>
-                                    <h5>Email</h5>
+                                    <Button
+                                      color="success"
+                                      type="submit"
+                                      // onClick={() => {
+                                      //   handleEdit();
+                                      //   // setIsEdit(false);
+                                      // }}
+                                    >
+                                      Save
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        setIsEdit(false);
+                                      }}
+                                    >
+                                      Cancel
+                                    </Button>
                                   </div>
-                                  <TextField
-                                    type="text"
-                                    size="small"
-                                    placeholder="Email"
-                                  />
-                                </div>
-
-                                <div style={{ marginTop: "10px" }}>
-                                  <Button
-                                    color="success"
-                                    onClick={() => {
-                                      setIsEdit(false);
-                                    }}
-                                  >
-                                    Save
-                                  </Button>
-                                  <Button
-                                    onClick={() => {
-                                      setIsEdit(false);
-                                    }}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
+                                </form>
                               </CardBody>
 
                               {/* <Button
@@ -586,9 +841,9 @@ const ApplicantSummary = () => {
                                     color="text.secondary"
                                     gutterBottom
                                   >
-                                    {applicantData?.tenant_firstName +
+                                    {matchedApplicant?.tenant_firstName +
                                       " " +
-                                      applicantData?.tenant_lastName}
+                                      matchedApplicant?.tenant_lastName}
                                   </Typography>
                                   <Typography
                                     // variant="h5"
@@ -600,7 +855,8 @@ const ApplicantSummary = () => {
                                       marginLeft: "10px",
                                     }}
                                     onClick={() => {
-                                      setIsEdit(true);
+                                      onClickEditButton();
+                                      // setIsEdit(true);
                                     }}
                                     // component="div"
                                   >
@@ -625,7 +881,7 @@ const ApplicantSummary = () => {
                                     color="text.secondary"
                                     gutterBottom
                                   >
-                                    {applicantData?.tenant_homeNumber || "N/A"}
+                                    {matchedApplicant?.tenant_homeNumber || "N/A"}
                                   </Typography>
                                 </div>
                                 <div
@@ -643,7 +899,7 @@ const ApplicantSummary = () => {
                                     color="text.secondary"
                                     gutterBottom
                                   >
-                                    {applicantData?.tenant_workNumber || "N/A"}
+                                    {matchedApplicant?.tenant_workNumber || "N/A"}
                                   </Typography>
                                 </div>
                                 <div
@@ -661,7 +917,7 @@ const ApplicantSummary = () => {
                                     color="text.secondary"
                                     gutterBottom
                                   >
-                                    {applicantData?.tenant_mobileNumber ||
+                                    {matchedApplicant?.tenant_mobileNumber ||
                                       "N/A"}
                                   </Typography>
                                 </div>
@@ -680,7 +936,7 @@ const ApplicantSummary = () => {
                                     color="text.secondary"
                                     gutterBottom
                                   >
-                                    {applicantData?.tenant_email || "N/A"}
+                                    {matchedApplicant?.tenant_email || "N/A"}
                                   </Typography>
                                 </div>
                               </CardContent>
@@ -691,11 +947,10 @@ const ApplicantSummary = () => {
                     </Col>
                   </Row>
                 </TabPanel>
-                
               </TabContext>
             </Col>
           </Row>
-        </Paper>
+        </Card>
       </Container>
     </>
   );

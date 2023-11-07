@@ -561,6 +561,14 @@ var routes = [
         component: <AddPayment/>,
         layout: "/admin",    
       },
+
+     {
+        path: "/RentRollLeaseing/:id/:entryIndex",
+        name: "Rent Roll Leaseing",
+        icon: "ni ni-home-3 text-orange",
+        component: <RentRollLeaseing/>,
+        layout: "/admin",    
+      },
 ];
 export default routes;
 

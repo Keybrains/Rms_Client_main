@@ -127,6 +127,7 @@ const RentRoll = () => {
           .then((response) => {
             if (response.data.statusCode === 200) {
               swal("Success!", "Tenant deleted successfully!", "success");
+              fetchData();
               // getTenantsDate();
               // Optionally, you can refresh your tenant data here.
             } else {
@@ -142,8 +143,8 @@ const RentRoll = () => {
     });
   };
 
-  const editLeasing = (id) => {
-    navigate(`/admin/RentRollLeaseing/${id}`);
+  const editLeasing = (id, entryIndex ) => {
+    navigate(`/admin/Leaseing/${id}/${entryIndex}`);
     console.log(id);
   };
   return (

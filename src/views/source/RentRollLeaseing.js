@@ -57,8 +57,8 @@ import Cookies from "universal-cookie";
 import AccountDialog from "components/AccountDialog";
 import moment from "moment";
 const RentRollLeaseing = () => {
-  const { id, entryIndex } = useParams();
-  console.log(id, entryIndex, "entryIndex");
+  const { id, entryIndex, } = useParams();
+  // console.log(id, propertyId, "propertyId");
   const [tenantData, setTenantData] = useState([]);
   const [selectedTenantData, setSelectedTenantData] = useState([]);
   const [checkedCheckbox, setCheckedCheckbox] = useState(null);
@@ -853,7 +853,7 @@ const RentRollLeaseing = () => {
 
   // Fetch vendor data if editing an existing vendor
   useEffect(() => {
-    console.log(id, entryIndex, "id && entry Id");
+    // console.log(id, propertyId, "id && entry Id");
     if (id && entryIndex) {
       axios
         .get(`https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${id}`)
@@ -1242,6 +1242,9 @@ const RentRollLeaseing = () => {
       .then((response) => {
         console.log(response, "response1111");
         handleResponse(response);
+        if(id && entryIndex){
+          navigate(`/admin/rentrolldetail/${id}/${entryIndex}`);
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -1260,6 +1263,95 @@ const RentRollLeaseing = () => {
       alert(response.data.message);
     }
   }
+  // const getNextMonthFirstDay = () => {
+  //   const now = new Date();
+  //   let current;
+
+  //   if (now.getMonth() === 11) {
+  //     current = new Date(now.getFullYear() + 1, 0, 1 + 1)
+  //       .toISOString()
+  //       .slice(0, 10);
+  //   } else {
+  //     current = new Date(now.getFullYear(), now.getMonth() + 1, 1 + 1)
+  //       .toISOString()
+  //       .slice(0, 10);
+  //   }
+
+  //   return current;
+  // };
+
+  // useEffect(() => {
+  //   // console.log(propertyId, "tenantId");
+  //   if (entryIndex) {
+  //     setAlignment("Signed");
+  //     axios
+  //       .get("https://propertymanager.cloudpress.host/api/rentals/allproperty")
+  //       .then((propRes) => {
+  //         axios
+  //           .get(
+  //             `https://propertymanager.cloudpress.host/api/applicant/applicant`
+  //           )
+  //           .then((response) => {
+  //             console.log(response.data.data);
+  //             if (response.data.data) {
+  //               const propertyData = propRes.data.data;
+  //               const selectedProperty = propertyData.find(
+  //                 (property) => property._id === entryIndex
+  //               );
+  //               console.log(selectedProperty, "selectedProperty");
+  //               setSelectedPropertyType(selectedProperty.rental_adress);
+  //               setselectedLeaseType("Fixed");
+  //               handleselectedRentCycle("Monthly");
+  //               setselectedAccount("Rent income");
+  //               leaseFormik.setFieldValue(
+  //                 "tenant_nextDue_date",
+  //                 getNextMonthFirstDay()
+  //               );
+  //               leaseFormik.setFieldValue(
+  //                 "Due_date",
+  //                 new Date().toISOString().slice(0, 10)
+  //               );
+  //               const applicantData = response.data.data;
+  //               const matchedApplicant = applicantData.find((applicant) => {
+  //                 return applicant._id === id;
+  //               });
+  //               console.log(matchedApplicant, "matchedApplicant");
+  //               leaseFormik.setValues({
+  //                 tenant_firstName: matchedApplicant.tenant_firstName,
+  //                 tenant_lastName: matchedApplicant.tenant_lastName,
+  //                 tenant_unitNumber: matchedApplicant.tenant_unitNumber,
+  //                 tenant_mobileNumber: matchedApplicant.tenant_mobileNumber,
+  //                 tenant_workNumber: matchedApplicant.tenant_workNumber,
+  //                 tenant_homeNumber: matchedApplicant.tenant_homeNumber,
+  //                 tenant_faxPhoneNumber: matchedApplicant.tenant_faxPhoneNumber,
+  //                 tenant_email: matchedApplicant.tenant_email,
+  //               })
+  //             }
+  //           })
+  //           .catch((err) => {
+  //             console.error(err);
+  //           });
+  //       });
+
+  //     // console.log(matchedApplicant, "matchedApplicant");
+  //   }
+  //   // // Make an HTTP GET request to your Express API endpoint
+  //   // fetch("http://64.225.8.160:4000/addagent/find_agentname")
+  //   //   .then((response) => response.json())
+  //   //   .then((data) => {
+  //   //     if (data.statusCode === 200) {
+  //   //       setAgentData(data.data);
+  //   //       console.log(data);
+  //   //     } else {
+  //   //       // Handle error
+  //   //       console.error("Error:", data.message);
+  //   //     }
+  //   // })
+  //   // .catch((error) => {
+  //   //   // Handle network error
+  //   //   console.error("Network error:", error);
+  //   // });
+  // }, []);
 
   return (
     <>

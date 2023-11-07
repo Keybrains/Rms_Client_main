@@ -144,31 +144,6 @@ const RentRollDetail = () => {
     }
   };
 
-  const navigateToPayment = async () => {
-    const apiUrl = `https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${id}/entry/${entry}`;
-  
-    try {
-      // Fetch tenant data
-      const response = await axios.get(apiUrl);
-      const tenantData = response.data.data;
-  
-      // Access the rental_address within the entries object
-      const rentalAddress = tenantData.entries.rental_adress;
-      // Set the tenantDetails state and loading state
-      console.log(rentalAddress, "rentalAddresssssssss");
-      setTenantDetails(tenantData);
-      setLoading(false);
-  
-      // Use navigate to go to the "AddPayment" route with rentalAddress as a parameter
-      navigate("../AddPayment", { rentalAddress: rentalAddress });
-    } catch (error) {
-      console.error("Error fetching tenant details:", error);
-      setError(error);
-      setLoading(false);
-    }
-  };
-  
-
   const navigateToFinancial = async () => {
     // Construct the API URL
     const apiUrl = `https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${id}/entry/${entry}`;
@@ -212,11 +187,28 @@ const RentRollDetail = () => {
       setLoading(false);
     }
   };
+  console.log(rentaldata, "rentalData");
 
   useEffect(() => {
     getTenantData();
   }, []);
 
+  useEffect(() => {
+    if (tenantId && entryIndex) {
+      getTenantData();
+      // getTenantData();
+      console.log(rental, "rental");
+      setValue("Tenant");
+      // tenantsData();
+
+      if (rental) {
+        // debugger
+        // console.log(rentaldata, "rentalData");
+        tenantsData();
+        // navigateToTenant();
+      }
+    }
+  }, [rental]);
   let cookies = new Cookies();
 
   // Check Authentication (token)
@@ -273,14 +265,16 @@ const RentRollDetail = () => {
       navigateToFinancial();
     }
   };
-  
+
   //Financial functions
   const [GeneralLedgerData, setGeneralLedgerData] = useState();
   const [loader, setLoader] = React.useState(true);
 
   const getGeneralLedgerData = async () => {
     try {
-      const response = await axios.get("https://propertymanager.cloudpress.host/api/payment/payment/financial");
+      const response = await axios.get(
+        "https://propertymanager.cloudpress.host/api/payment/payment/financial"
+      );
       setLoader(false);
       setGeneralLedgerData(response.data.data);
       console.log(response.data.data);
@@ -1042,16 +1036,19 @@ const RentRollDetail = () => {
                                       {generalledger.entries.map(
                                         (entry, index) => (
                                           <tr key={generalledger._id}>
-                                            <td>{formatDateWithoutTime(
+                                            <td>
+                                              {formatDateWithoutTime(
                                                 generalledger.date
-                                              ) || "N/A"}</td>
-                                            <td>{generalledger.payment_method}</td>
-                                            <td>{entry.account}</td>   
+                                              ) || "N/A"}
+                                            </td>
+                                            <td>
+                                              {generalledger.payment_method}
+                                            </td>
+                                            <td>{entry.account}</td>
                                             <td>{generalledger.memo}</td>
                                             <td>{generalledger.amount}</td>
                                             <td>{entry.amount}</td>
                                             <td>{entry.total_amount}</td>
-                                           
                                           </tr>
                                         )
                                       )}
@@ -1342,7 +1339,7 @@ const RentRollDetail = () => {
                               <Button
                                 color="success"
                                 onClick={() => {
-                                  navigateToPayment();
+                                  handleClick();
                                 }}
                                 style={{
                                   fontSize: "13px",

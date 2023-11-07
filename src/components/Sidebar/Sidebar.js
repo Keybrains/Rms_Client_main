@@ -394,12 +394,12 @@ const Sidebar = (props) => {
                 <DropdownItem to="/admin/TenantsTable" tag={Link}>
                   Tenants
                 </DropdownItem>
-                <DropdownItem to="/admin/RentalownerTable" tag={Link}>
+                {/* <DropdownItem to="/admin/RentalownerTable" tag={Link}>
                   Rental Owners
-                </DropdownItem>
+                </DropdownItem> */}
               </DropdownMenu>
             </UncontrolledDropdown>
-          </Nav>
+        </Nav>
 
           <Nav navbar>
           <UncontrolledDropdown nav>

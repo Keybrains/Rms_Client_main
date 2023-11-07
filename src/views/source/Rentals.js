@@ -82,6 +82,7 @@ const Rentals = () => {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
   const [rentalsData, setRentalsData] = useState(null);
   const [selectedRentalOwnerData, setSelectedRentalOwnerData] = useState([]);
+  console.log(selectedRentalOwnerData, "selectedRentalOwnerData");
   const [selectedrentalOwners, setSelectedrentalOwners] = useState([]);
   const [showRentalOwnerTable, setshowRentalOwnerTable] = useState(false);
   const [checkedCheckbox, setCheckedCheckbox] = useState();
@@ -97,9 +98,7 @@ const Rentals = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
-          if (!id) {
-            setRentalownerData(data.data);
-          }
+          setRentalownerData(data.data);
           console.log("here is my data", data.data);
         } else {
           // Handle error
@@ -110,7 +109,7 @@ const Rentals = () => {
         // Handle network error
         console.error("Network error:", error);
       });
-  }, []);
+  });
 
   const handleCheckboxChange = (event, rentalOwnerInfo, phoneNumber) => {
     if (checkedCheckbox === phoneNumber) {
@@ -272,7 +271,7 @@ const Rentals = () => {
   };
 
   const handleRentalownerDelete = () => {
-    setSelectedRentalOwnerData({});
+    setSelectedRentalOwnerData([]);
     rentalsFormik.setValues({
       rentalOwner_firstName: "",
       rentalOwner_lastName: "",
@@ -282,6 +281,8 @@ const Rentals = () => {
       rentalOwner_homeNumber: "",
       rentalOwner_businessNumber: "",
     });
+
+    console.log("first");
   };
 
   const [selectedbath, setSelectedbath] = useState("");
@@ -332,9 +333,6 @@ const Rentals = () => {
   const [residentialImage, setResidentialImage] = useState([]);
   const [commercialImage, setCommercialImage] = useState([]);
 
- 
-
-
   const fileData = async (file, name) => {
     //setImgLoader(true);
     const allData = [];
@@ -378,35 +376,49 @@ const Rentals = () => {
     console.log(commercialImage, "commercialImage");
   };
 
+  // const fileData = async (file, name) => {
+  //   const allData = [];
+  //   const axiosRequests = [];
 
-  // const fileData = async (file) => {
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-  
-  //   try {
-  //     const response = await fetch('https://propertymanager.cloudpress.host/api/uploadfile', {
-  //       method: 'POST',
-  //       body: formData,
-  //     });
-  
-  //     if (response.ok) {
-  //       const data = await response.text(); // You may need to use text() instead of json() since the server is sending a text response.
-  //       console.log(data); // 'File uploaded successfully' or an error message
-  //     } else {
-  //       console.error('File upload failed');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error uploading file:', error);
+  //   for (let i = 0; i < file.length; i++) {
+  //     const dataArray = new FormData();
+  //     dataArray.append('file', file[i]);
+
+  //     // Update the URL to point to your Express API
+  //     let url = 'https://propertymanager.cloudpress.host/api/uploadfile';
+
+  //     axiosRequests.push(
+  //       axios
+  //         .post(url, dataArray, {
+  //           headers: {
+  //             'Content-Type': 'multipart/form-data',
+  //           },
+  //         })
+  //         .then((res) => {
+  //           console.log('Response Object:', res);
+  //           const imagePath = res.data.filePath;
+  //           console.log('Image Path:', imagePath);
+
+  //           // Add the image path to your frontend state
+  //           allData.push(imagePath);
+  //         })
+  //         .catch((err) => {
+  //           console.log('Error uploading image:', err);
+  //         })
+  //     );
   //   }
+
+  //   await Promise.all(axiosRequests);
+
+  //   if (name === 'propertyres_image') {
+  //     setResidentialImage([...residentialImage, ...allData]);
+  //   } else {
+  //     setCommercialImage([...commercialImage, ...allData]);
+  //   }
+  //   console.log(residentialImage, 'residentialImage');
+  //   console.log(commercialImage, 'commercialImage');
   // };
-  
-  
 
-  
-  
-  
-
-  
   let navigate = useNavigate();
   const handleCloseButtonClick = () => {
     // Use history.push to navigate to the PropertiesTable page
@@ -581,6 +593,12 @@ const Rentals = () => {
           setRentalownerData(propertysData);
           // setRentalownerData(propertysData);
 
+          setSelectedRentalOwnerData({
+            firstName: propertysData.rentalOwner_firstName || "",
+            lastName: propertysData.rentalOwner_lastName || "",
+            phoneNumber: propertysData.rentalOwner_phoneNumber || "",
+            // Add other fields you want to display in the table
+          });
           const matchedProperty = propertysData.entries.find((entry) => {
             return entry.entryIndex === entryIndex;
           });
@@ -632,9 +650,9 @@ const Rentals = () => {
         .catch((error) => {
           console.error("Error fetching rentals data:", error);
         });
-        handleAddrentalOwner();
-      }
-  }, [id,rentalsFormik.values.rentalOwner_firstName]);
+      handleAddrentalOwner();
+    }
+  }, [id, entryIndex]);
   console.log(residentialImage, "residentialImage");
 
   const handleSubmit = async (values) => {
@@ -648,7 +666,7 @@ const Rentals = () => {
       property_type: selectedProp,
       rental_adress: values.rental_adress,
       rental_city: values.rental_city,
-      rental_country: values.rental_adress,
+      rental_country: values.rental_country,
       rental_postcode: values.rental_postcode,
 
       rentalOwner_operatingAccount: values.rentalOwner_operatingAccount,
@@ -783,7 +801,7 @@ const Rentals = () => {
       property_type: selectedProp,
       rental_adress: rentalsFormik.values.rental_adress,
       rental_city: rentalsFormik.values.rental_city,
-      rental_country: rentalsFormik.values.rental_adress,
+      rental_country: rentalsFormik.values.rental_country,
       rental_postcode: rentalsFormik.values.rental_postcode,
 
       rentalOwner_operatingAccount:
@@ -1139,74 +1157,77 @@ const Rentals = () => {
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      {rentalownerData?.map(
-                                        (rentalOwner, index) => (
-                                          <tr
-                                            key={index}
-                                            style={{
-                                              border: "1px solid #ddd",
-                                            }}
-                                          >
-                                            {console.log(
-                                              rentalOwner,
-                                              "revsefw"
-                                            )}
-                                            <td>
-                                              {
-                                                rentalOwner.rentalOwner_firstName
-                                              }
-                                              &nbsp;
-                                              {rentalOwner.rentalOwner_lastName}
-                                            </td>
-                                            <td>
-                                              <Checkbox
-                                                type="checkbox"
-                                                name="rentalOwner"
-                                                id={
-                                                  rentalOwner.rentalOwner_phoneNumber
+                                      {Array.isArray(rentalownerData) &&
+                                        rentalownerData?.map(
+                                          (rentalOwner, index) => (
+                                            <tr
+                                              key={index}
+                                              style={{
+                                                border: "1px solid #ddd",
+                                              }}
+                                            >
+                                              {console.log(
+                                                rentalOwner,
+                                                "revsefw"
+                                              )}
+                                              <td>
+                                                {
+                                                  rentalOwner.rentalOwner_firstName
                                                 }
-                                                checked={
-                                                  rentalOwner.rentalOwner_phoneNumber ===
-                                                  checkedCheckbox
+                                                &nbsp;
+                                                {
+                                                  rentalOwner.rentalOwner_lastName
                                                 }
-                                                onChange={(event) => {
-                                                  setCheckedCheckbox(
+                                              </td>
+                                              <td>
+                                                <Checkbox
+                                                  type="checkbox"
+                                                  name="rentalOwner"
+                                                  id={
                                                     rentalOwner.rentalOwner_phoneNumber
-                                                  );
-                                                  const rentalOwnerInfo = `${
-                                                    rentalOwner.rentalOwner_firstName ||
-                                                    ""
-                                                  } ${
-                                                    rentalOwner.rentalOwner_lastName ||
-                                                    ""
-                                                  } ${
-                                                    rentalOwner.rentalOwner_companyName ||
-                                                    ""
-                                                  } ${
-                                                    rentalOwner.rentalOwner_primaryEmail ||
-                                                    ""
-                                                  } ${
-                                                    rentalOwner.rentalOwner_phoneNumber ||
-                                                    ""
-                                                  } ${
-                                                    rentalOwner.rentalOwner_homeNumber ||
-                                                    ""
-                                                  } ${
-                                                    rentalOwner.rentalOwner_businessNumber ||
-                                                    ""
-                                                  }`;
+                                                  }
+                                                  checked={
+                                                    rentalOwner.rentalOwner_phoneNumber ===
+                                                    checkedCheckbox
+                                                  }
+                                                  onChange={(event) => {
+                                                    setCheckedCheckbox(
+                                                      rentalOwner.rentalOwner_phoneNumber
+                                                    );
+                                                    const rentalOwnerInfo = `${
+                                                      rentalOwner.rentalOwner_firstName ||
+                                                      ""
+                                                    } ${
+                                                      rentalOwner.rentalOwner_lastName ||
+                                                      ""
+                                                    } ${
+                                                      rentalOwner.rentalOwner_companyName ||
+                                                      ""
+                                                    } ${
+                                                      rentalOwner.rentalOwner_primaryEmail ||
+                                                      ""
+                                                    } ${
+                                                      rentalOwner.rentalOwner_phoneNumber ||
+                                                      ""
+                                                    } ${
+                                                      rentalOwner.rentalOwner_homeNumber ||
+                                                      ""
+                                                    } ${
+                                                      rentalOwner.rentalOwner_businessNumber ||
+                                                      ""
+                                                    }`;
 
-                                                  handleCheckboxChange(
-                                                    event,
-                                                    rentalOwnerInfo,
-                                                    rentalOwner.rentalOwner_phoneNumber
-                                                  );
-                                                }}
-                                              />
-                                            </td>
-                                          </tr>
-                                        )
-                                      )}
+                                                    handleCheckboxChange(
+                                                      event,
+                                                      rentalOwnerInfo,
+                                                      rentalOwner.rentalOwner_phoneNumber
+                                                    );
+                                                  }}
+                                                />
+                                              </td>
+                                            </tr>
+                                          )
+                                        )}
                                     </tbody>
                                   </table>
                                   <br />
@@ -2238,7 +2259,7 @@ const Rentals = () => {
                                   onChange={(e) => {
                                     const file = [...e.target.files];
                                     fileData(file, "propertyres_image");
-                          
+
                                     if (file.length > 0) {
                                       const allImages = file.map((file) => {
                                         return URL.createObjectURL(file);
@@ -2247,7 +2268,6 @@ const Rentals = () => {
                                         ...residentialImage,
                                         ...allImages,
                                       ]);
-                                     
                                     } else {
                                       // selectedPhotoPreview1.src = "";
                                       // rentalsFormik.setFieldValue(
@@ -2264,9 +2284,6 @@ const Rentals = () => {
                                 </label>
                                 {/* <b style={{ fontSize: "20px" }}>+</b> Add */}
                               </span>
-
-                              
-                  
                             </FormGroup>
                             {/* <FormGroup>
                             <label
@@ -2554,17 +2571,16 @@ const Rentals = () => {
                                   onChange={(e) => {
                                     const file = [...e.target.files];
                                     fileData(file, "property_image");
-                                   
+
                                     if (file) {
                                       const allImages = file.map((file) => {
                                         return URL.createObjectURL(file);
                                       });
-                                     
+
                                       setCommercialImage([
                                         ...commercialImage,
                                         ...allImages,
                                       ]);
-                                     
                                     } else {
                                       setCommercialImage([...commercialImage]);
                                     }
@@ -2645,7 +2661,6 @@ const Rentals = () => {
                   <br />
                   <br />
 
-             
                   {id ? (
                     <button
                       type="submit"

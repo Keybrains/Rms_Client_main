@@ -365,7 +365,7 @@ const Leaseing = () => {
   };
 
   const handleCosignerDelete = () => {
-    setCosignerData({});
+    setCosignerData([]);
     leaseFormik.setValues({
       cosigner_firstName: "",
       cosigner_lastName: "",
@@ -686,7 +686,7 @@ const Leaseing = () => {
         // Handle network error
         console.error("Network error:", error);
       });
-  }, []);
+  });
 
   let cookies = new Cookies();
   // Check Authe(token)
@@ -862,12 +862,17 @@ const Leaseing = () => {
           //setleasingData(leasingData);
           console.log(laesingdata, "gsgsgsdg");
           setTenantData(laesingdata);
+          // Assuming you want to display tenant data in the table
+          setSelectedTenantData({
+            firstName: laesingdata.tenant_firstName || "",
+            lastName: laesingdata.tenant_lastName || "",
+            mobileNumber: laesingdata.tenant_mobileNumber || "",
+            // Add other fields you want to display in the table
+          });
           const matchedLease = laesingdata.entries.find((entry) => {
             return entry.entryIndex === entryIndex;
           });
           console.log(matchedLease, "matchedlease");
-          // setShowTenantTable(true);
-
           const formattedStartDate = matchedLease.start_date
             ? new Date(matchedLease.start_date).toISOString().split("T")[0]
             : "";
@@ -922,6 +927,7 @@ const Leaseing = () => {
           console.log(data, "data");
           setFile(data);
           leaseFormik.setValues({
+            // Add other properties as needed
             start_date: formattedStartDate,
             end_date: formattedEndDate,
             amount: matchedLease.amount || "",
@@ -970,12 +976,11 @@ const Leaseing = () => {
         });
       handleAddTenant();
     }
-  }, [id, leaseFormik.values.tenant_firstName]);
+  }, [id, entryIndex]);
 
   const handleSubmit = async (values) => {
     console.log(file, "values");
-    const arrayOfNames = file.map((item) => item.name);
-
+    const arrayOfNames = Array.isArray(file) ? file.map((item) => item.name) : [];
     const entriesArray = [];
 
     const entriesObject = {

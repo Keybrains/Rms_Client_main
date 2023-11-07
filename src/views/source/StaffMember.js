@@ -65,7 +65,7 @@ import {
       };
       // auth post method
       let res = await axios.post(
-        "https://propertymanager.cloudpress.host/api/register/auth",
+        "http://https://propertymanager.cloudpress.host/api/:4000/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -85,7 +85,7 @@ import {
     const getStaffMemberData = async () => {
       try {
         const response = await axios.get(
-          "https://propertymanager.cloudpress.host/api/addstaffmember/addstaffmember"
+          "http://https://propertymanager.cloudpress.host/api/:4000/api/addstaffmember/addstaffmember"
         );
         setLoader(false);
         setStaffMemberData(response.data.data);
@@ -225,9 +225,10 @@ import {
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
                     <tr>
-                      
                       <th scope="col">NAME</th>
                       <th scope="col">DESIGNATION</th>
+                      <th scope="col">Contact</th>
+                      <th scope="col">Mail Id</th>
                       <th scope="col">ACTION</th>
                     </tr>
                   </thead>
@@ -236,6 +237,8 @@ import {
                     <tr key={staff._id}>
                       <td>{staff.staffmember_name}</td>
                       <td>{staff.staffmember_designation}</td>
+                      <td>{staff.staffmember_phoneNumber}</td>
+                      <td>{staff.staffmember_email}</td>
                       <td>
                         <div style={{ display: "flex" }}>
                           
