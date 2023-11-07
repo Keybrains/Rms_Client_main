@@ -69,9 +69,11 @@ const AdminNavbar = (props) => {
   let cookie_id = cookies.get("Tenant ID");
   console.log(cookie_id)
 
-  
-
   useEffect(() => {
+    fetchNotification();
+  }, []);
+
+  const fetchNotification = async () => {
     fetch(`https://propertymanager.cloudpress.host/api/notification/notification`)
       .then((response) => response.json())
       .then((data) => {
@@ -88,7 +90,7 @@ const AdminNavbar = (props) => {
         // Handle network error
         console.error("Network error:", error);
       });
-  }, []);
+  };
 
   const navigateToDetails = (workorder_id) => {
     // Make a DELETE request to delete the notification
@@ -105,6 +107,8 @@ const AdminNavbar = (props) => {
         console.log("updatedNotificationData", updatedNotificationData)
         setNotificationCount(updatedNotificationData.length);
         console.log(`Notification with workorder_id ${workorder_id} marked as read.`);
+        fetchNotification();
+
       } else {
       console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
     }

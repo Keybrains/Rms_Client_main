@@ -124,6 +124,10 @@ const StaffSidebar = (props) => {
   };
 
   useEffect(() => {
+    fetchNotification();
+  }, [staffmember_name]);
+
+  const fetchNotification = async () => {
     fetch(`https://propertymanager.cloudpress.host/api/notification/staffnotification/${staffmember_name}`)
       .then((response) => response.json())
       .then((data) => {
@@ -140,7 +144,7 @@ const StaffSidebar = (props) => {
         // Handle network error
         console.error("Network error:", error);
       });
-  }, [staffmember_name]);
+  };
 
   useEffect(() => {
     getVendorDetails();
@@ -161,6 +165,7 @@ const StaffSidebar = (props) => {
             });
             setNotificationData(updatedNotificationData);
             setNotificationCount(updatedNotificationData.length);
+            fetchNotification();
            console.log(`Notification with workorder_id ${workorder_id} deleted successfully.`);
         } else {
           console.error(`Failed to mark notification with workorder_id ${workorder_id} as read.`);

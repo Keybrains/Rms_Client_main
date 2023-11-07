@@ -927,13 +927,13 @@ const AddPayment = ({ tenantDetails }) => {
                   <Row>
                     <Col lg="3">
                       <FormGroup>
-                        <Checkbox />
-                        <label
+                        {/* <Checkbox /> */}
+                        {/* <label
                           className="form-control-label"
                           htmlFor="input-address"
                         >
                           Print Receipt
-                        </label>
+                        </label> */}
                       </FormGroup>
                     </Col>
                   </Row>

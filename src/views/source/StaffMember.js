@@ -65,7 +65,7 @@ import {
       };
       // auth post method
       let res = await axios.post(
-        "http://https://propertymanager.cloudpress.host/api/:4000/api/register/auth",
+        "https://propertymanager.cloudpress.host/api/register/auth",
         { purpose: "validate access" },
         authConfig
       );
@@ -85,7 +85,7 @@ import {
     const getStaffMemberData = async () => {
       try {
         const response = await axios.get(
-          "http://https://propertymanager.cloudpress.host/api/:4000/api/addstaffmember/addstaffmember"
+          "https://propertymanager.cloudpress.host/api/addstaffmember/addstaffmember"
         );
         setLoader(false);
         setStaffMemberData(response.data.data);

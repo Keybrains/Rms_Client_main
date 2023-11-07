@@ -370,7 +370,7 @@ const Applicants = () => {
               <Row>
                 <Col>
                   <FormGroup>
-                    <Label for="applicantName">Name</Label>
+                    <Label for="applicantName">First Name</Label>
 
                     <Input
                       type="text"
@@ -390,7 +390,7 @@ const Applicants = () => {
                     <Input
                       type="text"
                       id="tenant_lastName"
-                      placeholder="Enter last name"
+                      placeholder="Last Name"
                       onBlur={applicantFormik.handleBlur}
                       onChange={applicantFormik.handleChange}
                       value={applicantFormik.values.tenant_lastName}
@@ -418,7 +418,7 @@ const Applicants = () => {
                   />
                 </InputGroup>
               </FormGroup>
-              <div className="mb-3 form-check">
+              {/* <div className="mb-3 form-check">
                             <Input
                                 type="checkbox"
                                 className="form-check-input"
@@ -429,9 +429,9 @@ const Applicants = () => {
                                 value={applicantFormik.values.exampleCheck1}
                             />
                             <Label className="form-check-label" for="exampleCheck1">
-                                email link to online rental application
+                                
                             </Label>
-                        </div>
+                        </div> */}
               <FormGroup>
                 <Label for="MobileNumber">Mobile Number</Label>
                 <InputGroup>

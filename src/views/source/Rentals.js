@@ -99,17 +99,17 @@ const Rentals = () => {
       .then((data) => {
         if (data.statusCode === 200) {
           setRentalownerData(data.data);
-          console.log("here is my data", data.data);
+          // console.log("here is my data", data.data);
         } else {
           // Handle error
-          console.error("Error:", data.message);
+          // console.error("Error:", data.message);
         }
       })
       .catch((error) => {
         // Handle network error
         console.error("Network error:", error);
       });
-  });
+  },[]);
 
   const handleCheckboxChange = (event, rentalOwnerInfo, phoneNumber) => {
     if (checkedCheckbox === phoneNumber) {

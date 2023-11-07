@@ -521,11 +521,13 @@ const Leaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("https://propertymanager.cloudpress.host/api/rentals/property")
+    fetch("https://propertymanager.cloudpress.host/api/rentals/allproperty")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
+          console.log(data.data, "data.data");
           setPropertyData(data.data);
+
           console.log(data.data, "gdasga");
         } else {
           // Handle error
@@ -540,7 +542,9 @@ const Leaseing = () => {
 
   const fetchingAccountNames = async () => {
     console.log("fetching account names");
-    fetch("https://propertymanager.cloudpress.host/api/addaccount/find_accountname")
+    fetch(
+      "https://propertymanager.cloudpress.host/api/addaccount/find_accountname"
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -559,7 +563,9 @@ const Leaseing = () => {
 
   const fetchingRecAccountNames = async () => {
     console.log("fetching rec accounr names");
-    fetch("https://propertymanager.cloudpress.host/api/recurringAcc/find_accountname")
+    fetch(
+      "https://propertymanager.cloudpress.host/api/recurringAcc/find_accountname"
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -578,7 +584,9 @@ const Leaseing = () => {
 
   const fetchingOneTimeCharges = async () => {
     console.log("fetcjhiine pne rime charges");
-    fetch("https://propertymanager.cloudpress.host/api/onetimecharge/find_accountname")
+    fetch(
+      "https://propertymanager.cloudpress.host/api/onetimecharge/find_accountname"
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -686,7 +694,7 @@ const Leaseing = () => {
         // Handle network error
         console.error("Network error:", error);
       });
-  });
+  }, []);
 
   let cookies = new Cookies();
   // Check Authe(token)
@@ -856,7 +864,9 @@ const Leaseing = () => {
     console.log(id, entryIndex, "id && entry Id");
     if (id && entryIndex) {
       axios
-        .get(`https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${id}`)
+        .get(
+          `https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${id}`
+        )
         .then((response) => {
           const laesingdata = response.data.data;
           //setleasingData(leasingData);
@@ -980,7 +990,9 @@ const Leaseing = () => {
 
   const handleSubmit = async (values) => {
     console.log(file, "values");
-    const arrayOfNames = Array.isArray(file) ? file.map((item) => item.name) : [];
+    const arrayOfNames = Array.isArray(file)
+      ? file.map((item) => item.name)
+      : [];
     const entriesArray = [];
 
     const entriesObject = {
@@ -1072,7 +1084,9 @@ const Leaseing = () => {
     };
 
     try {
-      const res = await axios.get(`https://propertymanager.cloudpress.host/api/tenant/tenant`);
+      const res = await axios.get(
+        `https://propertymanager.cloudpress.host/api/tenant/tenant`
+      );
       if (res.data.statusCode === 200) {
         console.log(res.data.data, "allTenants");
         const allTenants = res.data.data;
@@ -1360,12 +1374,12 @@ const Leaseing = () => {
                             >
                               {propertyData.map((property) => (
                                 <DropdownItem
-                                  key={property}
+                                  key={property._id}
                                   onClick={() =>
                                     handlePropertyTypeSelect(property)
                                   }
                                 >
-                                  {property}
+                                  {property.rental_adress}
                                 </DropdownItem>
                               ))}
                             </DropdownMenu>

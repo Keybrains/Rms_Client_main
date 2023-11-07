@@ -88,28 +88,22 @@ const RentRoll = () => {
       console.error("Error fetching data:", error);
     }
   };
-
   const filterRentRollsBySearch = () => {
-    if (!searchQuery) {
+    if (searchQuery === undefined) {
       return tenantsData;
     }
-
+  
     return tenantsData.filter((tenant) => {
-      return (
-        `${tenant.tenant_firstName} ${tenant.tenant_lastName}`
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        tenant.property_type
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        tenant.lease_type.toLowerCase().includes(searchQuery.toLowerCase())
+      return tenant.entries.some((entry) =>
+        entry.rental_adress.toLowerCase().includes(searchQuery.toLowerCase())
       );
     });
   };
-
   useEffect(() => {
     fetchData();
   }, []);
+
+ 
 
   const deleteTenant = (tenantId, entryIndex) => {
     swal({

@@ -120,6 +120,10 @@ const VendorSidebar = (props) => {
     };
 
     useEffect(() => {
+      fetchNotification();
+    }, [vendor_name]);
+
+    const fetchNotification = async () => {
       fetch(`https://propertymanager.cloudpress.host/api/notification/vendornotification/${vendor_name}`)
         .then((response) => response.json())
         .then((data) => {
@@ -139,7 +143,7 @@ const VendorSidebar = (props) => {
           // Handle network error
           console.error("Network error:", error);
         });
-    }, [vendor_name]);
+    };
     
     useEffect(() => {
       getVendorDetails();
@@ -161,6 +165,7 @@ const VendorSidebar = (props) => {
             console.log("updatedNotificationData", updatedNotificationData)
             setNotificationCount(updatedNotificationData.length);
             console.log(`Notification with workorder_id ${workorder_id} marked as read.`);
+            fetchNotification();
           } else {
             console.error(`Failed to mark notification with workorder_id ${workorder_id} as read.`);
           }
