@@ -950,7 +950,7 @@ const [rentAddress, setRentAddress] = useState([]);
                   </Row>
                   <Row>
                     <Col lg="3">
-                      <FormGroup>
+                      {/* <FormGroup>
                         <Checkbox />
                         <label
                           className="form-control-label"
@@ -958,7 +958,7 @@ const [rentAddress, setRentAddress] = useState([]);
                         >
                           Print Receipt
                         </label>
-                      </FormGroup>
+                      </FormGroup> */}
                     </Col>
                   </Row>
                   <Row>

@@ -114,7 +114,44 @@ const TenantSidebar = (props) => {
   let [loader, setLoader] = React.useState(true);
   const [workData, setWorkData] = useState([]);
 const [rentalAddress, setRentalAddresses] = useState([]);
-  
+ 
+useEffect(() => {
+  fetchNotification();
+}, [rental_adress]);
+
+const fetchNotification = async () => {
+  // Fetch notification data when rental_adress changes
+  if (rental_adress) {
+    // fetch(`https://propertymanager.cloudpress.host/api/notification/tenantnotification/tenant/${rental_adress}`)
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       return response.json();
+         
+    //     } else {
+    //       throw new Error('Response status is not 200');
+    //     }
+    //   })
+    //   .then((data) => {
+    //     setNotificationData(data.data);
+    //     console.log("Notification",data.data)
+    //     setNotificationCount(data.data.length);
+    //     console.log("Notification Count",data.data.length)
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error:", error);
+    //     // Handle the error, display a message to the user, or take other appropriate action.
+    //   });
+    axios.get(`https://propertymanager.cloudpress.host/api/notification/tenantnotification/tenant/${rental_adress}`).then((response) => {
+      if (response.status === 200) {
+        console.log(response.data.data,'asfhuiasfjkouhygtyuhij')
+        setNotificationData(response.data.data);
+        setNotificationCount(response.data.data.length);
+      }
+    }).catch((error) => {
+      console.error("Error:", error);
+    })
+  }
+};
 
 const getRentalData = async (addresses) => {
   try {
@@ -188,6 +225,7 @@ const getRentalData = async (addresses) => {
             console.log("updatedNotificationData", updatedNotificationData)
             setNotificationCount(updatedNotificationData.length);
             console.log(`Notification with workorder_id ${workorder_id} marked as read.`);
+            fetchNotification();
           } else {
           console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
         }
@@ -283,7 +321,12 @@ const getRentalData = async (addresses) => {
                     Notifications
                   </h2>
                   <Divider />
+                  {console.log(notificationData, "notificationData")}
                   {notificationData.map((data) => {
+                    if(data.isTenantread === true){
+                      return null
+                    }
+                    else  {
                     const notificationTitle =
                       data.notification_title || 'No Title Available';
                     const notificationDetails =
@@ -328,6 +371,7 @@ const getRentalData = async (addresses) => {
                       <Divider/>
                      </div> 
                     );
+                      }
                   })}
                   
                 </List>

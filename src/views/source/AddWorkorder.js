@@ -82,8 +82,6 @@ const AddWorkorder = () => {
   const [selectedSub, setSelectedSub] = useState("");
   const [allVendors, setAllVendors] = useState([]);
 
-
-
   const handlePropertySelect = (property) => {
     setSelectedProp(property);
   };
@@ -117,7 +115,7 @@ const AddWorkorder = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
   let navigate = useNavigate();
   const handleCloseButtonClick = () => {
     navigate("../Workorder");
@@ -129,8 +127,8 @@ const AddWorkorder = () => {
       account_type: "",
       description: "",
       part_price: "",
-      // total_amount: "",
-      dropdownOpen:false,
+      total_amount: "",
+      dropdownOpen: false,
     };
     if (WorkFormik.values.entries) {
       WorkFormik.setValues({
@@ -178,7 +176,9 @@ const AddWorkorder = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`https://propertymanager.cloudpress.host/api/workorder/workorder_summary/${id}`)
+        .get(
+          `https://propertymanager.cloudpress.host/api/workorder/workorder_summary/${id}`
+        )
         .then((response) => {
           const vendorData = response.data.data;
           setWorkOrderData(vendorData); // Use vendorData here
@@ -194,7 +194,7 @@ const AddWorkorder = () => {
           setSelecteduser(vendorData.staffmember_name || "Select");
           setSelectedStatus(vendorData.status);
           setSelectedPriority(vendorData.priority || "Select");
-          setSelectedAccount(vendorData.account_type||"Select");
+          setSelectedAccount(vendorData.account_type || "Select");
 
           const entriesData = vendorData.entries || []; // Make sure entries is an array
           WorkFormik.setValues({
@@ -207,6 +207,7 @@ const AddWorkorder = () => {
             work_performed: vendorData.work_performed || "",
             vendor_note: vendorData.vendor_note || "",
             due_date: formattedDueDate,
+            final_total_amount:vendorData.final_total_amount || "",
             entries: entriesData.map((entry) => ({
               part_qty: entry.part_qty || "",
               account_type: entry.account_type || "Select",
@@ -223,10 +224,9 @@ const AddWorkorder = () => {
     }
   }, [id]);
 
-  const { v4: uuidv4 } = require('uuid');
+  const { v4: uuidv4 } = require("uuid");
 
   async function handleSubmit(values, work) {
-    
     try {
       values["rental_adress"] = selectedProp;
       values["work_category"] = selectedCategory;
@@ -236,7 +236,7 @@ const AddWorkorder = () => {
       values["status"] = selectedStatus;
       values["priority"] = selectedPriority;
       values["account_type"] = selectedAccount;
-
+      values["final_total_amount"]= final_total_amount;
       const entries = WorkFormik.values.entries.map((entry) => ({
         part_qty: entry.part_qty,
         account_type: entry.account_type,
@@ -324,10 +324,12 @@ const AddWorkorder = () => {
       status: "",
       due_date: "",
       priority: "",
+      final_total_amount:"",
+
       entries: [
         {
           part_qty: "",
-          account_type: selectedAccount, 
+          account_type: selectedAccount,
           description: "",
           part_price: "",
           total_amount: "",
@@ -364,7 +366,9 @@ const AddWorkorder = () => {
     setVendorsName();
 
     // Make an HTTP GET request to your Express API endpoint
-    fetch("https://propertymanager.cloudpress.host/api/addstaffmember/find_staffmember")
+    fetch(
+      "https://propertymanager.cloudpress.host/api/addstaffmember/find_staffmember"
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -380,9 +384,43 @@ const AddWorkorder = () => {
       });
   }, []);
 
+  const handleQuantityChange = (e, index) => {
+    const updatedEntries = [...WorkFormik.values.entries];
+    updatedEntries[index].part_qty = e.target.value;
+    const quantity = parseFloat(e.target.value);
+    const price = parseFloat(updatedEntries[index].part_price);
+    updatedEntries[index].total_amount =
+      isNaN(quantity) || isNaN(price) ? "" : (quantity * price).toFixed(2);
+    WorkFormik.setValues({
+      ...WorkFormik.values,
+      entries: updatedEntries,
+    });
+  };
+
+  const handlePriceChange = (e, index) => {
+    const updatedEntries = [...WorkFormik.values.entries];
+    updatedEntries[index].part_price = e.target.value;
+    const quantity = parseFloat(updatedEntries[index].part_qty);
+    const price = parseFloat(e.target.value);
+    updatedEntries[index].total_amount =
+      isNaN(quantity) || isNaN(price) ? "" : (quantity * price).toFixed(2);
+    WorkFormik.setValues({
+      ...WorkFormik.values,
+      entries: updatedEntries,
+    });
+  };
+
+  // Calculate the total
+  let final_total_amount = 0;
+  WorkFormik.values.entries.forEach((entries) => {
+    if (entries.total_amount) {
+      final_total_amount += parseFloat(entries.total_amount);
+    }
+  });
+
   return (
     <>
-      <AddWorkorderHeader/>
+      <AddWorkorderHeader />
       {/* Page content */}
       <Container className="mt--7" fluid>
         <Row>
@@ -476,9 +514,7 @@ const AddWorkorder = () => {
                                   <DropdownItem
                                     key={property}
                                     onClick={() =>
-                                      handlePropertySelect(
-                                        property
-                                      )
+                                      handlePropertySelect(property)
                                     }
                                   >
                                     {property}
@@ -627,7 +663,7 @@ const AddWorkorder = () => {
                               >
                                 Other
                               </DropdownItem> */}
-                               {allVendors.map((vendor, index) => (
+                              {allVendors.map((vendor, index) => (
                                 <DropdownItem
                                   key={index}
                                   onClick={() => handleVendorSelect(vendor)}
@@ -857,293 +893,326 @@ const AddWorkorder = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {
-                                WorkFormik.values.entries?.map(
-                                  (entry, index) => (
-                                    <tr key={index}>
-                                      <td>
-                                        <Input
-                                          className="form-control-alternative"
-                                          id="input-unitadd"
-                                          placeholder="Quantity"
-                                          type="text"
-                                          name={`entries[${index}].part_qty`}
-                                          onBlur={WorkFormik.handleBlur}
-                                          onChange={WorkFormik.handleChange}
-                                          value={entry.part_qty}
-                                        />
-                                        {WorkFormik.touched.entries &&
-                                        WorkFormik.touched.entries[index] &&
-                                        WorkFormik.errors.entries &&
-                                        WorkFormik.errors.entries[index] &&
-                                        WorkFormik.errors.entries[index]
-                                          .part_qty ? (
-                                          <div style={{ color: "red" }}>
-                                            {
-                                              WorkFormik.errors.entries[index]
-                                                .part_qty
-                                            }
-                                          </div>
-                                        ) : null}
-                                      </td>
-                                      <td>
-                                        
-                                        <Dropdown
-                                          isOpen={entry.dropdownOpen}
-                                          toggle={() => toggleDropdown(index)}
+                              {WorkFormik.values.entries?.map(
+                                (entry, index) => (
+                                  <tr key={index}>
+                                    <td>
+                                      <Input
+                                        className="form-control-alternative"
+                                        id="input-unitadd"
+                                        placeholder="Quantity"
+                                        type="text"
+                                        name={`entries[${index}].part_qty`}
+                                        onChange={(e) =>
+                                          handleQuantityChange(e, index)
+                                        }
+                                        value={entry.part_qty}
+                                      />
+                                      {WorkFormik.touched.entries &&
+                                      WorkFormik.touched.entries[index] &&
+                                      WorkFormik.errors.entries &&
+                                      WorkFormik.errors.entries[index] &&
+                                      WorkFormik.errors.entries[index]
+                                        .part_qty ? (
+                                        <div style={{ color: "red" }}>
+                                          {
+                                            WorkFormik.errors.entries[index]
+                                              .part_qty
+                                          }
+                                        </div>
+                                      ) : null}
+                                    </td>
+                                    <td>
+                                      <Dropdown
+                                        isOpen={entry.dropdownOpen}
+                                        toggle={() => toggleDropdown(index)}
+                                      >
+                                        <DropdownToggle
+                                          caret
+                                          style={{ width: "100%" }}
                                         >
-                                          <DropdownToggle caret style={{ width: "100%" }}>
-                                            {entry.account_type || "Select"} &nbsp;&nbsp;&nbsp;&nbsp;
-                                          </DropdownToggle>
-                                          <DropdownMenu style={{ width: "100%", maxHeight: "200px", overflowY: "auto" }}>
-                                            <DropdownItem
-                                          
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Advertising",index
-                                                )
-                                              }
-                                            >
-                                              Advertising
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Association Fees",index
-                                                )
-                                              }
-                                            >
-                                              Association Fees
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Auto and Travel",index
-                                                )
-                                              }
-                                            >
-                                              Auto and Travel
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Bank Fees",index
-                                                )
-                                              }
-                                            >
-                                              Bank Fees
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Cleaning and Maintenance",index
-                                                )
-                                              }
-                                            >
-                                              Cleaning and Maintenance
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Commissions",index
-                                                )
-                                              }
-                                            >
-                                              Commissions
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Depreciation Expense",index
-                                                )
-                                              }
-                                            >
-                                              Depreciation Expense
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Insurance",index
-                                                )
-                                              }
-                                            >
-                                              Insurance
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Legal and Professional Fees",index
-                                                )
-                                              }
-                                            >
-                                              Legal and Professional Fees
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Licenses and Permits",index
-                                                )
-                                              }
-                                            >
-                                              Licenses and Permits
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Management Fees",index
-                                                )
-                                              }
-                                            >
-                                              Management Fees
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Mortgage Interest",index
-                                                )
-                                              }
-                                            >
-                                              Mortgage Interest
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Other Expenses",index
-                                                )
-                                              }
-                                            >
-                                              Other Expenses
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Other Interest Expenses",index
-                                                )
-                                              }
-                                            >
-                                              Other Interest Expenses
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Postage and Delivery",index
-                                                )
-                                              }
-                                            >
-                                              Postage and Delivery
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Repairs",index
-                                                )
-                                              }
-                                            >
-                                              Repairs
-                                            </DropdownItem>
-                                            <DropdownItem
-                                              onClick={() =>
-                                                handleAccountSelection(
-                                                  "Insurance",index
-                                                )
-                                              }
-                                            >
-                                              Other Expenses
-                                            </DropdownItem>
-                                          </DropdownMenu>
-                                        </Dropdown>
-                                      </td>
-                                      <td>
-                                        <Input
-                                          className="form-control-alternative"
-                                          id="input-unitadd"
-                                          placeholder="Description"
-                                          type="text"
-                                          name={`entries[${index}].description`}
-                                          onBlur={WorkFormik.handleBlur}
-                                          onChange={WorkFormik.handleChange}
-                                          value={entry.description}
-                                        />
-                                        {WorkFormik.touched.entries &&
-                                        WorkFormik.touched.entries[index] &&
-                                        WorkFormik.errors.entries &&
-                                        WorkFormik.errors.entries[index] &&
-                                        WorkFormik.errors.entries[index]
-                                          .description ? (
-                                          <div style={{ color: "red" }}>
-                                            {
-                                              WorkFormik.errors.entries[index]
-                                                .description
-                                            }
-                                          </div>
-                                        ) : null}
-                                      </td>
-                                      <td>
-                                        <Input
-                                          className="form-control-alternative"
-                                          id="input-unitadd"
-                                          placeholder="Price"
-                                          type="number"
-                                          name={`entries[${index}].part_price`}
-                                          onBlur={WorkFormik.handleBlur}
-                                          onChange={WorkFormik.handleChange}
-                                          value={entry.part_price}
-                                        />
-                                        {WorkFormik.touched.entries &&
-                                        WorkFormik.touched.entries[index] &&
-                                        WorkFormik.errors.entries &&
-                                        WorkFormik.errors.entries[index] &&
-                                        WorkFormik.errors.entries[index]
-                                          .part_price ? (
-                                          <div style={{ color: "red" }}>
-                                            {
-                                              WorkFormik.errors.entries[index]
-                                                .part_price
-                                            }
-                                          </div>
-                                        ) : null}
-                                      </td>
-                                      <td>
-                                        <Input
-                                          className="form-control-alternative"
-                                          id="input-unitadd"
-                                          placeholder="Total"
-                                          type="number"
-                                          name={`entries[${index}].total_amount`}
-                                          onBlur={WorkFormik.handleBlur}
-                                          onChange={WorkFormik.handleChange}
-                                          value={entry.total_amount}
-                                        />
-                                        {WorkFormik.touched.entries &&
-                                        WorkFormik.touched.entries[index] &&
-                                        WorkFormik.errors.entries &&
-                                        WorkFormik.errors.entries[index] &&
-                                        WorkFormik.errors.entries[index]
-                                          .total_amount ? (
-                                          <div style={{ color: "red" }}>
-                                            {
-                                              WorkFormik.errors.entries[index]
-                                                .total_amount
-                                            }
-                                          </div>
-                                        ) : null}
-                                      </td>
-                                      <td style={{ border: "none" }}>
-                                        <ClearIcon
-                                          type="button"
+                                          {entry.account_type || "Select"}{" "}
+                                          &nbsp;&nbsp;&nbsp;&nbsp;
+                                        </DropdownToggle>
+                                        <DropdownMenu
                                           style={{
-                                            cursor: "pointer",
-                                            padding: 0,
+                                            width: "100%",
+                                            maxHeight: "200px",
+                                            overflowY: "auto",
                                           }}
-                                          onClick={() => handleRemoveRow(index)}
                                         >
-                                          Remove
-                                        </ClearIcon>
-                                      </td>
-                                    </tr>
-                                  )
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Advertising",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Advertising
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Association Fees",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Association Fees
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Auto and Travel",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Auto and Travel
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Bank Fees",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Bank Fees
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Cleaning and Maintenance",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Cleaning and Maintenance
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Commissions",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Commissions
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Depreciation Expense",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Depreciation Expense
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Insurance",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Insurance
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Legal and Professional Fees",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Legal and Professional Fees
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Licenses and Permits",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Licenses and Permits
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Management Fees",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Management Fees
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Mortgage Interest",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Mortgage Interest
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Other Expenses",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Other Expenses
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Other Interest Expenses",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Other Interest Expenses
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Postage and Delivery",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Postage and Delivery
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Repairs",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Repairs
+                                          </DropdownItem>
+                                          <DropdownItem
+                                            onClick={() =>
+                                              handleAccountSelection(
+                                                "Insurance",
+                                                index
+                                              )
+                                            }
+                                          >
+                                            Other Expenses
+                                          </DropdownItem>
+                                        </DropdownMenu>
+                                      </Dropdown>
+                                    </td>
+                                    <td>
+                                      <Input
+                                        className="form-control-alternative"
+                                        id="input-unitadd"
+                                        placeholder="Description"
+                                        type="text"
+                                        name={`entries[${index}].description`}
+                                        onBlur={WorkFormik.handleBlur}
+                                        onChange={WorkFormik.handleChange}
+                                        value={entry.description}
+                                      />
+                                      {WorkFormik.touched.entries &&
+                                      WorkFormik.touched.entries[index] &&
+                                      WorkFormik.errors.entries &&
+                                      WorkFormik.errors.entries[index] &&
+                                      WorkFormik.errors.entries[index]
+                                        .description ? (
+                                        <div style={{ color: "red" }}>
+                                          {
+                                            WorkFormik.errors.entries[index]
+                                              .description
+                                          }
+                                        </div>
+                                      ) : null}
+                                    </td>
+                                    <td>
+                                      <Input
+                                        className="form-control-alternative"
+                                        id="input-unitadd"
+                                        placeholder="Price"
+                                        type="number"
+                                        name={`entries[${index}].part_price`}
+                                        onChange={(e) =>
+                                          handlePriceChange(e, index)
+                                        }
+                                        value={entry.part_price}
+                                      />
+                                      {WorkFormik.touched.entries &&
+                                      WorkFormik.touched.entries[index] &&
+                                      WorkFormik.errors.entries &&
+                                      WorkFormik.errors.entries[index] &&
+                                      WorkFormik.errors.entries[index]
+                                        .part_price ? (
+                                        <div style={{ color: "red" }}>
+                                          {
+                                            WorkFormik.errors.entries[index]
+                                              .part_price
+                                          }
+                                        </div>
+                                      ) : null}
+                                    </td>
+                                    <td>
+                                      <Input
+                                        className="form-control-alternative"
+                                        id="input-unitadd"
+                                        placeholder="Total"
+                                        type="number"
+                                        name={`entries[${index}].total_amount`}
+                                        onBlur={WorkFormik.handleBlur}
+                                        onChange={WorkFormik.handleChange}
+                                        value={entry.total_amount}
+                                        disabled // Disable the input
+                                      />
+                                      {WorkFormik.touched.entries &&
+                                      WorkFormik.touched.entries[index] &&
+                                      WorkFormik.errors.entries &&
+                                      WorkFormik.errors.entries[index] &&
+                                      WorkFormik.errors.entries[index]
+                                        .total_amount ? (
+                                        <div style={{ color: "red" }}>
+                                          {
+                                            WorkFormik.errors.entries[index]
+                                              .total_amount
+                                          }
+                                        </div>
+                                      ) : null}
+                                    </td>
+                                    <td style={{ border: "none" }}>
+                                      <ClearIcon
+                                        type="button"
+                                        style={{
+                                          cursor: "pointer",
+                                          padding: 0,
+                                        }}
+                                        onClick={() => handleRemoveRow(index)}
+                                      >
+                                        Remove
+                                      </ClearIcon>
+                                    </td>
+                                  </tr>
                                 )
-                              }
+                              )}
+                              <tr>
+                                <th>Total</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>{final_total_amount.toFixed(2)}</th>
+                              </tr>
                             </tbody>
                             <tfoot>
                               <tr>
@@ -1406,7 +1475,7 @@ const AddWorkorder = () => {
                   </div>
                   <button
                     type="submit"
-                    onSubmit={{handleSubmit}}
+                    onSubmit={{ handleSubmit }}
                     className="btn btn-primary ml-4"
                     style={{ background: "green" }}
                   >

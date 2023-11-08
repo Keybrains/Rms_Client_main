@@ -271,20 +271,21 @@ const RentRollDetail = () => {
   const [loader, setLoader] = React.useState(true);
 
   const getGeneralLedgerData = async () => {
+
+    const apiUrl = `https://propertymanager.cloudpress.host/api/payment/payment/${rental}`;
+                    
     try {
-      const response = await axios.get(
-        "https://propertymanager.cloudpress.host/api/payment/payment/financial"
-      );
+      const response = await axios.get(apiUrl);
       setLoader(false);
       setGeneralLedgerData(response.data.data);
-      console.log(response.data.data);
+      console.log(response.data.data,'kkkkkk');
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
   useEffect(() => {
     getGeneralLedgerData();
-  }, []);
+  }, [rental]);
 
   return (
     <div>

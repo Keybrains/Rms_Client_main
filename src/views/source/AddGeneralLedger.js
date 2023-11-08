@@ -166,7 +166,9 @@ const AddGeneralLedger = () => {
     }
   });
   const handleSubmit = async (values) => {
-    const arrayOfNames = file.map((item) => item.name);
+    const arrayOfNames = Array.isArray(file)
+    ? file.map((item) => item.name)
+    : [];
     try {
       const updatedValues = {
         date: values.date,

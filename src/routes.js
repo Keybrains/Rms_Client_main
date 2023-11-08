@@ -569,6 +569,11 @@ var routes = [
         component: <RentRollLeaseing/>,
         layout: "/admin",    
       },
+      {
+        path: "/AddPayment/:tenantId/:entryIndex",
+        component: <AddPayment/>,
+        layout: "/admin",    
+      },
 ];
 export default routes;
 

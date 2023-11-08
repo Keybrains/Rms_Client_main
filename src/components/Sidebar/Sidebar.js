@@ -389,13 +389,13 @@ const Sidebar = (props) => {
                 <i className="ni ni-shop text-orange" /> Rentals
               </DropdownToggle>
               <DropdownMenu>
-                <DropdownItem to="/admin/propertiesTable" tag={Link}>
+                <DropdownItem to="/admin/propertiesTable" tag={Link}onClick={toggleCollapse}>
                   Properties
                 </DropdownItem>
-                <DropdownItem to="/admin/RentRoll" tag={Link}>
+                <DropdownItem to="/admin/RentRoll" tag={Link} onClick={toggleCollapse}>
                   Rent Roll
                 </DropdownItem>
-                <DropdownItem to="/admin/TenantsTable" tag={Link}>
+                <DropdownItem to="/admin/TenantsTable" tag={Link} onClick={toggleCollapse}>
                   Tenants
                 </DropdownItem>
                 {/* <DropdownItem to="/admin/RentalownerTable" tag={Link}>
@@ -414,7 +414,7 @@ const Sidebar = (props) => {
               {/* <DropdownItem to="/admin/Listings" tag={Link} >
                 Listings
               </DropdownItem> */}
-              <DropdownItem to="/admin/Applicants" tag={Link} >
+              <DropdownItem to="/admin/Applicants" tag={Link} onClick={toggleCollapse}>
                 Applicants
               </DropdownItem>
              
@@ -428,10 +428,10 @@ const Sidebar = (props) => {
                 <i className="ni ni-settings text-grey" /> Maintenance
               </DropdownToggle>
               <DropdownMenu>
-                <DropdownItem to="/admin/vendor" tag={Link}>
+                <DropdownItem to="/admin/vendor" tag={Link} onClick={toggleCollapse}>
                   Vendors
                 </DropdownItem>
-                <DropdownItem to="/admin/Workorder" tag={Link}>
+                <DropdownItem to="/admin/Workorder" tag={Link} onClick={toggleCollapse}>
                   Work Order
                 </DropdownItem>
               </DropdownMenu>
@@ -444,10 +444,10 @@ const Sidebar = (props) => {
                 <i className="ni ni-money-coins text-purple" /> Accounting
               </DropdownToggle>
               <DropdownMenu>
-                <DropdownItem to="/admin/GeneralLedger" tag={Link}>
+                <DropdownItem to="/admin/GeneralLedger" tag={Link} onClick={toggleCollapse}>
                   General Ledger
                 </DropdownItem>
-                <DropdownItem to="/admin/Payment" tag={Link}>
+                <DropdownItem to="/admin/Payment" tag={Link} onClick={toggleCollapse}>
                   Payment
                 </DropdownItem>
                 {/* <DropdownItem to="/admin/OutstandingBalance" tag={Link}>

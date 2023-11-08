@@ -117,11 +117,9 @@ const ApplicantSummary = () => {
       console.log(values, "values");
     },
   });
-  const navigateToLease = (tenantID,entryIndex) => {
+  const navigateToLease = (tenantID, entryIndex) => {
     axios
-      .get(
-        `https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`
-      )
+      .get(`https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`)
       .then((response) => {
         const data = response.data.data;
 
@@ -129,41 +127,40 @@ const ApplicantSummary = () => {
         const rentalAddress = data.rental_adress;
 
         console.log(rentalAddress, "Rental Addressss");
-        axios.get(
-          'https://propertymanager.cloudpress.host/api/rentals/allproperty'
-        ).then((response) => {
-          const property = response.data.data;
-          console.log(property, "properties");
-          const matchedProperty = property.find((property) => {
-            return property.rental_adress === rentalAddress;
+        axios
+          .get("https://propertymanager.cloudpress.host/api/rentals/allproperty")
+          .then((response) => {
+            const property = response.data.data;
+            console.log(property, "properties");
+            const matchedProperty = property.find((property) => {
+              return property.rental_adress === rentalAddress;
+            });
+            console.log(matchedProperty, "matchedProperty");
+            if (!matchedProperty) {
+              alert("Property not found");
+              return;
+            } else {
+              // navigate(`/admin/Leaseing/${id}/${matchedProperty._id}`);
+              console.log(tenantID, "tenantID");
+              navigate(`/admin/RentRollLeaseing/${tenantID}/${entryIndex}`);
+              console.log(matchedApplicant, "matchedApplicant");
+              // axios
+              // .get("https://propertymanager.cloudpress.host/api/tenant/tenant")
+              // .then((response) => {
+              //   console.log(response.data.data,'response.data.data');
+              //   const tenant = response.data.data;
+              //   const matchedTenant = tenant.find((tenant) => {
+              //     return tenant._id === id;
+              //   })
+              //   console.log(matchedTenant, "matchedTenantdddd");
+              // })
+              // .then((err) => {
+              //   console.log(err);
+              //   // setLoader(false);
+              // });
+              // navigate(`/admin/rentrolldetail/${id}/`);
+            }
           });
-          console.log(matchedProperty, "matchedProperty");
-          if(!matchedProperty) {
-            alert("Property not found");
-            return;
-          }
-          else{
-            // navigate(`/admin/Leaseing/${id}/${matchedProperty._id}`);
-            console.log(tenantID,"tenantID")
-            navigate(`/admin/RentRollLeaseing/${tenantID}/${entryIndex}`);
-            console.log(matchedApplicant, "matchedApplicant");
-            // axios
-            // .get("https://propertymanager.cloudpress.host/api/tenant/tenant")
-            // .then((response) => {
-            //   console.log(response.data.data,'response.data.data');
-            //   const tenant = response.data.data;
-            //   const matchedTenant = tenant.find((tenant) => {
-            //     return tenant._id === id;
-            //   })
-            //   console.log(matchedTenant, "matchedTenantdddd");
-            // })
-            // .then((err) => {
-            //   console.log(err);
-            //   // setLoader(false);
-            // });
-            // navigate(`/admin/rentrolldetail/${id}/`);
-          }
-        })
 
         // Navigate to the leasing page with the rental address
 
@@ -205,15 +202,47 @@ const ApplicantSummary = () => {
   //     })
   //     .then((err) => {
   //       console.log(err);
-  //       // setLoader(false);
+  //       // setLoader(false);rental_adressrental_address
   //     });
   // };
 
+  // useEffect(() => {
+  //   axios
+  //     .get(`https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`)
+  //     .then((applicants) => {
+  //       axios
+  //         .get("https://propertymanager.cloudpress.host/api/rentals/property")
+  //         .then((properties) => {
+  //           console.log(applicants.data.data, "applicants");
+  //           console.log(properties.data.data, "properties");
+  //           setApplicantData(applicants.data.data);
+  //           const allProperties = properties.data.data;
+  //           const allApplicants = applicants.data.data;
+  //           const matchedProperty = allProperties.find((property) => {
+  //             return property.rental_adress === allApplicants.rental_adress;
+  //           });
+  //           setPropertyData(matchedProperty);
+  //           console.log(matchedProperty, "matchedProperty");
+  //           // navigate(`/admin/Leaseing/${id}/${matchedProperty._id}`);
+  //           // console.log(response.data.data,'response.data.data');
+
+  //           // setRentalsData(response.data.data);
+
+  //           // setLoader(false);
+  //         })
+  //         .then((err) => {
+  //           console.log(err);
+  //           // setLoader(false);
+  //         });
+  //     })
+  //     .then((err) => {
+  //       console.log(err);
+  //       // setLoader(false);
+  //     });
+  // }, [id]);
   useEffect(() => {
     axios
-      .get(
-        `https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`
-      )
+      .get(`https://propertymanager.cloudpress.host/api/applicant/applicant_summary/${id}`)
       .then((applicants) => {
         axios
           .get("https://propertymanager.cloudpress.host/api/rentals/property")
@@ -228,26 +257,18 @@ const ApplicantSummary = () => {
             });
             setPropertyData(matchedProperty);
             console.log(matchedProperty, "matchedProperty");
-            // navigate(`/admin/Leaseing/${id}/${matchedProperty._id}`);
-            // console.log(response.data.data,'response.data.data');
-
-            // setRentalsData(response.data.data);
-
-            // setLoader(false);
           })
-          .then((err) => {
-            console.log(err);
-            // setLoader(false);
+          .catch((error) => {
+            console.error("Error fetching rental properties:", error);
+            // Handle the error, e.g., display an error message to the user.
           });
       })
-      .then((err) => {
-        console.log(err);
-        // setLoader(false);
+      .catch((error) => {
+        console.error("Error fetching applicants:", error);
+        // Handle the error, e.g., display an error message to the user.
       });
   }, [id]);
-  // const navigateToLease = () => {
-
-  // }
+  
   const [isChecklistVisible, setChecklistVisible] = useState(false);
   const [checklistItems, setChecklistItems] = useState([]);
   const [newItem, setNewItem] = useState("");
@@ -317,7 +338,10 @@ const ApplicantSummary = () => {
         if (postResponse.status === 200) {
           console.log("Data posted successfully:", postResponse.data.data);
           // setTenantID(postResponse.data.data._id)
-          navigateToLease(postResponse.data.data._id, postResponse.data.data.entries[0].entryIndex);
+          navigateToLease(
+            postResponse.data.data._id,
+            postResponse.data.data.entries[0].entryIndex
+          );
         } else {
           console.error(
             "Data post request failed. Status code:",
@@ -340,7 +364,7 @@ const ApplicantSummary = () => {
   const [matchedApplicant, setMatchedApplicant] = useState([]);
   const getApplicantData = async () => {
     await axios
-      .get(`https://propertymanager.cloudpress.host/api/applicant/applicant`)
+      .get("https://propertymanager.cloudpress.host/api/applicant/applicant")
       .then((response) => {
         console.log(response.data.data);
         if (response.data.data) {
@@ -406,31 +430,37 @@ const ApplicantSummary = () => {
     getApplicantData();
   }, []);
 
-const handleChecklistChange = (event,item) => {   
-
-  // if (event.target.checked) {
-  //   setChecklistItems([...checklistItems, item]);
-  //   const allCheckbox = [...checklistItems, item];
-  //   console.log(allCheckbox, "allCheckbox");
-  //   console.log(matchedApplicant, "matchedApplicant");
-  //   const updatedApplicant = {
-  //     ...matchedApplicant,
-  //     applicant_checklist: [...matchedApplicant.applicant_checklist, item],
-  //   };
-  //   console.log(updatedApplicant, "updatedApplicant");
-// }
-  if(event.target.checked){
-    console.log(item,"item");
-    if(!applicantFormik.values.applicant_checkedChecklist.includes(item)){
-      applicantFormik.setFieldValue("applicant_checkedChecklist", [...applicantFormik.values.applicant_checkedChecklist, item]);
+  const handleChecklistChange = (event, item) => {
+    // if (event.target.checked) {
+    //   setChecklistItems([...checklistItems, item]);
+    //   const allCheckbox = [...checklistItems, item];
+    //   console.log(allCheckbox, "allCheckbox");
+    //   console.log(matchedApplicant, "matchedApplicant");
+    //   const updatedApplicant = {
+    //     ...matchedApplicant,
+    //     applicant_checklist: [...matchedApplicant.applicant_checklist, item],
+    //   };
+    //   console.log(updatedApplicant, "updatedApplicant");
+    // }
+    if (event.target.checked) {
+      console.log(item, "item");
+      if (!applicantFormik.values.applicant_checkedChecklist.includes(item)) {
+        applicantFormik.setFieldValue("applicant_checkedChecklist", [
+          ...applicantFormik.values.applicant_checkedChecklist,
+          item,
+        ]);
+      }
+      // console.log(applicantFormik.values, "ssssssssssss");
+    } else {
+      applicantFormik.setFieldValue(
+        "applicant_checkedChecklist",
+        applicantFormik.values.applicant_checkedChecklist.filter(
+          (checklistItem) => checklistItem !== item
+        )
+      );
+      // setChecklistItems([...checklistItems, item]);
     }
-    // console.log(applicantFormik.values, "ssssssssssss");
-  }
-  else{
-    applicantFormik.setFieldValue("applicant_checkedChecklist", applicantFormik.values.applicant_checkedChecklist.filter((checklistItem) => checklistItem !== item));
-    // setChecklistItems([...checklistItems, item]);
-  }
-}
+  };
   console.log(applicantFormik.values, "formik");
   return (
     <>
@@ -603,12 +633,14 @@ const handleChecklistChange = (event,item) => {
                                     <FormControlLabel
                                       control={
                                         <Checkbox
-                                        value={item}
+                                          value={item}
                                           color="success"
                                           onChange={(e) => {
                                             handleChecklistChange(e, item);
                                           }}
-                                          checked={applicantFormik.values.applicant_checkedChecklist.includes(item)} // You can set the checked state as needed
+                                          checked={applicantFormik.values.applicant_checkedChecklist.includes(
+                                            item
+                                          )} // You can set the checked state as needed
                                         />
                                       }
                                       label={item}
@@ -882,7 +914,8 @@ const handleChecklistChange = (event,item) => {
                                     color="text.secondary"
                                     gutterBottom
                                   >
-                                    {matchedApplicant?.tenant_homeNumber || "N/A"}
+                                    {matchedApplicant?.tenant_homeNumber ||
+                                      "N/A"}
                                   </Typography>
                                 </div>
                                 <div
@@ -900,7 +933,8 @@ const handleChecklistChange = (event,item) => {
                                     color="text.secondary"
                                     gutterBottom
                                   >
-                                    {matchedApplicant?.tenant_workNumber || "N/A"}
+                                    {matchedApplicant?.tenant_workNumber ||
+                                      "N/A"}
                                   </Typography>
                                 </div>
                                 <div
