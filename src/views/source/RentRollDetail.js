@@ -71,7 +71,7 @@ const RentRollDetail = () => {
   }, [tenantId, entryIndex]);
 
   const handleClick = () => {
-    navigate("../AddPayment");
+    navigate(`../AddPayment/${tenantId}/${entryIndex}`);
   };
 
   const apiUrl = `https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${tenantId}/entry/${entryIndex}`;
@@ -990,7 +990,7 @@ const RentRollDetail = () => {
                           <Button
                             color="primary"
                             href="#rms"
-                            onClick={() => navigate("/admin/AddPayment")}
+                            onClick={() => navigate(`/admin/AddPayment/${tenantId}/${entryIndex}`)}
                             size="sm"
                             style={{ background: "white", color: "blue" }}
                           >

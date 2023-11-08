@@ -38,18 +38,20 @@ import Img from "assets/img/theme/team-4-800x800.jpg";
 import "jspdf-autotable";
 
 const AddPayment = ({ tenantDetails }) => {
-  const location = useLocation();
-  const rentalAddress = location.state && location.state.rentalAddress;
-  console.log(rentalAddress,"rental_address")
+  // const location = useLocation();
+  // const rentalAddress = location.state && location.state.rentalAddress;
+  // console.log(rentalAddress,"rental_address")
   
-  const { id } = useParams();
-  const { rental_adress } = useParams();
+  const { tenantId, entryIndex } = useParams();
+  // const {  } = useParams();
   const [file, setFile] = useState([]);
   const [accountData, setAccountData] = useState([]);
   const [propertyData, setPropertyData] = useState([]);
   const [checkedCheckbox, setCheckedCheckbox] = useState();
   const [prodropdownOpen, setproDropdownOpen] = useState(false);
   const [recdropdownOpen, setrecDropdownOpen] = useState(false);
+const [rentAddress, setRentAddress] = useState([]);
+
 
   const toggle1 = () => setproDropdownOpen((prevState) => !prevState);
   const toggle2 = () => setrecDropdownOpen((prevState) => !prevState);
@@ -64,14 +66,14 @@ const AddPayment = ({ tenantDetails }) => {
     setSelectedRec(propertyType);
   };
 
-  function formatDateWithoutTime(dateString) {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${month}-${day}-${year}`;
-  }
+  // function formatDateWithoutTime(dateString) {
+  //   if (!dateString) return "";
+  //   const date = new Date(dateString);
+  //   const year = date.getFullYear();
+  //   const month = String(date.getMonth() + 1).padStart(2, "0");
+  //   const day = String(date.getDate()).padStart(2, "0");
+  //   return `${month}-${day}-${year}`;
+  // }
 
   // const generatePDF = async (tenantId, tenantDetails) => {
   //   try {
@@ -127,7 +129,7 @@ const AddPayment = ({ tenantDetails }) => {
   const generalledgerFormik = useFormik({
     initialValues: {
       date: "",
-      rental_adress: rentalAddress, 
+      rental_adress: "", 
       amount: "",
       payment_method: "",
       tenant_firstName: "",
@@ -164,24 +166,25 @@ const AddPayment = ({ tenantDetails }) => {
     navigate("../Payment");
   };
 
-  // useEffect(() => {
-  //     // Make an HTTP GET request to your Express API endpoint
-  //     fetch("https://propertymanager.cloudpress.host/api/tenant/tenant-name/tenant/${rental_adress}")
-  //       .then((response) => response.json())
-  //       .then((data) => {
-  //         if (data.statusCode === 200) {
-  //           setPropertyData(data.data);
-  //           console.log(data.data, "gdasga");
-  //         } else {
-  //           // Handle error
-  //           console.error("Error:", data.message);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         // Handle network error
-  //         console.error("Network error:", error);
-  //       });
-  //   }, []);
+  useEffect(() => {
+    fetchTenantData();
+      // Make an HTTP GET request to your Express API endpoint
+      fetch(`https://propertymanager.cloudpress.host/api/tenant/tenant-name/tenant/${rentAddress}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.statusCode === 200) {
+            setPropertyData(data.data);
+            console.log(data, "gdasga");
+          } else {
+            // Handle error
+            console.error("Error:", data.message);
+          }
+        })
+        .catch((error) => {
+          // Handle network error
+          console.error("Network error:", error);
+        });
+    }, [rentAddress]);
 
   const handleAccountSelection = (value, index) => {
     console.log("Selected index:", index);
@@ -231,6 +234,26 @@ const AddPayment = ({ tenantDetails }) => {
       entries: updatedEntries,
     });
   };
+  const fetchTenantData = async () => {
+    fetch(`https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${tenantId}/entry/${entryIndex}`).then((response) => response.json())
+    .then((data) => {
+      if (data.statusCode === 200) {
+        // setTenantData(data.data);
+        console.log(data.data, "gdasgaaaaaaaaaaa");
+
+        const tenantData = data.data;
+
+        const rentalAddress = tenantData.entries.rental_adress;
+        setRentAddress(rentalAddress);
+        generalledgerFormik.setValues({
+          ...generalledgerFormik.values,
+          rental_adress: rentalAddress
+        })
+      }
+    })
+  }
+
+  console.log("generalledgerFormik.values", generalledgerFormik.values)
 
   useEffect(() => {
     fetch("https://propertymanager.cloudpress.host/api/addaccount/find_accountname")
@@ -277,6 +300,7 @@ const AddPayment = ({ tenantDetails }) => {
           total_amount: (totalDebit + totalCredit).toFixed(2),
         })),
       };
+      console.log(updatedValues, "updatedValues");
       const response = await axios.post(
         "https://propertymanager.cloudpress.host/api/payment/add_payment",
         updatedValues
@@ -927,13 +951,13 @@ const AddPayment = ({ tenantDetails }) => {
                   <Row>
                     <Col lg="3">
                       <FormGroup>
-                        {/* <Checkbox /> */}
-                        {/* <label
+                        <Checkbox />
+                        <label
                           className="form-control-label"
                           htmlFor="input-address"
                         >
                           Print Receipt
-                        </label> */}
+                        </label>
                       </FormGroup>
                     </Col>
                   </Row>
