@@ -113,6 +113,7 @@ const getRentalData = async (addresses) => {
 
       // Update the state with the filtered unread notifications
       setWorkData((prevData) => [...prevData, ...unreadNotifications]);
+      console.log("unreadNotifications", unreadNotifications)
       setNotificationData((prevNotificationData) => [...prevNotificationData, ...response.data.data]);
       setNotificationCount(unreadNotifications.length);
     } else if (typeof response.data.data === 'object') {
@@ -133,32 +134,37 @@ React.useEffect(() => {
   }
 }, [rentalAddress]);
 
-// useEffect(() => {
-//   // Fetch notification data when rental_adress changes
-//   if (rental_adress) {
-//     fetch(`https://propertymanager.cloudpress.host/api/notification/tenantnotification/tenant/${rental_adress}`)
-//       .then((response) => {
-//         if (response.status === 200) {
-//           return response.json();
+useEffect(() => {
+  fetchNotification();
+}, [rental_adress]);  
+
+const fetchNotification = async () => {
+  // Fetch notification data when rental_adress changes
+ 
+    fetch(`https://propertymanager.cloudpress.host/api/notification/tenantnotification/tenant/${rental_adress}`)
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
          
-//         } else {
-//           throw new Error('Response status is not 200');
-//         }
-//       })
-//       .then((data) => {
-//         setNotificationData(data.data);
-//         console.log("Notification",data.data)
-//         setNotificationCount(data.data.length);
-//         console.log("Notification Count",data.data.length)
-//       })
-//       .catch((error) => {
-//         console.error("Error:", error);
-//         // Handle the error, display a message to the user, or take other appropriate action.
-//       });
-//   }
-// }, [rental_adress]);
+        } else {
+          throw new Error('Response status is not 200');
+        }
+      })
+      .then((data) => {
+        const unreadNotifications = notificationData.filter(notification => !notification.isTenantread);
+        setNotificationData(unreadNotifications);
+        console.log("Notification",data.data)
+        
+        setNotificationCount(unreadNotifications.length)
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        // Handle the error, display a message to the user, or take other appropriate action.
+      });
+  
+};
 
-
+const unreadNotificationCount = notificationData.filter(notification => !notification.isTenantread).length;
 
 const navigateToDetails = (workorder_id) => {
   // Make a DELETE request to delete the notification
@@ -175,6 +181,7 @@ const navigateToDetails = (workorder_id) => {
           console.log("updatedNotificationData", updatedNotificationData)
           setNotificationCount(updatedNotificationData.length);
           console.log(`Notification with workorder_id ${workorder_id} marked as read.`);
+          fetchNotification();
         } else {
         console.error(`Failed to delete notification with workorder_id ${workorder_id}.`);
       }
@@ -205,16 +212,15 @@ const navigateToDetails = (workorder_id) => {
             {props.brandText}
           </Link>
           <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
-        <FormGroup className="mb-0" onClick={toggleSidebar} style={{ cursor: 'pointer', position: 'relative' }}>
-          <NotificationsIcon style={{ color: 'white', fontSize: '30px' }} />
-          {notificationCount > 0 && (
-            <div className="notification-circle" style={{ position: 'absolute', top: '-15px', right: '-20px', background: 'red', borderRadius: '50%', padding: '0.1px 8px' }}>
-              <span className="notification-count" style={{ color: 'white', fontSize: "13px" }}>{notificationCount}</span>
-
-            </div>
-          )}
-        </FormGroup>
-      </Form>
+            <FormGroup className="mb-0" onClick={toggleSidebar} style={{ cursor: 'pointer',position: 'relative' }}>
+              <NotificationsIcon style={{color:'white',fontSize:'30px'}}/>
+              {unreadNotificationCount > 0 && (
+              <div className="notification-circle" style={{position: 'absolute',top: '-15px',right: '-20px',background: 'red',borderRadius: '50%',padding: '0.1px 8px'}}>
+                <span className="notification-count" style={{color:'white',fontSize:"13px"}}>{unreadNotificationCount}</span>
+              </div>
+               )}
+            </FormGroup>
+            </Form>
           
           <Nav className="align-items-center d-none d-md-flex" navbar>
             
@@ -230,11 +236,15 @@ const navigateToDetails = (workorder_id) => {
                   </h2>
                   <Divider />
                   {notificationData.map((data) => {
-                    const notificationTitle =
+                    if(data.isTenantread){
+                      return null
+                    }
+                    else{   
+                      const notificationTitle =
                       data.notification_title || 'No Title Available';
-                    const notificationDetails =
+                      const notificationDetails =
                       data.notification_details || 'No Details Available';
-                    const notificationTime = new Date(data.notification_time).toLocaleString(); 
+                      const notificationTime = new Date(data.notification_time).toLocaleString(); 
 
                     return (
                       <div key={data._id}>
@@ -267,13 +277,14 @@ const navigateToDetails = (workorder_id) => {
                           secondary={notificationTime}
                         />
                         <ListItemText
-                          primary={notificationDetails}
-                          secondary="Notification Details"
-                        /> */}
+                        primary={notificationDetails}
+                        secondary="Notification Details"
+                      /> */}
                       </ListItem>
                       <Divider/>
                      </div> 
                     );
+                  }
                   })}
                   
                 </List>

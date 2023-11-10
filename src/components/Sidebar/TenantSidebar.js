@@ -210,6 +210,9 @@ const getRentalData = async (addresses) => {
     console.log(id);
   }, [id]);
 
+  const unreadNotificationCount = notificationData.filter(notification => !notification.isTenantread).length;
+
+
   const navigateToDetails = (workorder_id) => {
     // Make a DELETE request to delete the notification
     axios.get(`https://propertymanager.cloudpress.host/api/notification/notification/${workorder_id}?role=tenant`)
@@ -301,9 +304,9 @@ const getRentalData = async (addresses) => {
 
           <FormGroup className="mb-0" style={notificationIconStyle} onClick={toggleSidebar}>
              <NotificationsIcon style={{color:'black',fontSize:'30px'}}/>
-              {notificationCount > 0 && (
+             {unreadNotificationCount > 0 && (
               <div className="notification-circle" style={{position: 'absolute',top: '-15px',right: '-20px',background: 'red',borderRadius: '50%',padding: '0.1px 8px'}}>
-                <span className="notification-count" style={{color:'white',fontSize:"13px"}}>{notificationCount}</span>
+                <span className="notification-count" style={{color:'white',fontSize:"13px"}}>{unreadNotificationCount}</span>
               </div>
                )}
           </FormGroup>

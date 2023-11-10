@@ -88,6 +88,24 @@ const RentRoll = () => {
       console.error("Error fetching data:", error);
     }
   };
+
+  // const filterRentRollsBySearch = () => {
+  //   if (!searchQuery) {
+  //     return tenantsData;
+  //   }
+
+  //   return tenantsData.filter((tenant) => {
+  //     return (
+  //       `${tenant.tenant_firstName} ${tenant.tenant_lastName}`
+  //         .toLowerCase()
+  //         .includes(searchQuery.toLowerCase()) ||
+  //       tenant.property_type
+  //         .toLowerCase()
+  //         .includes(searchQuery.toLowerCase()) ||
+  //       tenant.lease_type.toLowerCase().includes(searchQuery.toLowerCase())
+  //     );
+  //   });
+  // };
   const filterRentRollsBySearch = () => {
     if (searchQuery === undefined) {
       return tenantsData;
@@ -102,8 +120,6 @@ const RentRoll = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
- 
 
   const deleteTenant = (tenantId, entryIndex) => {
     swal({
@@ -202,6 +218,7 @@ const RentRoll = () => {
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
                     <tr>
+                      <th scope="col">Tenant Name</th>
                       <th scope="col">Lease</th>
                       <th scope="col">Type</th>
                       <th scope="col">Start Date</th>
@@ -225,6 +242,7 @@ const RentRoll = () => {
                             }
                             style={{ cursor: "pointer" }}
                           >
+                            <td>{tenant.tenant_firstName} {tenant.tenant_lastName}</td>
                             <td>{entry.rental_adress}</td>
                             <td>{entry.lease_type}</td>
                             <td>{entry.start_date}</td>

@@ -63,6 +63,32 @@ const RentRollDetail = () => {
   const [value, setValue] = React.useState("Summary");
   const [rental, setRental] = useState("");
   const [rentaldata, setRentaldata] = useState([]);
+  const [paymentData, setPaymentData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint
+        const response = await fetch(
+          `https://propertymanager.cloudpress.host/api/payment/Payment_summary/tenant/${tenantId}/${entryIndex}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        if (data && data.data && data.data.length > 0) {
+          setPaymentData(data.data[0]);
+        } else {
+          throw new Error("Invalid data format");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+        // You can set an error state or display an error message to the user
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array means this effect will run once on component mount
 
   useEffect(() => {
     if (tenantId && entryIndex) {
@@ -271,14 +297,13 @@ const RentRollDetail = () => {
   const [loader, setLoader] = React.useState(true);
 
   const getGeneralLedgerData = async () => {
-
     const apiUrl = `https://propertymanager.cloudpress.host/api/payment/payment/${rental}`;
-                    
+
     try {
       const response = await axios.get(apiUrl);
       setLoader(false);
       setGeneralLedgerData(response.data.data);
-      console.log(response.data.data,'kkkkkk');
+      console.log(response.data.data, "kkkkkk");
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -808,173 +833,143 @@ const RentRollDetail = () => {
                           </Table>
                         </div>
                       </Col>
-                      <Col sm="3">
-                        <Card style={{ background: "#F4F6FF" }}>
-                          <CardContent>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Credit balance :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "40px",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                $400.00
-                              </Typography>
-                            </div>
-                            <hr
-                              style={{ marginTop: "2px", marginBottom: "6px" }}
-                            />
-
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Prepayments :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "60px",
-                                }}
-                              >
-                                $0.00
-                              </Typography>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Deposite held :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "55px",
-                                }}
-                              >
-                                $0.00
-                              </Typography>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Rent :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "115px",
-                                }}
-                              >
-                                $0.00
-                              </Typography>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Due date :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "60px",
-                                }}
-                              >
-                                10/12/2023
-                              </Typography>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Button
-                                color="success"
-                                onClick={() => {
-                                  handleClick();
-                                }}
+                      <Col xs="12" md="6" lg="4" xl="3">
+                        {paymentData && (
+                          <Card style={{ background: "#F4F6FF" }}>
+                            <CardContent>
+                              <div
                                 style={{
-                                  fontSize: "13px",
-                                  background: "white",
-                                  color: "green",
-                                  "&:hover": {
-                                    background: "green",
-                                    color: "white",
-                                  },
+                                  display: "flex",
+                                  flexDirection: "row",
                                 }}
                               >
-                                Payment
-                              </Button>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "10px",
-                                  paddingTop: "10px",
-                                  cursor: "pointer",
-                                  color: "blue",
+                                <Typography
+                                  sx={{ fontSize: 14, fontWeight: "bold" }}
+                                  color="text.secondary"
+                                  gutterBottom
+                                >
+                                  Credit balance:
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontSize: 14,
+                                    marginLeft: "10px",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  ${paymentData.amount}
+                                </Typography>
+                              </div>
+                              <hr
+                                style={{
+                                  marginTop: "2px",
+                                  marginBottom: "6px",
                                 }}
-                                onClick={() => handleChange("Financial")}
+                              />
+                              {/* Display entries data */}
+                              {paymentData.entries &&
+                                paymentData.entries.length > 0 && (
+                                  <>
+                                    <div>
+                                      {paymentData.entries.map(
+                                        (entry, index) => (
+                                          <div
+                                            key={index}
+                                            className="entry-container"
+                                          >
+                                            <div
+                                              style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                alignItems: "center",
+                                                marginBottom: "5px",
+                                              }}
+                                            >
+                                              <Typography
+                                                sx={{
+                                                  fontSize: 14,
+                                                  fontWeight: "bold",
+                                                  marginRight: "10px",
+                                                }}
+                                                color="text.secondary"
+                                                gutterBottom
+                                              >
+                                                {entry.account}:
+                                              </Typography>
+                                              <Typography sx={{ fontSize: 14 }}>
+                                                {entry.amount}
+                                              </Typography>
+                                            </div>
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        flexDirection: "row",
+                                        marginTop: "10px",
+                                      }}
+                                    >
+                                      <Typography
+                                        sx={{
+                                          fontSize: 14,
+                                          fontWeight: "bold",
+                                        }}
+                                        color="text.secondary"
+                                        gutterBottom
+                                      >
+                                        Due date :
+                                      </Typography>
+                                      <Typography
+                                        sx={{
+                                          fontSize: 14,
+                                          marginLeft: "10px",
+                                        }}
+                                      >
+                                        10/12/2023
+                                      </Typography>
+                                    </div>
+                                  </>
+                                )}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  marginTop: "10px",
+                                }}
                               >
-                                Lease Ledger
-                              </Typography>
-                            </div>
-                          </CardContent>
-                        </Card>
+                                <Button
+                                  color="success"
+                                  onClick={handleClick}
+                                  style={{
+                                    fontSize: "13px",
+                                    background: "white",
+                                    color: "green",
+                                    "&:hover": {
+                                      background: "green",
+                                      color: "white",
+                                    },
+                                  }}
+                                >
+                                  Payment
+                                </Button>
+                                <Typography
+                                  sx={{
+                                    fontSize: 14,
+                                    marginLeft: "10px",
+                                    paddingTop: "10px",
+                                    cursor: "pointer",
+                                    color: "blue",
+                                  }}
+                                  onClick={() => handleChange("Financial")}
+                                >
+                                  Lease Ledger
+                                </Typography>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
                       </Col>
                     </Row>
                   </TabPanel>
@@ -991,7 +986,11 @@ const RentRollDetail = () => {
                           <Button
                             color="primary"
                             href="#rms"
-                            onClick={() => navigate(`/admin/AddPayment/${tenantId}/${entryIndex}`)}
+                            onClick={() =>
+                              navigate(
+                                `/admin/AddPayment/${tenantId}/${entryIndex}`
+                              )
+                            }
                             size="sm"
                             style={{ background: "white", color: "blue" }}
                           >
@@ -1035,7 +1034,7 @@ const RentRollDetail = () => {
                                   {GeneralLedgerData?.map((generalledger) => (
                                     <>
                                       {generalledger.entries.map(
-                                        (entry, index) => (
+                                        (entry) => (
                                           <tr key={generalledger._id}>
                                             <td>
                                               {formatDateWithoutTime(
@@ -1203,173 +1202,143 @@ const RentRollDetail = () => {
                           <h3>No data available....</h3>
                         )}
                       </Col>
-                      <Col sm="3">
-                        <Card style={{ background: "#F4F6FF" }}>
-                          <CardContent>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Credit balance :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "40px",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                $400.00
-                              </Typography>
-                            </div>
-                            <hr
-                              style={{ marginTop: "2px", marginBottom: "6px" }}
-                            />
-
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Prepayments :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "60px",
-                                }}
-                              >
-                                $0.00
-                              </Typography>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Deposite held :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "55px",
-                                }}
-                              >
-                                $0.00
-                              </Typography>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Rent :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "115px",
-                                }}
-                              >
-                                $0.00
-                              </Typography>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Typography
-                                sx={{ fontSize: 14, fontWeight: "bold" }}
-                                color="text.secondary"
-                                gutterBottom
-                              >
-                                Due date :
-                              </Typography>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "60px",
-                                }}
-                              >
-                                10/12/2023
-                              </Typography>
-                            </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                marginTop: "10px",
-                              }}
-                            >
-                              <Button
-                                color="success"
-                                onClick={() => {
-                                  handleClick();
-                                }}
+                      <Col xs="12" md="6" lg="4" xl="3">
+                        {paymentData && (
+                          <Card style={{ background: "#F4F6FF" }}>
+                            <CardContent>
+                              <div
                                 style={{
-                                  fontSize: "13px",
-                                  background: "white",
-                                  color: "green",
-                                  "&:hover": {
-                                    background: "green",
-                                    color: "white",
-                                  },
+                                  display: "flex",
+                                  flexDirection: "row",
                                 }}
                               >
-                                Payment
-                              </Button>
-                              <Typography
-                                // variant="h5"
-                                sx={{
-                                  fontSize: 14,
-                                  marginLeft: "10px",
-                                  paddingTop: "10px",
-                                  cursor: "pointer",
-                                  color: "blue",
+                                <Typography
+                                  sx={{ fontSize: 14, fontWeight: "bold" }}
+                                  color="text.secondary"
+                                  gutterBottom
+                                >
+                                  Credit balance:
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontSize: 14,
+                                    marginLeft: "10px",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  ${paymentData.amount}
+                                </Typography>
+                              </div>
+                              <hr
+                                style={{
+                                  marginTop: "2px",
+                                  marginBottom: "6px",
                                 }}
-                                onClick={() => handleChange("Financial")}
+                              />
+                              {/* Display entries data */}
+                              {paymentData.entries &&
+                                paymentData.entries.length > 0 && (
+                                  <>
+                                    <div>
+                                      {paymentData.entries.map(
+                                        (entry, index) => (
+                                          <div
+                                            key={index}
+                                            className="entry-container"
+                                          >
+                                            <div
+                                              style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                alignItems: "center",
+                                                marginBottom: "5px",
+                                              }}
+                                            >
+                                              <Typography
+                                                sx={{
+                                                  fontSize: 14,
+                                                  fontWeight: "bold",
+                                                  marginRight: "10px",
+                                                }}
+                                                color="text.secondary"
+                                                gutterBottom
+                                              >
+                                                {entry.account}:
+                                              </Typography>
+                                              <Typography sx={{ fontSize: 14 }}>
+                                                {entry.amount}
+                                              </Typography>
+                                            </div>
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        flexDirection: "row",
+                                        marginTop: "10px",
+                                      }}
+                                    >
+                                      <Typography
+                                        sx={{
+                                          fontSize: 14,
+                                          fontWeight: "bold",
+                                        }}
+                                        color="text.secondary"
+                                        gutterBottom
+                                      >
+                                        Due date :
+                                      </Typography>
+                                      <Typography
+                                        sx={{
+                                          fontSize: 14,
+                                          marginLeft: "10px",
+                                        }}
+                                      >
+                                        10/12/2023
+                                      </Typography>
+                                    </div>
+                                  </>
+                                )}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  marginTop: "10px",
+                                }}
                               >
-                                Lease Ledger
-                              </Typography>
-                            </div>
-                          </CardContent>
-                        </Card>
+                                <Button
+                                  color="success"
+                                  onClick={handleClick}
+                                  style={{
+                                    fontSize: "13px",
+                                    background: "white",
+                                    color: "green",
+                                    "&:hover": {
+                                      background: "green",
+                                      color: "white",
+                                    },
+                                  }}
+                                >
+                                  Payment
+                                </Button>
+                                <Typography
+                                  sx={{
+                                    fontSize: 14,
+                                    marginLeft: "10px",
+                                    paddingTop: "10px",
+                                    cursor: "pointer",
+                                    color: "blue",
+                                  }}
+                                  onClick={() => handleChange("Financial")}
+                                >
+                                  Lease Ledger
+                                </Typography>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
                       </Col>
                     </Row>
                   </TabPanel>

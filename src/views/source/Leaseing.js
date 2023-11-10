@@ -521,13 +521,11 @@ const Leaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("https://propertymanager.cloudpress.host/api/rentals/allproperty")
+    fetch("https://propertymanager.cloudpress.host/api/rentals/property")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
-          console.log(data.data, "data.data");
           setPropertyData(data.data);
-
           console.log(data.data, "gdasga");
         } else {
           // Handle error
@@ -694,7 +692,7 @@ const Leaseing = () => {
         // Handle network error
         console.error("Network error:", error);
       });
-  }, []);
+  },[]);
 
   let cookies = new Cookies();
   // Check Authe(token)
@@ -1374,12 +1372,12 @@ const Leaseing = () => {
                             >
                               {propertyData.map((property) => (
                                 <DropdownItem
-                                  key={property._id}
+                                  key={property}
                                   onClick={() =>
                                     handlePropertyTypeSelect(property)
                                   }
                                 >
-                                  {property.rental_adress}
+                                  {property}
                                 </DropdownItem>
                               ))}
                             </DropdownMenu>

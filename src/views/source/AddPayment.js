@@ -37,21 +37,18 @@ import { values } from "pdf-lib";
 import Img from "assets/img/theme/team-4-800x800.jpg";
 import "jspdf-autotable";
 
-const AddPayment = ({ tenantDetails }) => {
-  // const location = useLocation();
-  // const rentalAddress = location.state && location.state.rentalAddress;
-  // console.log(rentalAddress,"rental_address")
-  
+const AddPayment = () => {
   const { tenantId, entryIndex } = useParams();
-  // const {  } = useParams();
   const [file, setFile] = useState([]);
   const [accountData, setAccountData] = useState([]);
   const [propertyData, setPropertyData] = useState([]);
   const [checkedCheckbox, setCheckedCheckbox] = useState();
   const [prodropdownOpen, setproDropdownOpen] = useState(false);
   const [recdropdownOpen, setrecDropdownOpen] = useState(false);
-const [rentAddress, setRentAddress] = useState([]);
-
+  const [rentAddress, setRentAddress] = useState([]);
+  const [tenantid, setTenantid] = useState(""); // Add this line
+  const [tenantentryIndex, setTenantentryindex] = useState(""); // Add this line
+  const [printReceipt, setPrintReceipt] = useState(false);
 
   const toggle1 = () => setproDropdownOpen((prevState) => !prevState);
   const toggle2 = () => setrecDropdownOpen((prevState) => !prevState);
@@ -62,76 +59,21 @@ const [rentAddress, setRentAddress] = useState([]);
   };
 
   const [selectedRec, setSelectedRec] = useState("Select Resident");
-  const handleRecieverSelection = (propertyType) => {
-    setSelectedRec(propertyType);
+  const handleRecieverSelection = (property) => {
+    setSelectedRec(`${property.tenant_firstName} ${property.tenant_lastName}`);
+    setTenantid(property._id); // Set the selected tenant's ID
+    setTenantentryindex(property.entryIndex); // Set the selected tenant's entry index
   };
-
-  // function formatDateWithoutTime(dateString) {
-  //   if (!dateString) return "";
-  //   const date = new Date(dateString);
-  //   const year = date.getFullYear();
-  //   const month = String(date.getMonth() + 1).padStart(2, "0");
-  //   const day = String(date.getDate()).padStart(2, "0");
-  //   return `${month}-${day}-${year}`;
-  // }
-
-  // const generatePDF = async (tenantId, tenantDetails) => {
-  //   try {
-  //     let tenantData = tenantDetails;
-  //     if (!tenantData || !tenantData._id) {
-  //       const response = await axios.get(
-  //         `https://propertymanager.cloudpress.host/api/Payment/Payment_summary/${tenantId}`
-  //       );
-  //       tenantData = response.data.data;
-  //       console.log(tenantData, "tenantData");
-  //     }
-
-  //     const doc = new jsPDF();
-  //     doc.text(`Lease Details`, 10, 10);
-
-  //     const headers = ["Title", "Value"];
-  //     const data = [
-  //       ["Name",tenantData.tenant_firstName],
-  //       ["Date",  formatDateWithoutTime(tenantData.date)],
-  //       ["Amount", tenantData.amount],
-  //       ["Payment Method", tenantData.payment_method],
-  //       ["Memo", tenantData.memo],
-  //       ["Account", tenantData.account],
-  //       ["Balance", tenantData.balance],
-  //       ["Amount", tenantData.amount],
-  //       ["Total Amount", tenantData.total_amount],
-  //     ];
-
-  //     tenantData.upload_file.forEach((item, index) => {
-  //       data.push([`Uploaded File ${index + 1}`, item]);
-  //     });
-
-  //     const filteredData = data.filter(
-  //       (row) => row[1] !== undefined && row[1] !== null && row[1] !== ""
-  //     );
-
-  //     if (filteredData.length > 0) {
-  //       doc.autoTable({
-  //         head: [headers],
-  //         body: filteredData,
-  //         startY: 20,
-  //       });
-
-  //       doc.save(`${tenantId}.pdf`);
-  //     } else {
-  //       console.error("No valid data to generate PDF.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error generating PDF:", error);
-  //   }
-  // };
 
   const generalledgerFormik = useFormik({
     initialValues: {
       date: "",
-      rental_adress: "", 
+      rental_adress: "",
+      tenant_id: "",
+      entryIndex: "",
       amount: "",
       payment_method: "",
+      debitcard_number: "",
       tenant_firstName: "",
       memo: "",
       entries: [
@@ -168,23 +110,22 @@ const [rentAddress, setRentAddress] = useState([]);
 
   useEffect(() => {
     fetchTenantData();
-      // Make an HTTP GET request to your Express API endpoint
-      fetch(`https://propertymanager.cloudpress.host/api/tenant/tenant-name/tenant/${rentAddress}`)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.statusCode === 200) {
-            setPropertyData(data.data);
-            console.log(data, "gdasga");
-          } else {
-            // Handle error
-            console.error("Error:", data.message);
-          }
-        })
-        .catch((error) => {
-          // Handle network error
-          console.error("Network error:", error);
-        });
-    }, [rentAddress]);
+    // Make an HTTP GET request to your Express API endpoint
+    fetch(`https://propertymanager.cloudpress.host/api/tenant/tenant-name/tenant/${rentAddress}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.statusCode === 200) {
+          setPropertyData(data.data);
+        } else {
+          // Handle error
+          console.error("Error:", data.message);
+        }
+      })
+      .catch((error) => {
+        // Handle network error
+        console.error("Network error:", error);
+      });
+  }, [rentAddress]);
 
   const handleAccountSelection = (value, index) => {
     console.log("Selected index:", index);
@@ -234,26 +175,24 @@ const [rentAddress, setRentAddress] = useState([]);
       entries: updatedEntries,
     });
   };
+
   const fetchTenantData = async () => {
-    fetch(`https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${tenantId}/entry/${entryIndex}`).then((response) => response.json())
-    .then((data) => {
-      if (data.statusCode === 200) {
-        // setTenantData(data.data);
-        console.log(data.data, "gdasgaaaaaaaaaaa");
-
-        const tenantData = data.data;
-
-        const rentalAddress = tenantData.entries.rental_adress;
-        setRentAddress(rentalAddress);
-        generalledgerFormik.setValues({
-          ...generalledgerFormik.values,
-          rental_adress: rentalAddress
-        })
-      }
-    })
-  }
-
-  console.log("generalledgerFormik.values", generalledgerFormik.values)
+    fetch(
+      `https://propertymanager.cloudpress.host/api/tenant/tenant_summary/${tenantId}/entry/${entryIndex}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.statusCode === 200) {
+          const tenantData = data.data;
+          const rentalAddress = tenantData.entries.rental_adress;
+          setRentAddress(rentalAddress);
+          generalledgerFormik.setValues({
+            ...generalledgerFormik.values,
+            rental_adress: rentalAddress,
+          });
+        }
+      });
+  };
 
   useEffect(() => {
     fetch("https://propertymanager.cloudpress.host/api/addaccount/find_accountname")
@@ -285,14 +224,18 @@ const [rentAddress, setRentAddress] = useState([]);
   const handleSubmit = async (values) => {
     const arrayOfNames = file.map((item) => item.name);
     const rentalAddress = generalledgerFormik.values.rental_adress;
+
     try {
       const updatedValues = {
         date: values.date,
         amount: values.amount,
         payment_method: selectedProp,
+        debitcard_number: values.debitcard_number,
         tenant_firstName: selectedRec,
         attachment: arrayOfNames,
         rental_adress: rentalAddress,
+        tenant_id: tenantid,
+        entryIndex: tenantentryIndex,
         entries: generalledgerFormik.values.entries.map((entry) => ({
           account: entry.account,
           balance: parseFloat(entry.balance),
@@ -313,7 +256,7 @@ const [rentAddress, setRentAddress] = useState([]);
             `https://propertymanager.cloudpress.host/api/Payment/Payment_summary/${id}`,
             { responseType: "blob" }
           );
-          if (pdfResponse.status === 200) {
+          if (pdfResponse.status === 200 && printReceipt) {
             const pdfBlob = pdfResponse.data;
             const pdfData = URL.createObjectURL(pdfBlob);
             const doc = new jsPDF();
@@ -374,8 +317,13 @@ const [rentAddress, setRentAddress] = useState([]);
             ]);
 
             // Add a separate row for "Total Amount"
-            const totalAmount = parseFloat(updatedValues.entries[0].total_amount);
-            data.push([{ content: 'Total Amount', styles: { fontStyle: 'bold' } }, { content: totalAmount, styles: { fontStyle: 'bold' } }]);
+            const totalAmount = parseFloat(
+              updatedValues.entries[0].total_amount
+            );
+            data.push([
+              { content: "Total Amount", styles: { fontStyle: "bold" } },
+              { content: totalAmount, styles: { fontStyle: "bold" } },
+            ]);
 
             const headStyles = {
               lineWidth: 0.01,
@@ -403,7 +351,13 @@ const [rentAddress, setRentAddress] = useState([]);
             // Save the PDF with a custom filename
             doc.save(`PaymentReceipt_${id}.pdf`);
           } else {
-            swal("Error", "Failed to retrieve PDF summary", "error");
+            if(!printReceipt){
+              swal("Success!", "Payment added successfully", "success");
+            }
+            else{
+              swal("Error", "Failed to retrieve PDF summary", "error");
+
+            }
           }
         } else {
           swal("Error", "Failed to get 'id' from the response", "error");
@@ -423,8 +377,6 @@ const [rentAddress, setRentAddress] = useState([]);
   };
 
   const fileData = (files) => {
-    //setImgLoader(true);
-    // console.log(files, "file");
     const filesArray = [...files];
 
     if (filesArray.length <= 10 && file.length === 0) {
@@ -438,8 +390,6 @@ const [rentAddress, setRentAddress] = useState([]);
     } else {
       setFile([...file, ...filesArray]);
     }
-
-    // console.log(file, "fileanaadsaa");
 
     const dataArray = new FormData();
     dataArray.append("b_video", files);
@@ -601,6 +551,34 @@ const [rentAddress, setRentAddress] = useState([]);
                         </Dropdown>
                       </FormGroup>
                     </Col>
+                    <Col sm="4">
+                      {selectedProp === "Debit Card" && (
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-property"
+                          >
+                            Debit Card Number
+                          </label>
+                          <Input
+                            className="form-control-alternative"
+                            id="input-unitadd"
+                            placeholder="Enter Number"
+                            type="text"
+                            name="debitcard_number"
+                            onBlur={generalledgerFormik.handleBlur}
+                            onChange={generalledgerFormik.handleChange}
+                            value={generalledgerFormik.values.debitcard_number}
+                          />
+                          {generalledgerFormik.touched.debitcard_number &&
+                          generalledgerFormik.errors.debitcard_number ? (
+                            <div style={{ color: "red" }}>
+                              {generalledgerFormik.errors.debitcard_number}
+                            </div>
+                          ) : null}
+                        </FormGroup>
+                      )}
+                    </Col>
                   </Row>
                   <Row>
                     <Col lg="2">
@@ -624,16 +602,16 @@ const [rentAddress, setRentAddress] = useState([]);
                               overflowX: "hidden",
                             }}
                           >
-                            <DropdownItem
-                              onClick={() => handleRecieverSelection("Avi")}
-                            >
-                              Avi
-                            </DropdownItem>
-                            <DropdownItem
-                              onClick={() => handleRecieverSelection("Mansi")}
-                            >
-                              Mansi
-                            </DropdownItem>
+                            {propertyData.map((property, index) => (
+                              <DropdownItem
+                                key={index}
+                                onClick={() =>
+                                  handleRecieverSelection(property)
+                                }
+                              >
+                                {`${property.tenant_firstName} ${property.tenant_lastName}`}
+                              </DropdownItem>
+                            ))}
                           </DropdownMenu>
                         </Dropdown>
                       </FormGroup>
@@ -950,15 +928,18 @@ const [rentAddress, setRentAddress] = useState([]);
                   </Row>
                   <Row>
                     <Col lg="3">
-                      {/* <FormGroup>
-                        <Checkbox />
+                      <FormGroup>
+                        <Checkbox
+                          name="print_receipt"
+                          onChange={(e) => setPrintReceipt(e.target.checked)}
+                        />
                         <label
                           className="form-control-label"
                           htmlFor="input-address"
                         >
                           Print Receipt
                         </label>
-                      </FormGroup> */}
+                      </FormGroup>
                     </Col>
                   </Row>
                   <Row>
