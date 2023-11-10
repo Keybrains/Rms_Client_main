@@ -521,7 +521,7 @@ const Leaseing = () => {
 
   useEffect(() => {
     // Make an HTTP GET request to your Express API endpoint
-    fetch("https://propertymanager.cloudpress.host/api/rentals/property")
+    fetch("https://propertymanager.cloudpress.host/api/rentals/allproperty")
       .then((response) => response.json())
       .then((data) => {
         if (data.statusCode === 200) {
@@ -1370,16 +1370,14 @@ const Leaseing = () => {
                                 overflowY: "auto",
                               }}
                             >
-                              {propertyData.map((property) => (
-                                <DropdownItem
-                                  key={property}
-                                  onClick={() =>
-                                    handlePropertyTypeSelect(property)
-                                  }
-                                >
-                                  {property}
-                                </DropdownItem>
-                              ))}
+                                    {propertyData.map((property) => (
+                          <DropdownItem
+                            key={property._id}
+                            onClick={() => handlePropertyTypeSelect(property.rental_adress)}
+                          >
+                            {property.rental_adress}
+                          </DropdownItem>
+                        ))}
                             </DropdownMenu>
                           </Dropdown>
                         </FormGroup>
