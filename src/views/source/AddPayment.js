@@ -210,20 +210,26 @@ const AddPayment = () => {
   }, []);
 
   // Calculate the total debit and credit
-  let totalDebit = 0;
-  let totalCredit = 0;
+  // let totalDebit = 0;
+  // let totalCredit = 0;
+  // generalledgerFormik.values.entries.forEach((entries) => {
+  //   if (entries.balance) {
+  //     totalDebit += parseFloat(entries.balance);
+  //   }
+  //   if (entries.amount) {
+  //     totalCredit += parseFloat(entries.amount);
+  //   }
+  // });
+  let total_amount = 0;
   generalledgerFormik.values.entries.forEach((entries) => {
-    if (entries.balance) {
-      totalDebit += parseFloat(entries.balance);
-    }
     if (entries.amount) {
-      totalCredit += parseFloat(entries.amount);
+      total_amount += parseFloat(entries.amount);
     }
   });
-
   const handleSubmit = async (values) => {
     const arrayOfNames = file.map((item) => item.name);
     const rentalAddress = generalledgerFormik.values.rental_adress;
+    values["total_amount"] = total_amount;
 
     try {
       const updatedValues = {
@@ -236,11 +242,12 @@ const AddPayment = () => {
         rental_adress: rentalAddress,
         tenant_id: tenantid,
         entryIndex: tenantentryIndex,
+
         entries: generalledgerFormik.values.entries.map((entry) => ({
           account: entry.account,
           balance: parseFloat(entry.balance),
           amount: parseFloat(entry.amount),
-          total_amount: (totalDebit + totalCredit).toFixed(2),
+          total_amount: total_amount,
         })),
       };
       console.log(updatedValues, "updatedValues");
@@ -351,12 +358,10 @@ const AddPayment = () => {
             // Save the PDF with a custom filename
             doc.save(`PaymentReceipt_${id}.pdf`);
           } else {
-            if(!printReceipt){
+            if (!printReceipt) {
               swal("Success!", "Payment added successfully", "success");
-            }
-            else{
+            } else {
               swal("Error", "Failed to retrieve PDF summary", "error");
-
             }
           }
         } else {
@@ -837,8 +842,9 @@ const AddPayment = () => {
                                 )}
                                 <tr>
                                   <th>Total</th>
-                                  <th>{totalDebit.toFixed(2)}</th>
-                                  <th>{totalCredit.toFixed(2)}</th>
+                                  {/* <th>{totalDebit.toFixed(2)}</th> */}
+                                  <th></th>
+                                  <th>{total_amount.toFixed(2)}</th>
                                 </tr>
                               </>
                             </tbody>
